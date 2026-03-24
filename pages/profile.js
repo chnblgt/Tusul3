@@ -4,7 +4,7 @@ const MOCK_USER = {
   name: "Bat-Erdene Gantulga",
   username: "baterdenee",
   avatar: null,
-  bio: "Cotton picker.",
+  bio: "Bio example",
   location: "Ulaanbaatar, Mongolia",
   email: "Bold12IZQ@gmail.com",
   phone: "+976 911",
@@ -333,8 +333,6 @@ export default function ProfilePage({ user = MOCK_USER }) {
       `}</style>
 
       <div className="pp-root">
-        {/* Top accent */}
-        <div style={{ height: "2px", background: "linear-gradient(90deg, #4c1d95, #7c3aed, #c4b5fd, #7c3aed, #4c1d95)" }} />
 
         {/* Banner */}
         <div className="pp-banner">

@@ -88,7 +88,7 @@ export default function Header({ user = null }) {
               style={{ borderRadius: "7px", objectFit: "cover", display: "block" }} />
             <span style={{
               fontFamily: "'Fraunces', serif",
-              fontSize: "17px", fontWeight: 800,
+              fontSize: "20px", fontWeight: 800,
               color: "#1a0533", letterSpacing: "-0.03em",
             }}>
               Duguilan.mn
@@ -100,7 +100,7 @@ export default function Header({ user = null }) {
               <a key={label} href={href} className="hdr-nav-link"
                 onMouseEnter={() => setHoveredLink(label)}
                 onMouseLeave={() => setHoveredLink(null)}
-                style={{ color: hoveredLink === label ? "#7c3aed" : "#555" }}
+                style={{ color: hoveredLink === label ? "#7c3aed" : "#555", fontSize: "16px" }}
               >
                 {label}
               </a>
@@ -115,7 +115,7 @@ export default function Header({ user = null }) {
                   onMouseLeave={() => setSigninHover(false)}
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "13.5px", fontWeight: 500,
+                    fontSize: "16px", fontWeight: 500,
                     color: signinHover ? "#7c3aed" : "#555",
                     textDecoration: "none", transition: "color 0.2s",
                   }}
@@ -127,7 +127,7 @@ export default function Header({ user = null }) {
                   onMouseLeave={() => setSignupHover(false)}
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "13px", fontWeight: 600,
+                    fontSize: "16px", fontWeight: 600,
                     background: signupHover ? "#6d28d9" : "#1a0533",
                     color: "#fff",
                     padding: "8px 18px", borderRadius: "6px",

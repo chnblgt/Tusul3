@@ -36,11 +36,10 @@ export default function Footer() {
       `}</style>
 
       <footer>
-        <div style={{
-          height: "100px",
-          background: "linear-gradient(to bottom, #ffffff, #0d0118)",
-        }} />
-
+       <div style={{
+  height: "120px",
+  background: "linear-gradient(to bottom, #ffffff 0%, #f8f5ff 20%, #ede6ff 38%, #d4c8f0 52%, #9b88c8 68%, #43385d 85%, #0d0118 100%)",
+}} />
         <div style={{ background: "#0d0118" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "52px 36px 44px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "56px", marginBottom: "52px" }}>
@@ -48,7 +47,7 @@ export default function Footer() {
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "18px" }}>
                   <img src="/assets/logo_white.png" alt="Logo" width={30} height={30} style={{ borderRadius: "7px" }} />
                   <span className="ft-logo" style={{ fontSize: "17px", fontWeight: 800, letterSpacing: "-0.03em" }}>
-                    <span style={{ color: "#fff" }}>Duguilan</span><span style={{ color: "#white" }}>.mn</span>
+                    <span style={{ color: "#fff" }}>Duguilan</span><span style={{ color: "#fff" }}>.mn</span>
                   </span>
                 </div>
                 <p style={{ color: "#7a6090", fontSize: "13px", lineHeight: 1.75, maxWidth: "220px", fontFamily: "'DM Sans', sans-serif", margin: "0 0 22px" }}>
