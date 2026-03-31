@@ -28,7 +28,7 @@ export default function Header({ user = null }) {
   const navLinks = [
     { label: "Categories", href: "/page1" },
     { label: "Events", href: "#" },
-    { label: "About", href: "#" },
+    { label: "About", href: "/about" },
   ];
 
   return (

@@ -68,8 +68,14 @@ export default function Footer() {
                   Navigate
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                  {["Home", "Categories", "Events", "About Us"].map(l => (
-                    <a key={l} href="#" className="ft-link">{l}</a>
+                  {[
+                    { label: "Home", href: "/page" },
+                    { label: "Categories", href: "/page1" },
+                    { label: "Events", href: "#" },
+                    { label: "About Us", href: "#" },
+                    { label: "Register Club", href: "/club-register" },
+                  ].map(({ label, href }) => (
+                    <a key={label} href={href} className="ft-link">{label}</a>
                   ))}
                 </div>
               </div>
@@ -98,11 +104,11 @@ export default function Footer() {
               paddingTop: "28px",
               display: "flex", justifyContent: "space-between", alignItems: "center",
             }}>
-              <p style={{ color: "#5b3d8a", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}>
+              <p style={{ color: "#ffffff", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}>
                 © 2026 Duguilan.mn — School Project
               </p>
               <span style={{
-                fontSize: "10.5px", color: "#5b3d8a",
+                fontSize: "10.5px", color: "#ffffff",
                 fontWeight: 700, letterSpacing: "0.1em",
                 textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif",
               }}>
