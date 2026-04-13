@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const fonts = `
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800;1,9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap');
@@ -44,6 +45,11 @@ const fonts = `
     transform: translateY(-1px);
     box-shadow: 0 6px 24px rgba(124,58,237,0.4);
   }
+  .si-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
 
   .si-social-btn {
     width: 100%;
@@ -60,12 +66,60 @@ const fonts = `
     transition: background 0.2s, transform 0.15s;
   }
   .si-social-btn:hover { transform: translateY(-1px); }
+
+  .si-error {
+    background: #fef2f2;
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #dc2626;
+    font-family: 'DM Sans', sans-serif;
+  }
 `;
 
 export default function SignInPage() {
-  const [username, setUsername] = useState("");
+  const router = useRouter();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSignIn() {
+    setError("");
+
+    if (!email || !password) {
+      setError("Имэйл болон нууц үгээ оруулна уу");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:8000/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.message || "Нэвтрэхэд алдаа гарлаа");
+        return;
+      }
+
+      localStorage.setItem("user", JSON.stringify(result.user));
+
+      router.push("/page");
+
+    } catch (err) {
+      setError("Сервертэй холбогдож чадсангүй. Дахин оролдоно уу.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div style={{
@@ -76,10 +130,8 @@ export default function SignInPage() {
     }}>
       <style>{fonts}</style>
 
-      {/* Top gradient bar */}
       <div style={{ height: "3px", background: "linear-gradient(90deg, #4c1d95, #7c3aed, #c4b5fd, #7c3aed, #4c1d95)" }} />
 
-      {/* Mini header */}
       <div style={{ padding: "20px 36px" }}>
         <a href="/page" style={{ display: "inline-flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
           <img src="/assets/logo1.png" alt="Logo" width={28} height={28} style={{ borderRadius: "7px" }} />
@@ -89,11 +141,8 @@ export default function SignInPage() {
         </a>
       </div>
 
-      {/* Main content */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px 64px" }}>
         <div style={{ width: "100%", maxWidth: "420px" }}>
-
-          {/* Card */}
           <div style={{
             background: "#fff",
             border: "1.5px solid rgba(124,58,237,0.15)",
@@ -102,7 +151,6 @@ export default function SignInPage() {
             boxShadow: "0 12px 48px rgba(124,58,237,0.1), 0 2px 8px rgba(26,5,51,0.06)",
           }}>
 
-            {/* Logo */}
             <div style={{ display: "flex", justifyContent: "center", marginBottom: "28px" }}>
               <div style={{
                 width: "64px", height: "64px", borderRadius: "16px",
@@ -125,17 +173,23 @@ export default function SignInPage() {
               Sign in to Duguilan.mn
             </p>
 
+            {error && (
+              <div className="si-error" style={{ marginBottom: "20px" }}>
+                {error}
+              </div>
+            )}
+
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               <div>
                 <label className="si-sans" style={{ fontSize: "11px", fontWeight: 700, color: "#9879d4", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: "7px" }}>
-                  Username
+                  Email
                 </label>
                 <input
                   className="si-input"
-                  type="text"
-                  placeholder="your_username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -150,6 +204,7 @@ export default function SignInPage() {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSignIn()}
                     style={{ paddingRight: "44px" }}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} style={{
@@ -162,37 +217,31 @@ export default function SignInPage() {
                     }
                   </button>
                 </div>
-                <div style={{ textAlign: "right", marginTop: "6px" }}>
-                  <a href="#" className="si-sans" style={{ fontSize: "12px", color: "#9879d4", fontWeight: 600, textDecoration: "none" }}
-                    onMouseEnter={e => e.target.style.color = "#7c3aed"}
-                    onMouseLeave={e => e.target.style.color = "#9879d4"}>
-                    Forgot password?
-                  </a>
-                </div>
               </div>
 
-              <button className="si-btn-primary" style={{ marginTop: "4px" }} onClick={e => e.preventDefault()}>
-                Sign in →
+              <button
+                className="si-btn-primary"
+                style={{ marginTop: "4px" }}
+                onClick={handleSignIn}
+                disabled={loading}
+              >
+                {loading ? "Нэвтэрч байна..." : "Sign in →"}
               </button>
 
               <p className="si-sans" style={{ textAlign: "center", fontSize: "13px", color: "#9ca3af", margin: "4px 0 0" }}>
                 Don't have an account?{" "}
-                <a href="/signup" style={{ color: "#7c3aed", fontWeight: 700, textDecoration: "none" }}
-                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                  onMouseLeave={e => e.target.style.textDecoration = "none"}>
+                <a href="/signup" style={{ color: "#7c3aed", fontWeight: 700, textDecoration: "none" }}>
                   Sign up
                 </a>
               </p>
             </div>
 
-            {/* Divider */}
             <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "24px 0" }}>
               <div style={{ flex: 1, height: "1px", background: "rgba(124,58,237,0.1)" }} />
               <span className="si-sans" style={{ fontSize: "12px", color: "#c4b5fd", fontWeight: 500 }}>or continue with</span>
               <div style={{ flex: 1, height: "1px", background: "rgba(124,58,237,0.1)" }} />
             </div>
 
-            {/* Social buttons */}
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <button className="si-social-btn" style={{ background: "#1877F2", color: "#fff", border: "none" }}
                 onMouseEnter={e => e.currentTarget.style.background = "#166fe5"}

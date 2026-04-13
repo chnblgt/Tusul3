@@ -170,9 +170,9 @@ export default function Body() {
                 padding: "5px 12px", borderRadius: "20px", marginBottom: "28px",
                 boxShadow: "0 2px 12px rgba(124,58,237,0.1)",
               }}>
-                <div style={{ width: "7px", height: "7px", background: "#22c55e", borderRadius: "50%", boxShadow: "0 0 0 3px rgba(34,197,94,0.2)" }} />
+                <div style={{ width: "7px", height: "7px", background: "#9400D3", borderRadius: "50%", boxShadow: "0 0 0 3px rgba(65, 15, 96, 0.2)" }} />
                 <span className="hb-sans" style={{ fontSize: "11px", fontWeight: 700, color: "#7c3aed", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                  Now live in Ulaanbaatar
+                  Prepared by Nest team
                 </span>
               </div>
 
