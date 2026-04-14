@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 const MapComponent = dynamic(() => import("./Mapcomponent"), { ssr: false });
 
@@ -146,6 +147,13 @@ const HOW_STEPS = [
 ];
 
 export default function Body() {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    setLoggedIn(!!user);
+  }, []);
+
   return (
     <main style={{ flex: 1, background: "#fff" }}>
       <style>{fonts}</style>
@@ -197,7 +205,7 @@ export default function Body() {
 
               <div className="hb-a4" style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "36px" }}>
                 <a href="/page1" className="hb-cta-primary">Browse Clubs →</a>
-                <a href="/signup" className="hb-cta-secondary">Create Account</a>
+                {!loggedIn && <a href="/signup" className="hb-cta-secondary">Create Account</a>}
               </div>
 
               <div className="hb-a5" style={{
@@ -252,7 +260,7 @@ export default function Body() {
             <p className="hb-sans" style={{ fontSize: "14px", color: "#888", lineHeight: 1.7, maxWidth: "400px", margin: "0 auto" }}>Getting started takes less than a minute.</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-            {HOW_STEPS.map((step, i) => (
+            {HOW_STEPS.filter((step, i) => !(loggedIn && i === 0)).map((step, i) => (
               <div key={i} className="hb-how-card">
                 <div style={{ width: "46px", height: "46px", borderRadius: "12px", background: `${step.accent}14`, border: `1.5px solid ${step.accent}28`, display: "flex", alignItems: "center", justifyContent: "center", color: step.accent, marginBottom: "20px" }}>{step.icon}</div>
                 <div className="hb-sans" style={{ fontSize: "10px", fontWeight: 700, color: "#c4b5fd", letterSpacing: "0.12em", marginBottom: "8px" }}>{step.num}</div>

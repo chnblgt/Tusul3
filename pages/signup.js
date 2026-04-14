@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 const fonts = `
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800;1,9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap');
@@ -243,7 +243,7 @@ export default function SignUpPage() {
     }
   }
 
-  const inp = { className: "su-input" };
+  const inp = { className: "su-input", autoComplete: "new-password" };
   const selectStyle = {
     width: "100%", padding: "13px 16px",
     border: "1.5px solid rgba(124,58,237,0.2)", borderRadius: "10px",

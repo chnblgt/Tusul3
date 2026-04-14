@@ -1,39 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
 
-const categories = [
-  { name: "Football",    icon: "football",   accent: "#22c55e",  bg: "#f0fdf4",  desc: "Leagues, training & 5-a-side",   count: "8 clubs" },
-  { name: "Basketball",  icon: "basketball", accent: "#f97316",  bg: "#fff7ed",  desc: "Teams for all skill levels",      count: "5 clubs" },
-  { name: "Volleyball",  icon: "volleyball", accent: "#eab308",  bg: "#fefce8",  desc: "Indoor & beach volleyball",       count: "4 clubs" },
-  { name: "Tennis",      icon: "tennis",     accent: "#84cc16",  bg: "#f7fee7",  desc: "Singles, doubles & coaching",     count: "3 clubs" },
-  { name: "Swimming",    icon: "swimming",   accent: "#3b82f6",  bg: "#eff6ff",  desc: "Pool sessions & competitions",    count: "3 clubs" },
-  { name: "Chess",       icon: "chess",      accent: "#64748b",  bg: "#f8fafc",  desc: "Casual play to tournaments",      count: "2 clubs" },
-  { name: "Music",       icon: "music",      accent: "#ec4899",  bg: "#fdf2f8",  desc: "Bands, choirs & jam sessions",    count: "6 clubs" },
-  { name: "Art",         icon: "art",        accent: "#a855f7",  bg: "#faf5ff",  desc: "Painting, drawing & galleries",   count: "4 clubs" },
-  { name: "Dance",       icon: "dance",      accent: "#ef4444",  bg: "#fef2f2",  desc: "Contemporary, hip-hop & more",    count: "5 clubs" },
-  { name: "Drama",       icon: "drama",      accent: "#6366f1",  bg: "#eef2ff",  desc: "Theatre, improv & performance",   count: "3 clubs" },
-  { name: "Coding",      icon: "coding",     accent: "#06b6d4",  bg: "#ecfeff",  desc: "Projects, hackathons & learning", count: "4 clubs" },
-  { name: "Science",     icon: "science",    accent: "#14b8a6",  bg: "#f0fdfa",  desc: "Experiments & science fairs",     count: "2 clubs" },
-];
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-function CategoryIcon({ type, size = 22 }) {
-  const s = { width: `${size}px`, height: `${size}px` };
-  switch (type) {
-    case "football":   return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20M2 12h20"/></svg>;
-    case "basketball": return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2v20M4.5 4.5c4 3 11 3 15 0M4.5 19.5c4-3 11-3 15 0"/></svg>;
-    case "volleyball": return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="10"/><path d="M12 2c3 4 3 12 0 20M2 12c4-3 12-3 20 0M4 6c5 5 12 6 16 2"/></svg>;
-    case "tennis":     return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="10"/><path d="M5 3c4 4 4 14 0 18M19 3c-4 4-4 14 0 18"/></svg>;
-    case "swimming":   return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M2 16c1-1 2.5-1 4 0s2.5 1 4 0 2.5-1 4 0 2.5 1 4 0 2.5-1 4 0"/><path d="M2 20c1-1 2.5-1 4 0s2.5 1 4 0 2.5-1 4 0 2.5 1 4 0 2.5-1 4 0"/><circle cx="10" cy="6" r="2"/><path d="M12 6l3 4-4 2"/></svg>;
-    case "chess":      return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M8 21h8M10 21V11M14 21V11M6 11h12l-2-4h-8l-2 4z"/><path d="M10 7V3h4v4M9 3h6"/></svg>;
-    case "music":      return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
-    case "art":        return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="13.5" cy="6.5" r="2"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10c0 2-1 3-3 3h-2c-1 0-2 1-2 2 0 .5.2 1 .5 1.3.3.3.5.7.5 1.2 0 1.5-1 2.5-4 2.5z"/></svg>;
-    case "dance":      return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="4" r="2"/><path d="M12 6v6M8 22l2-6 2 1 2-1 2 6M7 12l5 2 5-2"/></svg>;
-    case "drama":      return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M2 4c0 0 4-2 9 0M15 7c0 0 4 0 7-3M2 4c0 7 4 12 9 14M22 4c0 7-4 12-9 14"/><circle cx="7" cy="9" r="1" fill="currentColor"/><circle cx="17" cy="9" r="1" fill="currentColor"/><path d="M6 13c1.5 1 3 1.5 5 1M18 13c-1.5 1-3 1.5-5 1"/></svg>;
-    case "coding":     return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>;
-    case "science":    return <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M9 3h6M10 3v7l-5 8c-1 1.5 0 3 2 3h10c2 0 3-1.5 2-3l-5-8V3"/><circle cx="12" cy="16" r="1" fill="currentColor"/><circle cx="10" cy="14" r="0.5" fill="currentColor"/><circle cx="14" cy="15" r="0.5" fill="currentColor"/></svg>;
-    default: return null;
-  }
+const CATEGORY_STYLES = {
+  football:   { accent: "#22c55e", bg: "#f0fdf4" },
+  basketball: { accent: "#f97316", bg: "#fff7ed" },
+  volleyball: { accent: "#eab308", bg: "#fefce8" },
+  tennis:     { accent: "#84cc16", bg: "#f7fee7" },
+  swimming:   { accent: "#3b82f6", bg: "#eff6ff" },
+  chess:      { accent: "#64748b", bg: "#f8fafc" },
+  music:      { accent: "#ec4899", bg: "#fdf2f8" },
+  art:        { accent: "#a855f7", bg: "#faf5ff" },
+  dance:      { accent: "#ef4444", bg: "#fef2f2" },
+  drama:      { accent: "#6366f1", bg: "#eef2ff" },
+  coding:     { accent: "#06b6d4", bg: "#ecfeff" },
+  science:    { accent: "#14b8a6", bg: "#f0fdfa" },
+  wrestling:  { accent: "#dc2626", bg: "#fef2f2" },
+  boxing:     { accent: "#b45309", bg: "#fffbeb" },
+  judo:       { accent: "#7c3aed", bg: "#f5f0ff" },
+  athletics:  { accent: "#16a34a", bg: "#f0fdf4" },
+  other:      { accent: "#6b7280", bg: "#f9fafb" },
+};
+
+function getStyle(category) {
+  const key = (category || "").toLowerCase();
+  return CATEGORY_STYLES[key] || { accent: "#7c3aed", bg: "#f5f0ff" };
 }
 
 const fonts = `
@@ -101,7 +95,7 @@ const fonts = `
     border: 1px solid rgba(26,5,51,0.1); border-radius: 7px;
     padding: 7px 14px; cursor: pointer; text-decoration: none;
     transition: background 0.2s, color 0.2s; line-height: 1;
-    margin-bottom: 40px; display: inline-flex;
+    margin-bottom: 40px;
   }
   .p1-back:hover { background: rgba(124,58,237,0.06); color: #7c3aed; border-color: rgba(124,58,237,0.2); }
 `;
@@ -109,18 +103,34 @@ const fonts = `
 const FILTERS = ["All", "Sports", "Arts & Culture", "Tech & Science"];
 
 const FILTER_MAP = {
-  "Sports": ["Football", "Basketball", "Volleyball", "Tennis", "Swimming", "Dance"],
+  "Sports": ["Football", "Basketball", "Volleyball", "Tennis", "Swimming", "Dance", "Wrestling", "Boxing", "Judo", "Athletics"],
   "Arts & Culture": ["Music", "Art", "Drama"],
   "Tech & Science": ["Coding", "Science", "Chess"],
 };
 
 export default function CategoriesPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
+  const [clubs, setClubs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const filtered = categories.filter(c => {
-    const matchSearch = c.name.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = activeFilter === "All" || (FILTER_MAP[activeFilter] || []).includes(c.name);
+  useEffect(() => {
+    fetch(`${API}/clubs`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) setClubs(data.clubs);
+        else setError("Клубуудыг ачаалахад алдаа гарлаа");
+      })
+      .catch(() => setError("Сервертэй холбогдож чадсангүй"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = clubs.filter(c => {
+    const matchSearch = c.name.toLowerCase().includes(search.toLowerCase()) ||
+                        c.category.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = activeFilter === "All" || (FILTER_MAP[activeFilter] || []).map(f => f.toLowerCase()).includes(c.category.toLowerCase());
     return matchSearch && matchFilter;
   });
 
@@ -130,7 +140,6 @@ export default function CategoriesPage() {
       <Header />
       <div style={{ height: "2px", background: "linear-gradient(90deg, #4c1d95, #7c3aed, #c4b5fd, #7c3aed, #4c1d95)" }} />
 
-      {/* ── Page hero ── */}
       <div style={{
         background: "radial-gradient(ellipse at 60% 0%, #ede9fe 0%, #f5f0ff 35%, #fdfcff 65%, #fff 100%)",
         borderBottom: "1px solid rgba(124,58,237,0.08)",
@@ -153,7 +162,7 @@ export default function CategoriesPage() {
                   padding: "4px 12px", borderRadius: "20px",
                   fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase",
                 }}>
-                  {categories.length} Categories
+                  {loading ? "..." : `${clubs.length} Clubs`}
                 </span>
               </div>
               <h1 className="p1-display" style={{
@@ -164,11 +173,10 @@ export default function CategoriesPage() {
                 <span style={{ color: "#7c3aed", fontStyle: "italic" }}>Perfect Club</span>
               </h1>
               <p className="p1-sans" style={{ fontSize: "15px", color: "#888", lineHeight: 1.7, margin: 0, maxWidth: "380px" }}>
-                Explore every club and activity on offer across Ulaanbaatar. Pick one, or pick a few.
+                Explore every club across Ulaanbaatar. Pick one, or pick a few.
               </p>
             </div>
 
-            {/* Search box */}
             <div style={{ width: "100%", maxWidth: "380px" }}>
               <div style={{ position: "relative", marginBottom: "12px" }}>
                 <svg style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
@@ -206,7 +214,6 @@ export default function CategoriesPage() {
       <main style={{ flex: 1 }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "48px 48px 96px" }}>
 
-          {/* Filter tabs */}
           <div style={{ display: "flex", gap: "8px", marginBottom: "40px", flexWrap: "wrap" }}>
             {FILTERS.map(f => (
               <button key={f} className="p1-filter-btn" onClick={() => setActiveFilter(f)} style={{
@@ -220,74 +227,98 @@ export default function CategoriesPage() {
             ))}
           </div>
 
-          {/* Grid */}
-          {filtered.length > 0 ? (
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "100px 0" }}>
+              <p className="p1-sans" style={{ color: "#9879d4", fontSize: "15px" }}>Клубуудыг ачааллаж байна...</p>
+            </div>
+          ) : error ? (
+            <div style={{ textAlign: "center", padding: "100px 0" }}>
+              <div style={{ width: "72px", height: "72px", borderRadius: "20px", background: "#fef2f2", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: "32px" }}>⚠️</div>
+              <h3 className="p1-display" style={{ fontSize: "24px", color: "#1a0533", marginBottom: "10px", fontWeight: 800 }}>Холбогдож чадсангүй</h3>
+              <p className="p1-sans" style={{ color: "#888", fontSize: "14px", marginBottom: "28px" }}>{error}</p>
+              <button onClick={() => window.location.reload()} className="p1-sans" style={{
+                background: "linear-gradient(135deg, #7c3aed, #4c1d95)", color: "#fff",
+                border: "none", padding: "12px 28px", borderRadius: "9px",
+                fontSize: "14px", fontWeight: 600, cursor: "pointer",
+              }}>
+                Дахин оролдох
+              </button>
+            </div>
+          ) : filtered.length > 0 ? (
             <div style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
               gap: "16px",
             }}>
-              {filtered.map((cat, i) => (
-                <a
-                  key={cat.name}
-                  href={`/club-detail?category=${encodeURIComponent(cat.name.toLowerCase())}`}
-                  className="p1-card p1-card-in"
-                  style={{ animationDelay: `${i * 40}ms` }}
-                >
-                  {/* Top accent line */}
-                  <div style={{
-                    position: "absolute", top: 0, left: "24px", right: "24px",
-                    height: "2px", background: cat.accent,
-                    borderRadius: "0 0 2px 2px", opacity: 0.6,
-                  }} />
+              {filtered.map((club, i) => {
+                const { accent, bg } = getStyle(club.category);
+                return (
+                  <a
+                    key={club.id}
+                    href={`/club-detail?id=${club.id}`}
+                    className="p1-card p1-card-in"
+                    style={{ animationDelay: `${i * 40}ms` }}
+                  >
+                    <div style={{
+                      position: "absolute", top: 0, left: "24px", right: "24px",
+                      height: "2px", background: accent,
+                      borderRadius: "0 0 2px 2px", opacity: 0.6,
+                    }} />
 
-                  {/* Icon */}
-                  <div style={{
-                    width: "52px", height: "52px",
-                    background: cat.bg,
-                    border: `1.5px solid ${cat.accent}28`,
-                    borderRadius: "14px",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: cat.accent, marginBottom: "20px",
-                    boxShadow: `0 4px 12px ${cat.accent}18`,
-                  }}>
-                    <CategoryIcon type={cat.icon} size={22} />
-                  </div>
-
-                  {/* Name */}
-                  <div className="p1-display" style={{
-                    fontSize: "18px", fontWeight: 800,
-                    color: "#1a0533", letterSpacing: "-0.02em", lineHeight: 1.2,
-                    marginBottom: "6px",
-                  }}>
-                    {cat.name}
-                  </div>
-
-                  {/* Desc */}
-                  <p className="p1-sans" style={{
-                    fontSize: "12.5px", color: "#888", lineHeight: 1.6,
-                    margin: "0 0 auto", flexGrow: 1, paddingBottom: "18px",
-                  }}>
-                    {cat.desc}
-                  </p>
-
-                  {/* Footer */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "16px", borderTop: `1px solid ${cat.accent}18` }}>
-                    <span className="p1-sans" style={{
-                      fontSize: "11px", fontWeight: 700,
-                      color: cat.accent,
-                      background: cat.bg,
-                      padding: "3px 9px", borderRadius: "5px",
-                      letterSpacing: "0.06em",
+                    <div style={{
+                      width: "52px", height: "52px",
+                      background: bg,
+                      border: `1.5px solid ${accent}28`,
+                      borderRadius: "14px",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: accent, marginBottom: "20px",
+                      boxShadow: `0 4px 12px ${accent}18`,
+                      overflow: "hidden",
                     }}>
-                      {cat.count}
-                    </span>
-                    <svg width="14" height="14" fill="none" stroke={cat.accent} strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                  </div>
-                </a>
-              ))}
+                      {club.logo
+                        ? <img src={club.logo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <span style={{ fontFamily: "'Fraunces', serif", fontSize: "22px", fontWeight: 800, color: accent }}>
+                            {club.name[0]}
+                          </span>
+                      }
+                    </div>
+
+                    <div className="p1-display" style={{
+                      fontSize: "18px", fontWeight: 800,
+                      color: "#1a0533", letterSpacing: "-0.02em", lineHeight: 1.2,
+                      marginBottom: "6px",
+                    }}>
+                      {club.name}
+                    </div>
+
+                    <p className="p1-sans" style={{
+                      fontSize: "12.5px", color: "#888", lineHeight: 1.6,
+                      margin: "0 0 auto", flexGrow: 1, paddingBottom: "18px",
+                    }}>
+                      {club.description?.slice(0, 80)}{club.description?.length > 80 ? "..." : ""}
+                    </p>
+
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "16px", borderTop: `1px solid ${accent}18` }}>
+                      <span className="p1-sans" style={{
+                        fontSize: "11px", fontWeight: 700,
+                        color: accent, background: bg,
+                        padding: "3px 9px", borderRadius: "5px",
+                        letterSpacing: "0.06em",
+                      }}>
+                        {club.category}
+                      </span>
+                      <span className="p1-sans" style={{
+                        fontSize: "11px", fontWeight: 600,
+                        color: club.pricing_type === "free" ? "#22c55e" : "#7c3aed",
+                        background: club.pricing_type === "free" ? "#f0fdf4" : "#f5f0ff",
+                        padding: "3px 9px", borderRadius: "5px",
+                      }}>
+                        {club.pricing_type === "free" ? "Free" : "Paid"}
+                      </span>
+                    </div>
+                  </a>
+                );
+              })}
             </div>
           ) : (
             <div style={{ textAlign: "center", padding: "100px 0" }}>
@@ -297,24 +328,33 @@ export default function CategoriesPage() {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 margin: "0 auto 24px", fontSize: "32px",
               }}>🔍</div>
-              <h3 className="p1-display" style={{ fontSize: "24px", color: "#1a0533", marginBottom: "10px", fontWeight: 800, letterSpacing: "-0.02em" }}>
-                Nothing found
+              <h3 className="p1-display" style={{ fontSize: "24px", color: "#1a0533", marginBottom: "10px", fontWeight: 800 }}>
+                {clubs.length === 0 ? "Клуб байхгүй байна" : "Олдсонгүй"}
               </h3>
               <p className="p1-sans" style={{ color: "#888", fontSize: "14px", marginBottom: "28px" }}>
-                Try a different search or filter
+                {clubs.length === 0 ? "Эхний клубыг бүртгүүлээрэй!" : "Өөр хайлт туршина уу"}
               </p>
-              <button onClick={() => { setSearch(""); setActiveFilter("All"); }} className="p1-sans" style={{
-                background: "linear-gradient(135deg, #7c3aed, #4c1d95)", color: "#fff",
-                border: "none", padding: "12px 28px", borderRadius: "9px",
-                fontSize: "14px", fontWeight: 600, cursor: "pointer",
-                boxShadow: "0 4px 16px rgba(124,58,237,0.3)",
-              }}>
-                Clear filters
-              </button>
+              {clubs.length === 0 ? (
+                <a href="/club-register" className="p1-sans" style={{
+                  background: "linear-gradient(135deg, #7c3aed, #4c1d95)", color: "#fff",
+                  border: "none", padding: "12px 28px", borderRadius: "9px",
+                  fontSize: "14px", fontWeight: 600, textDecoration: "none",
+                  display: "inline-block",
+                }}>
+                  Register a club →
+                </a>
+              ) : (
+                <button onClick={() => { setSearch(""); setActiveFilter("All"); }} className="p1-sans" style={{
+                  background: "linear-gradient(135deg, #7c3aed, #4c1d95)", color: "#fff",
+                  border: "none", padding: "12px 28px", borderRadius: "9px",
+                  fontSize: "14px", fontWeight: 600, cursor: "pointer",
+                }}>
+                  Clear filters
+                </button>
+              )}
             </div>
           )}
 
-          {/* Register CTA */}
           <div style={{
             marginTop: "72px",
             background: "linear-gradient(135deg, #1a0533 0%, #2d0a57 50%, #3b0764 100%)",
@@ -340,9 +380,8 @@ export default function CategoriesPage() {
               background: "#fff", color: "#1a0533",
               padding: "14px 32px", borderRadius: "10px",
               fontWeight: 700, fontSize: "14px", textDecoration: "none",
-              whiteSpace: "nowrap", flexShrink: 0, display: "inline-block",
+              whiteSpace: "nowrap", flexShrink: 0,
               position: "relative", zIndex: 1,
-              transition: "background 0.2s, color 0.2s",
             }}
               onMouseEnter={e => { e.currentTarget.style.background = "#f5f0ff"; e.currentTarget.style.color = "#7c3aed"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#1a0533"; }}

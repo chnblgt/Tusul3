@@ -1,12 +1,30 @@
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function Header({ user = null }) {
+  const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
   const [signinHover, setSigninHover] = useState(false);
   const [signupHover, setSignupHover] = useState(false);
   const [pfpHover, setPfpHover] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+      return;
+    }
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      try {
+        setCurrentUser(JSON.parse(stored));
+      } catch (e) {
+        setCurrentUser(null);
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     function handleClick(e) {
@@ -18,12 +36,20 @@ export default function Header({ user = null }) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const loggedIn = user !== null;
-  const displayUser = user || { name: "Bat-Erdene", username: "baterdenee", avatar: null };
-
   function getInitials(name) {
+    if (!name) return "?";
     return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
   }
+
+  function handleSignOut() {
+    localStorage.removeItem("user");
+    setCurrentUser(null);
+    setDropdownOpen(false);
+    router.push("/page");
+  }
+
+  const loggedIn = currentUser !== null;
+  const displayName = currentUser?.name || currentUser?.username || "User";
 
   const navLinks = [
     { label: "Categories", href: "/page1" },
@@ -147,7 +173,13 @@ export default function Header({ user = null }) {
               <button
                 onMouseEnter={() => setPfpHover(true)}
                 onMouseLeave={() => setPfpHover(false)}
-                onClick={() => loggedIn ? setDropdownOpen((v) => !v) : window.location.href = "/profile"}
+                onClick={() => {
+                  if (loggedIn) {
+                    setDropdownOpen(v => !v);
+                  } else {
+                    router.push("/signin");
+                  }
+                }}
                 style={{
                   width: "34px", height: "34px", minWidth: "34px",
                   borderRadius: "50%",
@@ -163,10 +195,10 @@ export default function Header({ user = null }) {
                   padding: 0, outline: "none", flexShrink: 0,
                 }}
               >
-                {loggedIn && displayUser.avatar
-                  ? <img src={displayUser.avatar} alt={displayUser.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                {loggedIn && currentUser?.avatar
+                  ? <img src={currentUser.avatar} alt={displayName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   : loggedIn
-                    ? getInitials(displayUser.name)
+                    ? getInitials(displayName)
                     : <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
                       </svg>
@@ -185,10 +217,10 @@ export default function Header({ user = null }) {
                 }}>
                   <div style={{ padding: "16px 18px 12px", borderBottom: "1px solid #f5f0ff" }}>
                     <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "15px", color: "#1a0533", margin: "0 0 2px", letterSpacing: "-0.02em" }}>
-                      {displayUser.name}
+                      {displayName}
                     </p>
                     <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#9879d4", margin: 0, fontWeight: 500 }}>
-                      @{displayUser.username}
+                      @{currentUser?.username || ""}
                     </p>
                   </div>
 
@@ -213,7 +245,8 @@ export default function Header({ user = null }) {
 
                   <div style={{ height: "1px", background: "#f5f0ff", margin: "2px 0" }} />
 
-                  <button onClick={() => {}}
+                  <button
+                    onClick={handleSignOut}
                     onMouseEnter={e => e.currentTarget.style.background = "#fff5f5"}
                     onMouseLeave={e => e.currentTarget.style.background = "none"}
                     style={{
