@@ -55,22 +55,6 @@ const fonts = `
   .su-btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
   .su-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-  .su-social-btn {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 13.5px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-family: 'DM Sans', sans-serif;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .su-social-btn:hover { transform: translateY(-1px); }
-
   .su-mode-toggle {
     display: flex;
     background: #f5f0ff;
@@ -111,9 +95,10 @@ const CATEGORIES = [
 
 function PasswordStrength({ password }) {
   if (!password) return null;
-  const strength = password.length < 6
+  // FIX: strength thresholds now match the 8-char minimum
+  const strength = password.length < 8
     ? { label: "Weak", color: "#ef4444", width: "33%" }
-    : password.length < 10
+    : password.length < 12
       ? { label: "Fair", color: "#f59e0b", width: "66%" }
       : { label: "Strong", color: "#22c55e", width: "100%" };
   return (
@@ -141,6 +126,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // User fields
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -148,21 +134,18 @@ export default function SignUpPage() {
   const [showPw, setShowPw] = useState(false);
   const [showCf, setShowCf] = useState(false);
 
+  // Club fields
   const [clubName, setClubName] = useState("");
   const [clubCategory, setClubCategory] = useState("");
   const [clubEmail, setClubEmail] = useState("");
   const [clubPhone, setClubPhone] = useState("");
   const [clubWebsite, setClubWebsite] = useState("");
   const [clubDesc, setClubDesc] = useState("");
-  const [clubPw, setClubPw] = useState("");
-  const [clubCf, setClubCf] = useState("");
-  const [showCPw, setShowCPw] = useState(false);
-  const [showCCf, setShowCCf] = useState(false);
 
   const match = confirm && password === confirm;
   const mismatch = confirm && password !== confirm;
-  const clubMatch = clubCf && clubPw === clubCf;
-  const clubMismatch = clubCf && clubPw !== clubCf;
+
+  const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   async function handleUserSignUp() {
     setError("");
@@ -171,30 +154,29 @@ export default function SignUpPage() {
       setError("Бүх талбарыг бөглөнө үү");
       return;
     }
+    if (password.length < 8) {
+      setError("Нууц үг хамгийн багадаа 8 тэмдэгт байх ёстой");
+      return;
+    }
     if (password !== confirm) {
       setError("Нууц үг таарахгүй байна");
       return;
     }
 
     setLoading(true);
-
     try {
-      const response = await fetch("http://localhost:8000/createUser", {
+      const response = await fetch(`${API}/createUser`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, passwordMatch: confirm })
+        body: JSON.stringify({ username, email, password, passwordMatch: confirm }),
       });
-
       const result = await response.json();
-
       if (!response.ok) {
         setError(result.message || "Бүртгэлд алдаа гарлаа");
         return;
       }
-
       router.push("/signin");
-
-    } catch (err) {
+    } catch {
       setError("Сервертэй холбогдож чадсангүй. Дахин оролдоно уу.");
     } finally {
       setLoading(false);
@@ -204,39 +186,33 @@ export default function SignUpPage() {
   async function handleClubSignUp() {
     setError("");
 
-    if (!clubName || !clubCategory || !clubEmail || !clubPw || !clubCf) {
+    if (!clubName || !clubCategory || !clubEmail || !clubDesc) {
       setError("Бүх талбарыг бөглөнө үү");
-      return;
-    }
-    if (clubPw !== clubCf) {
-      setError("Нууц үг таарахгүй байна");
       return;
     }
 
     setLoading(true);
-
     try {
-      const response = await fetch("http://localhost:8000/createUser", {
+      const fd = new FormData();
+      fd.append("name",        clubName);
+      fd.append("category",    clubCategory);
+      fd.append("email",       clubEmail);
+      fd.append("description", clubDesc);
+      fd.append("pricingType", "free");
+      if (clubPhone)   fd.append("phone",   clubPhone);
+      if (clubWebsite) fd.append("website", clubWebsite);
+
+      const response = await fetch(`${API}/registerClub`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: clubName,
-          email: clubEmail,
-          password: clubPw,
-          passwordMatch: clubCf
-        })
+        body: fd,
       });
-
       const result = await response.json();
-
       if (!response.ok) {
         setError(result.message || "Бүртгэлд алдаа гарлаа");
         return;
       }
-
-      router.push("/signin");
-
-    } catch (err) {
+      router.push("/signup-success");
+    } catch {
       setError("Сервертэй холбогдож чадсангүй. Дахин оролдоно уу.");
     } finally {
       setLoading(false);
@@ -357,7 +333,7 @@ export default function SignUpPage() {
                       {showCf ? eyeClosed : eyeOpen}
                     </button>
                   </div>
-                  {mismatch && <span className="su-sans" style={{ fontSize: "11px", color: "#ef4444", fontWeight: 600, marginTop: "4px", display: "block" }}>Passwords don't match</span>}
+                  {mismatch && <span className="su-sans" style={{ fontSize: "11px", color: "#ef4444", fontWeight: 600, marginTop: "4px", display: "block" }}>Passwords don&apos;t match</span>}
                   {match && <span className="su-sans" style={{ fontSize: "11px", color: "#22c55e", fontWeight: 600, marginTop: "4px", display: "block" }}>Passwords match ✓</span>}
                 </InputField>
 
@@ -397,31 +373,12 @@ export default function SignUpPage() {
                   <textarea className="su-input" placeholder="Brief description…" value={clubDesc} onChange={e => setClubDesc(e.target.value)} rows={3} style={{ resize: "vertical", lineHeight: 1.6 }} />
                 </InputField>
 
-                <InputField label="Password">
-                  <div style={{ position: "relative" }}>
-                    <input {...inp} type={showCPw ? "text" : "password"} placeholder="Min. 8 characters" value={clubPw} onChange={e => setClubPw(e.target.value)} style={{ paddingRight: "44px" }} />
-                    <button type="button" onClick={() => setShowCPw(!showCPw)} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#c4b5fd" }}>
-                      {showCPw ? eyeClosed : eyeOpen}
-                    </button>
-                  </div>
-                  <PasswordStrength password={clubPw} />
-                </InputField>
-
-                <InputField label="Confirm Password">
-                  <div style={{ position: "relative" }}>
-                    <input {...inp} type={showCCf ? "text" : "password"} placeholder="Re-enter password" value={clubCf} onChange={e => setClubCf(e.target.value)}
-                      style={{ paddingRight: "44px", borderColor: clubMismatch ? "#ef4444" : clubMatch ? "#22c55e" : "rgba(124,58,237,0.2)" }} />
-                    <button type="button" onClick={() => setShowCCf(!showCCf)} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#c4b5fd" }}>
-                      {showCCf ? eyeClosed : eyeOpen}
-                    </button>
-                  </div>
-                  {clubMismatch && <span className="su-sans" style={{ fontSize: "11px", color: "#ef4444", fontWeight: 600, marginTop: "4px", display: "block" }}>Passwords don't match</span>}
-                  {clubMatch && <span className="su-sans" style={{ fontSize: "11px", color: "#22c55e", fontWeight: 600, marginTop: "4px", display: "block" }}>Passwords match ✓</span>}
-                </InputField>
-
                 <button className="su-btn-primary" onClick={handleClubSignUp} disabled={loading}>
                   {loading ? "Үүсгэж байна..." : "Register Club →"}
                 </button>
+                <p className="su-sans" style={{ fontSize: "12px", color: "#9879d4", textAlign: "center", margin: "4px 0 0", lineHeight: 1.5 }}>
+                  Your club will be reviewed and approved by an admin before going live.
+                </p>
               </div>
             )}
 

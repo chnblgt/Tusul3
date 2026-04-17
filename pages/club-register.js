@@ -27,7 +27,6 @@ const extraStyles = `
     border: 1px solid rgba(26,5,51,0.1); border-radius: 7px;
     padding: 7px 14px; cursor: pointer; text-decoration: none;
     transition: background 0.2s, color 0.2s; line-height: 1; margin-bottom: 32px;
-    display: inline-flex;
   }
   .reg-back:hover { background: rgba(124,58,237,0.06); color: #7c3aed; border-color: rgba(124,58,237,0.2); }
   .reg-upload-btn {
@@ -41,20 +40,20 @@ const extraStyles = `
 
 export default function ClubRegisterPage() {
   const router = useRouter();
-  const [step, setStep] = useState(0);
+  const [step, setStep]           = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState("");
 
   const [form, setForm] = useState({
     clubName: "",
     category: "",
     description: "",
     foundedYear: "",
-    logo: null,           // File object
-    logoPreview: null,    // Object URL for preview
-    bannerPhotos: [],     // Array of File objects
-    bannerPreviews: [],   // Array of Object URLs
+    logo: null,
+    logoPreview: null,
+    bannerPhotos: [],
+    bannerPreviews: [],
     pricingType: "free",
     tiers: [{ name: "Basic", price: "", period: "monthly", description: "", features: "" }],
     address: "",
@@ -64,7 +63,7 @@ export default function ClubRegisterPage() {
     website: "",
   });
 
-  const logoRef = useRef();
+  const logoRef   = useRef();
   const bannerRef = useRef();
 
   function setField(key, value) {
@@ -82,7 +81,7 @@ export default function ClubRegisterPage() {
     const newPreviews = files.map(f => URL.createObjectURL(f));
     setForm(f => ({
       ...f,
-      bannerPhotos: [...f.bannerPhotos, ...files].slice(0, 5),
+      bannerPhotos:   [...f.bannerPhotos, ...files].slice(0, 5),
       bannerPreviews: [...f.bannerPreviews, ...newPreviews].slice(0, 5),
     }));
   }
@@ -90,7 +89,7 @@ export default function ClubRegisterPage() {
   function removeBanner(i) {
     setForm(f => ({
       ...f,
-      bannerPhotos: f.bannerPhotos.filter((_, idx) => idx !== i),
+      bannerPhotos:   f.bannerPhotos.filter((_, idx) => idx !== i),
       bannerPreviews: f.bannerPreviews.filter((_, idx) => idx !== i),
     }));
   }
@@ -118,45 +117,32 @@ export default function ClubRegisterPage() {
   async function handleSubmit() {
     setError("");
     setLoading(true);
-
     try {
-      // ── Use FormData so image files are included in the request ──────────
       const fd = new FormData();
-      fd.append("name",         form.clubName);
-      fd.append("category",     form.category);
-      fd.append("description",  form.description);
-      fd.append("email",        form.email);
-      fd.append("address",      form.address);
-      fd.append("district",     form.district);
-      fd.append("pricingType",  form.pricingType);
+      fd.append("name",        form.clubName);
+      fd.append("category",    form.category);
+      fd.append("description", form.description);
+      fd.append("email",       form.email);
+      fd.append("address",     form.address);
+      fd.append("district",    form.district);
+      fd.append("pricingType", form.pricingType);
       if (form.foundedYear) fd.append("foundedYear", form.foundedYear);
       if (form.phone)       fd.append("phone",       form.phone);
       if (form.website)     fd.append("website",     form.website);
+      if (form.logo)        fd.append("logo",        form.logo);
+      form.bannerPhotos.forEach(file => fd.append("bannerPhotos", file));
 
-      // Attach image files if the user uploaded them
-      if (form.logo) {
-        fd.append("logo", form.logo);
-      }
-      form.bannerPhotos.forEach(file => {
-        fd.append("bannerPhotos", file);
-      });
-
-      // Do NOT set Content-Type header — browser sets it automatically with
-      // the correct multipart boundary when using FormData.
       const response = await fetch(`${API}/registerClub`, {
         method: "POST",
         body: fd,
       });
-
       const result = await response.json();
-
       if (!response.ok) {
         setError(result.message || "Клуб бүртгэхэд алдаа гарлаа");
         return;
       }
-
       setSubmitted(true);
-    } catch (err) {
+    } catch {
       setError("Сервертэй холбогдож чадсангүй. Backend ажиллаж байгаа эсэхийг шалгана уу.");
     } finally {
       setLoading(false);
@@ -176,7 +162,6 @@ export default function ClubRegisterPage() {
     letterSpacing: "0.1em", textTransform: "uppercase",
     display: "block", marginBottom: "7px", fontFamily: "'DM Sans', sans-serif",
   };
-
   if (submitted) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#fff" }}>
@@ -196,10 +181,13 @@ export default function ClubRegisterPage() {
               </svg>
             </div>
             <h1 className="reg-display" style={{ fontSize: "2.4rem", fontWeight: 800, color: "#1a0533", letterSpacing: "-0.04em", margin: "0 0 16px" }}>
-              Club registered!
+              Club submitted!
             </h1>
-            <p className="reg-sans" style={{ fontSize: "15px", color: "#888", lineHeight: 1.7, marginBottom: "36px" }}>
-              <strong style={{ color: "#1a0533" }}>{form.clubName}</strong> амжилттай бүртгэгдлээ. Одоо browse хуудсанд харагдаж байна!
+            <p className="reg-sans" style={{ fontSize: "15px", color: "#888", lineHeight: 1.7, marginBottom: "12px" }}>
+              <strong style={{ color: "#1a0533" }}>{form.clubName}</strong> амжилттай бүртгэгдлээ.
+            </p>
+            <p className="reg-sans" style={{ fontSize: "14px", color: "#9879d4", lineHeight: 1.7, marginBottom: "36px" }}>
+              Таны клубийг админ баталгаажуулсны дараа browse хуудсанд харагдана. Энэ ажиллагаа ихэвчлэн 24 цагийн дотор хийгддэг.
             </p>
             <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
               <a href="/page1" className="reg-sans" style={{
@@ -245,11 +233,9 @@ export default function ClubRegisterPage() {
               Register your <span style={{ color: "#7c3aed", fontStyle: "italic" }}>club</span>
             </h1>
             <p className="reg-sans" style={{ color: "#888", fontSize: "15px", lineHeight: 1.7 }}>
-              Fill in the details below and your club will appear on the browse page immediately.
+              Fill in the details below. Your club will appear on the browse page after admin approval.
             </p>
           </div>
-
-          {/* Step indicator */}
           <div style={{ display: "flex", marginBottom: "48px" }}>
             {STEPS.map((s, i) => (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
@@ -271,8 +257,6 @@ export default function ClubRegisterPage() {
           )}
 
           <div style={{ background: "#fff", border: "1.5px solid rgba(124,58,237,0.12)", borderRadius: "20px", padding: "48px", boxShadow: "0 4px 32px rgba(124,58,237,0.06)" }}>
-
-            {/* ── Step 0: Basic Info ── */}
             {step === 0 && (
               <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
                 <div>
@@ -311,10 +295,9 @@ export default function ClubRegisterPage() {
               </div>
             )}
 
-            {/* ── Step 1: Media ── */}
+            {/* Step 1: Media */}
             {step === 1 && (
               <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-                {/* Logo */}
                 <div>
                   <label style={labelStyle}>Club Logo</label>
                   <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
@@ -329,13 +312,10 @@ export default function ClubRegisterPage() {
                         {form.logoPreview ? "Change logo" : "Upload logo"}
                       </button>
                       <p className="reg-sans" style={{ fontSize: "12px", color: "#bbb", marginTop: "6px" }}>PNG or JPG, recommended 400×400px</p>
-                      {/* Hidden file input — logo */}
                       <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleLogoUpload} />
                     </div>
                   </div>
                 </div>
-
-                {/* Banner photos */}
                 <div>
                   <label style={labelStyle}>Banner Photos <span style={{ color: "#bbb", fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(up to 5)</span></label>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "12px" }}>
@@ -357,13 +337,12 @@ export default function ClubRegisterPage() {
                       </div>
                     )}
                   </div>
-                  {/* Hidden file input — banners (multiple) */}
                   <input ref={bannerRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleBannerUpload} />
                 </div>
               </div>
             )}
 
-            {/* ── Step 2: Pricing ── */}
+            {/* Step 2: Pricing */}
             {step === 2 && (
               <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                 <div>
@@ -385,7 +364,7 @@ export default function ClubRegisterPage() {
                           <span className="reg-sans" style={{ fontSize: "12px", fontWeight: 700, color: "#9879d4", letterSpacing: "0.08em", textTransform: "uppercase" }}>Tier {i + 1}</span>
                           {form.tiers.length > 1 && <button onClick={() => removeTier(i)} className="reg-sans" style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: "12px", fontWeight: 600 }}>Remove</button>}
                         </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px" }}>
                           <div><label style={labelStyle}>Tier Name *</label><input style={inp} placeholder="e.g. Basic" value={tier.name} onChange={e => setTierField(i, "name", e.target.value)} /></div>
                           <div><label style={labelStyle}>Price (₮) *</label><input style={inp} placeholder="e.g. 15000" type="number" value={tier.price} onChange={e => setTierField(i, "price", e.target.value)} /></div>
                           <div>
@@ -422,7 +401,7 @@ export default function ClubRegisterPage() {
               </div>
             )}
 
-            {/* ── Step 3: Location & Contact ── */}
+            {/* Step 3: Location & Contact */}
             {step === 3 && (
               <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
                 <div>
@@ -460,7 +439,6 @@ export default function ClubRegisterPage() {
                     <input style={inp} type="url" placeholder="https://…" value={form.website} onChange={e => setField("website", e.target.value)} />
                   </div>
                 </div>
-
                 {/* Summary */}
                 <div style={{ background: "#f5f0ff", border: "1px solid rgba(124,58,237,0.12)", borderRadius: "14px", padding: "20px 24px", marginTop: "8px" }}>
                   <p className="reg-sans" style={{ fontSize: "11px", fontWeight: 700, color: "#9879d4", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 14px" }}>Summary</p>
@@ -481,7 +459,6 @@ export default function ClubRegisterPage() {
               </div>
             )}
 
-            {/* Navigation buttons */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: "40px", paddingTop: "28px", borderTop: "1px solid rgba(124,58,237,0.08)" }}>
               <button onClick={() => setStep(s => s - 1)} disabled={step === 0} className="reg-sans" style={{ padding: "12px 24px", borderRadius: "9px", cursor: step === 0 ? "default" : "pointer", border: "1.5px solid rgba(124,58,237,0.15)", background: "none", color: step === 0 ? "#ddd" : "#555", fontWeight: 600, fontSize: "14px" }}>
                 ← Back
@@ -498,7 +475,7 @@ export default function ClubRegisterPage() {
               ) : (
                 <button onClick={() => canProceed() && handleSubmit()} disabled={loading} className="reg-sans"
                   style={{ padding: "12px 28px", borderRadius: "9px", cursor: canProceed() && !loading ? "pointer" : "not-allowed", background: canProceed() ? "linear-gradient(135deg, #7c3aed, #4c1d95)" : "#e5e7eb", color: canProceed() ? "#fff" : "#bbb", fontWeight: 700, fontSize: "14px", border: "none", boxShadow: canProceed() ? "0 4px 16px rgba(124,58,237,0.35)" : "none" }}>
-                  {loading ? "Бүртгэж байна..." : "Register Club 🚀"}
+                  {loading ? "Бүртгэж байна..." : "Submit Club 🚀"}
                 </button>
               )}
             </div>

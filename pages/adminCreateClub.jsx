@@ -1,6 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/router";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || "";
 
 const CATEGORIES = [
   "Football", "Basketball", "Volleyball", "Tennis", "Swimming",
@@ -40,79 +42,50 @@ const styles = `
 
   .ac-badge {
     font-family: 'DM Sans', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #a78bfa;
-    background: rgba(124,58,237,0.15);
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: #a78bfa; background: rgba(124,58,237,0.15);
     border: 1px solid rgba(124,58,237,0.3);
-    border-radius: 6px;
-    padding: 5px 10px;
-    display: inline-block;
-    margin-bottom: 12px;
+    border-radius: 6px; padding: 5px 10px;
+    display: inline-block; margin-bottom: 12px;
   }
 
   .ac-title {
     font-family: 'Fraunces', serif;
     font-size: clamp(2.2rem, 5vw, 3.4rem);
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
+    font-weight: 800; color: #fff;
+    letter-spacing: -0.04em; line-height: 1.1;
   }
-
   .ac-title em { color: #a78bfa; font-style: italic; }
 
   .ac-sub {
     font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: rgba(255,255,255,0.4);
-    margin-top: 8px;
-    line-height: 1.6;
+    font-size: 14px; color: rgba(255,255,255,0.4);
+    margin-top: 8px; line-height: 1.6;
   }
 
   .ac-card {
-    max-width: 860px;
-    margin: 0 auto;
+    max-width: 860px; margin: 0 auto;
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(124,58,237,0.2);
-    border-radius: 24px;
-    padding: 48px;
+    border-radius: 24px; padding: 48px;
     backdrop-filter: blur(12px);
   }
 
   .ac-section {
-    margin-bottom: 40px;
-    padding-bottom: 40px;
+    margin-bottom: 40px; padding-bottom: 40px;
     border-bottom: 1px solid rgba(124,58,237,0.08);
   }
-
-  .ac-section:last-of-type {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
+  .ac-section:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
   .ac-section-label {
     font-family: 'DM Sans', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #7c3aed;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: #7c3aed; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
   }
-
-  .ac-section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: rgba(124,58,237,0.15);
-  }
+  .ac-section-label::after { content: ''; flex: 1; height: 1px; background: rgba(124,58,237,0.15); }
 
   .ac-grid { display: grid; gap: 18px; }
   .ac-grid-2 { grid-template-columns: 1fr 1fr; }
@@ -120,213 +93,102 @@ const styles = `
 
   .ac-field label {
     font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 11px; font-weight: 700;
     color: rgba(255,255,255,0.35);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 8px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    display: block; margin-bottom: 8px;
   }
 
   .ac-input {
-    width: 100%;
-    padding: 13px 16px;
+    width: 100%; padding: 13px 16px;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(124,58,237,0.2);
     border-radius: 10px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: #fff;
-    outline: none;
+    font-size: 14px; color: #fff; outline: none;
     transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
   }
-
   .ac-input::placeholder { color: rgba(255,255,255,0.2); }
-
   .ac-input:focus {
     border-color: #7c3aed;
     background: rgba(124,58,237,0.08);
     box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
   }
-
   .ac-input option { background: #1a0533; color: #fff; }
-
   .ac-textarea { resize: vertical; min-height: 110px; line-height: 1.65; }
 
   .ac-pricing-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
   .ac-pricing-btn {
-    padding: 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    transition: all 0.2s;
-    border: 1px solid rgba(124,58,237,0.2);
-    background: transparent;
-    color: rgba(255,255,255,0.35);
+    padding: 14px; border-radius: 10px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+    transition: all 0.2s; border: 1px solid rgba(124,58,237,0.2);
+    background: transparent; color: rgba(255,255,255,0.35);
   }
-
-  .ac-pricing-btn.active {
-    background: rgba(124,58,237,0.2);
-    border-color: #7c3aed;
-    color: #a78bfa;
-  }
+  .ac-pricing-btn.active { background: rgba(124,58,237,0.2); border-color: #7c3aed; color: #a78bfa; }
 
   .ac-submit {
-    width: 100%;
-    padding: 16px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #7c3aed, #4c1d95);
-    color: #fff;
+    width: 100%; padding: 16px; border-radius: 12px; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+    background: linear-gradient(135deg, #7c3aed, #4c1d95); color: #fff;
     box-shadow: 0 4px 24px rgba(124,58,237,0.4);
-    transition: all 0.2s;
-    margin-top: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+    transition: all 0.2s; margin-top: 40px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
   }
-
-  .ac-submit:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(124,58,237,0.5);
-  }
-
+  .ac-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(124,58,237,0.5); }
   .ac-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .ac-error {
-    background: rgba(239,68,68,0.1);
-    border: 1px solid rgba(239,68,68,0.2);
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin-top: 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    color: #f87171;
-  }
-
-  .ac-success {
-    background: rgba(34,197,94,0.08);
-    border: 1px solid rgba(34,197,94,0.2);
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin-top: 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    color: #4ade80;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 10px; padding: 12px 16px; margin-top: 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; color: #f87171;
   }
 
   .ac-upload-btn {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: #a78bfa;
-    background: rgba(124,58,237,0.12);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    color: #a78bfa; background: rgba(124,58,237,0.12);
     border: 1px solid rgba(124,58,237,0.3);
-    border-radius: 8px;
-    padding: 9px 18px;
-    cursor: pointer;
-    transition: all 0.2s;
+    border-radius: 8px; padding: 9px 18px; cursor: pointer; transition: all 0.2s;
   }
-
   .ac-upload-btn:hover { background: rgba(124,58,237,0.22); }
 
   .ac-clubs-list { max-width: 860px; margin: 48px auto 0; }
-
   .ac-clubs-title {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.3);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
   }
-
   .ac-clubs-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
 
   .ac-club-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     padding: 14px 20px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(124,58,237,0.1);
-    border-radius: 12px;
-    margin-bottom: 10px;
-    animation: ac-fadeIn 0.3s ease;
-    gap: 12px;
-    flex-wrap: wrap;
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(124,58,237,0.1);
+    border-radius: 12px; margin-bottom: 10px;
+    animation: ac-fadeIn 0.3s ease; gap: 12px; flex-wrap: wrap;
   }
-
   .ac-club-row-left { display: flex; align-items: center; gap: 14px; }
 
   .ac-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 40px; height: 40px; border-radius: 10px;
     background: linear-gradient(135deg, #7c3aed, #4c1d95);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-family: 'Fraunces', serif;
-    font-size: 14px;
-    font-weight: 800;
-    color: #fff;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    font-family: 'Fraunces', serif; font-size: 14px; font-weight: 800; color: #fff;
     overflow: hidden;
   }
 
-  .ac-club-name {
-    font-family: 'Fraunces', serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: -0.02em;
-  }
-
-  .ac-club-meta {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    color: rgba(255,255,255,0.3);
-    margin-top: 2px;
-  }
+  .ac-club-name { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+  .ac-club-meta { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 2px; }
 
   .ac-tag {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: rgba(124,58,237,0.15);
-    color: #a78bfa;
+    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(124,58,237,0.15); color: #a78bfa;
     border: 1px solid rgba(124,58,237,0.2);
   }
+  .ac-tag.free { background: rgba(34,197,94,0.1); color: #4ade80; border-color: rgba(34,197,94,0.2); }
 
-  .ac-tag.free {
-    background: rgba(34,197,94,0.1);
-    color: #4ade80;
-    border-color: rgba(34,197,94,0.2);
-  }
-
-  @keyframes ac-fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes ac-fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
   @media (max-width: 640px) {
     .ac-card { padding: 28px 20px; }
@@ -341,15 +203,22 @@ const empty = {
 };
 
 export default function AdminCreateClub() {
-  const [form, setForm] = useState(empty);
+  const router = useRouter();
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!user || !user.is_admin) {
+      router.replace("/page");
+    }
+  }, []);
+
+  const [form, setForm]       = useState(empty);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError]     = useState("");
   const [created, setCreated] = useState([]);
 
-  // Image state
-  const [logo, setLogo] = useState(null);
-  const [logoPreview, setLogoPreview] = useState(null);
-  const [bannerPhotos, setBannerPhotos] = useState([]);
+  const [logo, setLogo]                   = useState(null);
+  const [logoPreview, setLogoPreview]     = useState(null);
+  const [bannerPhotos, setBannerPhotos]   = useState([]);
   const [bannerPreviews, setBannerPreviews] = useState([]);
 
   const logoRef   = useRef();
@@ -378,8 +247,6 @@ export default function AdminCreateClub() {
     setBannerPreviews(prev => prev.filter((_, idx) => idx !== i));
   }
 
-  const inp = "ac-input";
-
   async function handleCreate() {
     setError("");
     if (!form.name.trim() || !form.category || !form.description.trim() || !form.email.trim()) {
@@ -389,7 +256,6 @@ export default function AdminCreateClub() {
 
     setLoading(true);
     try {
-      // ── Use FormData so image files travel with the request ───────────────
       const fd = new FormData();
       fd.append("name",        form.name);
       fd.append("category",    form.category);
@@ -401,13 +267,12 @@ export default function AdminCreateClub() {
       if (form.district)    fd.append("district",    form.district);
       if (form.phone)       fd.append("phone",       form.phone);
       if (form.website)     fd.append("website",     form.website);
-
       if (logo) fd.append("logo", logo);
       bannerPhotos.forEach(file => fd.append("bannerPhotos", file));
 
       const res = await fetch(`${API}/adminCreateClub`, {
         method: "POST",
-        // Do NOT set Content-Type — browser handles multipart boundary
+        headers: { "x-admin-secret": ADMIN_SECRET },
         body: fd,
       });
 
@@ -415,8 +280,6 @@ export default function AdminCreateClub() {
       if (!res.ok) { setError(data.message || "Failed to create club."); return; }
 
       setCreated(prev => [{ ...form, id: data.clubId, logoPreview, createdAt: new Date() }, ...prev]);
-
-      // Reset form and image state
       setForm(empty);
       setLogo(null);
       setLogoPreview(null);
@@ -428,6 +291,8 @@ export default function AdminCreateClub() {
       setLoading(false);
     }
   }
+
+  const inp = "ac-input";
 
   return (
     <>
@@ -457,8 +322,6 @@ export default function AdminCreateClub() {
         </div>
 
         <div className="ac-card">
-
-          {/* ── Basic Info ── */}
           <div className="ac-section">
             <div className="ac-section-label">Basic Info</div>
             <div className="ac-grid" style={{ gap: 18 }}>
@@ -489,16 +352,10 @@ export default function AdminCreateClub() {
               </div>
             </div>
           </div>
-
-          {/* ── Media ── */}
           <div className="ac-section">
             <div className="ac-section-label">Media (optional)</div>
-
-            {/* Logo */}
             <div style={{ marginBottom: "24px" }}>
-              <div className="ac-field">
-                <label>Club Logo</label>
-              </div>
+              <div className="ac-field"><label>Club Logo</label></div>
               <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                 <div style={{ width: "72px", height: "72px", borderRadius: "14px", background: "rgba(124,58,237,0.1)", border: "1.5px dashed rgba(124,58,237,0.3)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                   {logoPreview
@@ -516,7 +373,6 @@ export default function AdminCreateClub() {
               </div>
             </div>
 
-            {/* Banners */}
             <div className="ac-field">
               <label>Banner Photos <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "rgba(255,255,255,0.2)" }}>(up to 5)</span></label>
             </div>
@@ -538,8 +394,6 @@ export default function AdminCreateClub() {
             </div>
             <input ref={bannerRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleBannerUpload} />
           </div>
-
-          {/* ── Membership ── */}
           <div className="ac-section">
             <div className="ac-section-label">Membership</div>
             <div className="ac-field">
@@ -555,8 +409,6 @@ export default function AdminCreateClub() {
               </div>
             </div>
           </div>
-
-          {/* ── Location ── */}
           <div className="ac-section">
             <div className="ac-section-label">Location</div>
             <div className="ac-grid ac-grid-2">
@@ -574,8 +426,6 @@ export default function AdminCreateClub() {
               </div>
             </div>
           </div>
-
-          {/* ── Contact ── */}
           <div className="ac-section">
             <div className="ac-section-label">Contact</div>
             <div className="ac-grid ac-grid-3">
@@ -606,8 +456,6 @@ export default function AdminCreateClub() {
             }
           </button>
         </div>
-
-        {/* Recently created list */}
         {created.length > 0 && (
           <div className="ac-clubs-list">
             <div className="ac-clubs-title">Created this session ({created.length})</div>
@@ -632,7 +480,7 @@ export default function AdminCreateClub() {
                     {c.pricingType === "free" ? "Free" : "Paid"}
                   </span>
                   <span className="ac-tag">{c.category}</span>
-                  <a href={`/clubs/${c.id}`} style={{
+                  <a href={`/club-detail?id=${c.id}`} style={{
                     fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 600,
                     color: "#a78bfa", textDecoration: "none",
                   }}>

@@ -103,18 +103,18 @@ const fonts = `
 const FILTERS = ["All", "Sports", "Arts & Culture", "Tech & Science"];
 
 const FILTER_MAP = {
-  "Sports": ["Football", "Basketball", "Volleyball", "Tennis", "Swimming", "Dance", "Wrestling", "Boxing", "Judo", "Athletics"],
+  "Sports":         ["Football", "Basketball", "Volleyball", "Tennis", "Swimming", "Dance", "Wrestling", "Boxing", "Judo", "Athletics"],
   "Arts & Culture": ["Music", "Art", "Drama"],
   "Tech & Science": ["Coding", "Science", "Chess"],
 };
 
 export default function CategoriesPage() {
   const router = useRouter();
-  const [search, setSearch] = useState("");
+  const [search, setSearch]           = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
-  const [clubs, setClubs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [clubs, setClubs]             = useState([]);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState("");
 
   useEffect(() => {
     fetch(`${API}/clubs`)
@@ -245,11 +245,7 @@ export default function CategoriesPage() {
               </button>
             </div>
           ) : filtered.length > 0 ? (
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-              gap: "16px",
-            }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "16px" }}>
               {filtered.map((club, i) => {
                 const { accent, bg } = getStyle(club.category);
                 return (
@@ -271,12 +267,12 @@ export default function CategoriesPage() {
                       border: `1.5px solid ${accent}28`,
                       borderRadius: "14px",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      color: accent, marginBottom: "20px",
+                      marginBottom: "20px",
                       boxShadow: `0 4px 12px ${accent}18`,
                       overflow: "hidden",
                     }}>
                       {club.logo
-                        ? <img src={club.logo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ? <img src={club.logo} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt={club.name} />
                         : <span style={{ fontFamily: "'Fraunces', serif", fontSize: "22px", fontWeight: 800, color: accent }}>
                             {club.name[0]}
                           </span>
@@ -354,7 +350,6 @@ export default function CategoriesPage() {
               )}
             </div>
           )}
-
           <div style={{
             marginTop: "72px",
             background: "linear-gradient(135deg, #1a0533 0%, #2d0a57 50%, #3b0764 100%)",

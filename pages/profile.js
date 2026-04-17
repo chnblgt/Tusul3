@@ -99,6 +99,7 @@ export default function ProfilePage() {
   const [editData, setEditData] = useState(DEFAULT_USER);
   const [saved, setSaved] = useState(DEFAULT_USER);
   const [clubs, setClubs] = useState([]);
+  const [totalClubs, setTotalClubs] = useState(0); 
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveError, setSaveError] = useState("");
 
@@ -109,7 +110,6 @@ export default function ProfilePage() {
     setUser(u);
     setSaved(u);
     setEditData(u);
-
     fetch(`${API}/myClubs/${u.id}`)
       .then(r => r.json())
       .then(data => {
@@ -117,16 +117,19 @@ export default function ProfilePage() {
           const colored = data.clubs.map((c, i) => ({
             ...c,
             enrolled: true,
-            accent: ["#22c55e","#a855f7","#f97316","#3b82f6","#ef4444"][i % 5],
-            bg: ["#f0fdf4","#faf5ff","#fff7ed","#eff6ff","#fef2f2"][i % 5],
+            accent: ["#22c55e", "#a855f7", "#f97316", "#3b82f6", "#ef4444"][i % 5],
+            bg:     ["#f0fdf4", "#faf5ff", "#fff7ed", "#eff6ff", "#fef2f2"][i % 5],
           }));
           setClubs(colored);
         }
       })
       .catch(() => {});
+    fetch(`${API}/clubs`)
+      .then(r => r.json())
+      .then(data => { if (data.success) setTotalClubs(data.clubs.length); })
+      .catch(() => {});
   }, []);
 
-  // FIX: toggleEnroll was missing — now implemented
   async function toggleEnroll(clubId) {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
     const userId = storedUser.id;
@@ -136,7 +139,6 @@ export default function ProfilePage() {
 
     try {
       if (isEnrolled) {
-        // FIX: leaveClub now uses URL params (DELETE with body is unreliable)
         await fetch(`${API}/leaveClub/${userId}/${clubId}`, { method: "DELETE" });
         setClubs(prev => prev.filter(c => c.id !== clubId));
       } else {
@@ -160,10 +162,10 @@ export default function ProfilePage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: editData.name,
-          bio: editData.bio,
+          name:     editData.name,
+          bio:      editData.bio,
           location: editData.location,
-          phone: editData.phone,
+          phone:    editData.phone,
         }),
       });
       const result = await res.json();
@@ -242,8 +244,6 @@ export default function ProfilePage() {
               </p>
             )}
           </div>
-
-          {/* Stats bar */}
           <div style={{
             display: "flex", gap: "32px", padding: "24px 28px",
             background: "#fdfcff", border: "1.5px solid rgba(124,58,237,0.1)",
@@ -251,7 +251,7 @@ export default function ProfilePage() {
           }}>
             {[
               [enrolledClubs.length, "Clubs joined"],
-              [clubs.length, "Clubs discovered"],
+              [totalClubs, "Clubs available"],
               ["UB", "City"],
             ].map(([val, lbl]) => (
               <div key={lbl}>
@@ -261,7 +261,6 @@ export default function ProfilePage() {
             ))}
           </div>
 
-          {/* Tabs */}
           <div style={{ borderBottom: "1px solid rgba(26,5,51,0.08)", marginBottom: "36px", display: "flex" }}>
             {[["clubs", "My Clubs"], ["activity", "Activity"]].map(([id, lbl]) => (
               <button key={id} className={`pp-tab${activeTab === id ? " active" : ""}`} onClick={() => setActiveTab(id)}>
@@ -277,8 +276,6 @@ export default function ProfilePage() {
               </button>
             ))}
           </div>
-
-          {/* CLUBS TAB */}
           {activeTab === "clubs" && (
             <div>
               {enrolledClubs.length > 0 ? (
@@ -294,10 +291,12 @@ export default function ProfilePage() {
                             width: "42px", height: "42px", borderRadius: "11px",
                             background: club.bg, border: `1.5px solid ${club.accent}22`,
                             display: "flex", alignItems: "center", justifyContent: "center",
+                            overflow: "hidden",
                           }}>
-                            <span style={{ fontSize: "18px", fontWeight: 800, color: club.accent, fontFamily: "'Fraunces', serif" }}>
-                              {club.name[0]}
-                            </span>
+                            {club.logo
+                              ? <img src={club.logo} alt={club.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              : <span style={{ fontSize: "18px", fontWeight: 800, color: club.accent, fontFamily: "'Fraunces', serif" }}>{club.name[0]}</span>
+                            }
                           </div>
                           <span className="pp-sans" style={{
                             fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase",
@@ -306,7 +305,6 @@ export default function ProfilePage() {
                           }}>Enrolled</span>
                         </div>
                         <div className="pp-display" style={{ fontSize: "16px", fontWeight: 800, color: "#1a0533", marginBottom: "4px" }}>{club.name}</div>
-                        {/* FIX: removed club.members (not in DB) */}
                         <div className="pp-sans" style={{ fontSize: "12px", color: "#888", marginBottom: "14px" }}>{club.category}</div>
                         <button onClick={() => toggleEnroll(club.id)} className="pp-sans" style={{
                           width: "100%", padding: "9px", borderRadius: "8px",
@@ -334,11 +332,8 @@ export default function ProfilePage() {
               )}
             </div>
           )}
-
-          {/* ACTIVITY TAB */}
           {activeTab === "activity" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* Account created */}
               <div style={{
                 display: "flex", alignItems: "center", gap: "16px",
                 padding: "18px 22px",
@@ -354,7 +349,6 @@ export default function ProfilePage() {
                 </span>
               </div>
 
-              {/* Joined clubs activity */}
               {enrolledClubs.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "60px 0" }}>
                   <div style={{ fontSize: "32px", marginBottom: "12px" }}>📭</div>
@@ -367,7 +361,7 @@ export default function ProfilePage() {
                   }}>Browse clubs →</a>
                 </div>
               ) : (
-                enrolledClubs.map((club, i) => (
+                enrolledClubs.map((club) => (
                   <div key={club.id} style={{
                     display: "flex", alignItems: "center", gap: "16px",
                     padding: "18px 22px",
@@ -378,8 +372,12 @@ export default function ProfilePage() {
                       width: "40px", height: "40px", borderRadius: "11px", flexShrink: 0,
                       background: club.bg, display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: "18px", fontFamily: "'Fraunces', serif", fontWeight: 800, color: club.accent,
+                      overflow: "hidden",
                     }}>
-                      {club.name[0]}
+                      {club.logo
+                        ? <img src={club.logo} alt={club.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : club.name[0]
+                      }
                     </div>
                     <div style={{ flex: 1 }}>
                       <p className="pp-sans" style={{ fontSize: "14px", color: "#1a0533", fontWeight: 600, margin: "0 0 2px" }}>
@@ -401,8 +399,6 @@ export default function ProfilePage() {
       </main>
 
       <Footer />
-
-      {/* Edit Modal */}
       {editOpen && (
         <div className="pp-modal-overlay" onClick={e => e.target === e.currentTarget && setEditOpen(false)}>
           <div className="pp-modal">
@@ -415,9 +411,9 @@ export default function ProfilePage() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
               {[
-                { key: "name", label: "Full Name", type: "text", placeholder: "Your full name" },
-                { key: "phone", label: "Phone", type: "tel", placeholder: "+976 ···" },
-                { key: "location", label: "Location", type: "text", placeholder: "City, Country" },
+                { key: "name",     label: "Full Name", type: "text", placeholder: "Your full name" },
+                { key: "phone",    label: "Phone",     type: "tel",  placeholder: "+976 ···" },
+                { key: "location", label: "Location",  type: "text", placeholder: "City, Country" },
               ].map(({ key, label, type, placeholder }) => (
                 <div key={key}>
                   <label className="pp-sans" style={labelStyle}>{label}</label>
