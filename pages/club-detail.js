@@ -8,6 +8,13 @@ const MapComponent = dynamic(() => import("@/waterbottle/Mapcomponent"), { ssr: 
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+const fetchAPI = (url, options = {}) =>
+  fetch(url, {
+    ...options,
+    headers: { "ngrok-skip-browser-warning": "true", ...options.headers },
+  });
+
+
 const fonts = `
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800;1,9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap');
   .cd-display { font-family: 'Fraunces', serif; }
@@ -71,6 +78,17 @@ function PhotoPlaceholder({ index }) {
     </div>
   );
 }
+function parseTiers(club) {
+  const raw = club?.tiers;
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 function parseBanners(club) {
   const raw = club?.banner;
   if (!raw) return [];
@@ -102,14 +120,14 @@ export default function ClubDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`${API}/clubs/${id}`)
+    fetchAPI(`${API}/clubs/${id}`)
       .then(r => r.json())
       .then(data => {
         if (data.success) {
           setClub(data.club);
           const user = JSON.parse(localStorage.getItem("user") || "null");
           if (user) {
-            fetch(`${API}/myClubs/${user.id}`)
+            fetchAPI(`${API}/myClubs/${user.id}`)
               .then(r => r.json())
               .then(d => {
                 if (d.success) setEnrolled(d.clubs.some(c => c.id === data.club.id));
@@ -130,10 +148,10 @@ export default function ClubDetailPage() {
     setActionLoading(true);
     try {
       if (enrolled) {
-        await fetch(`${API}/leaveClub/${user.id}/${club.id}`, { method: "DELETE" });
+        await fetchAPI(`${API}/leaveClub/${user.id}/${club.id}`, { method: "DELETE" });
         setEnrolled(false);
       } else {
-        await fetch(`${API}/joinClub`, {
+        await fetchAPI(`${API}/joinClub`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId: user.id, clubId: club.id }),
@@ -177,12 +195,12 @@ export default function ClubDetailPage() {
 
   const slides = buildSlides(club);
   const pricingType = club.pricing_type || "free";
+  const tiers = parseTiers(club);
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#fff" }}>
       <style>{fonts + styles}</style>
       <Header />
-      <div style={{ height: "2px", background: "linear-gradient(90deg, #4c1d95, #7c3aed, #c4b5fd, #7c3aed, #4c1d95)" }} />
       <div style={{ position: "relative", height: "420px", background: "#0d0118", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0 }}>
           {slides[activePhoto]
@@ -312,7 +330,7 @@ export default function ClubDetailPage() {
             <div style={{ background: "linear-gradient(135deg, #1a0533 0%, #3b0764 100%)", borderRadius: "18px", padding: "24px" }}>
               <p className="cd-display" style={{ fontSize: "20px", fontWeight: 800, color: "#fff", margin: "0 0 8px", letterSpacing: "-0.03em" }}>Ready to join?</p>
               <p className="cd-sans" style={{ fontSize: "13px", color: "#a78bfa", margin: "0 0 20px", lineHeight: 1.6 }}>
-                {pricingType === "free" ? "It's completely free. Join now and get started." : "Contact the club for membership details."}
+                {pricingType === "free" ? "It's completely free. Join now and get started." : `${tiers.length > 0 ? tiers.length + " membership tier" + (tiers.length > 1 ? "s" : "") + " available" : "Paid membership"}. View pricing details below.`}
               </p>
               <button
                 onClick={() => { if (pricingType === "free") handleJoin(); else setShowJoinModal(true); }}
@@ -334,33 +352,117 @@ export default function ClubDetailPage() {
       </main>
       {showJoinModal && (
         <div className="cd-modal-overlay" onClick={e => e.target === e.currentTarget && setShowJoinModal(false)}>
-          <div className="cd-modal">
+          <div className="cd-modal" style={{ maxWidth: tiers.length > 1 ? "560px" : "460px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
-              <h2 className="cd-display" style={{ fontSize: "22px", fontWeight: 800, color: "#1a0533", margin: 0, letterSpacing: "-0.03em" }}>
-                Join {club.name}
-              </h2>
-              <button onClick={() => setShowJoinModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#bbb", padding: 0 }}>
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></svg>
+              <div>
+                <h2 className="cd-display" style={{ fontSize: "22px", fontWeight: 800, color: "#1a0533", margin: "0 0 4px", letterSpacing: "-0.03em" }}>
+                  Join {club.name}
+                </h2>
+                <p className="cd-sans" style={{ fontSize: "12px", color: "#9879d4", margin: 0, fontWeight: 600 }}>
+                  💳 Paid membership
+                </p>
+              </div>
+              <button onClick={() => setShowJoinModal(false)} style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.12)", borderRadius: "8px", cursor: "pointer", color: "#9879d4", padding: "7px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></svg>
               </button>
             </div>
-            <p className="cd-sans" style={{ fontSize: "14px", color: "#555", marginBottom: "24px", lineHeight: 1.7 }}>
-              Contact the club at <strong>{club.email}</strong> for membership options and pricing.
-            </p>
-            <button
-              onClick={handleJoin}
-              disabled={actionLoading}
-              className="cd-sans"
-              style={{
-                width: "100%", padding: "14px",
-                background: "linear-gradient(135deg, #7c3aed, #4c1d95)", color: "#fff",
-                border: "none", borderRadius: "10px", fontWeight: 700, fontSize: "14px",
-                cursor: "pointer", boxShadow: "0 4px 16px rgba(124,58,237,0.3)",
-              }}
-            >
-              {actionLoading ? "..." : enrolled ? "Leave club" : "Confirm & Join →"}
-            </button>
-            <p className="cd-sans" style={{ textAlign: "center", fontSize: "12px", color: "#bbb", marginTop: "14px" }}>
-              You can leave the club at any time from your profile.
+            {tiers.length > 0 ? (
+              <>
+                <p className="cd-sans" style={{ fontSize: "13px", color: "#888", marginBottom: "16px", lineHeight: 1.6 }}>
+                  Choose a membership plan and contact the club to enroll.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
+                  {tiers.map((tier, i) => {
+                    const periodLabel = { monthly: "/ сар", quarterly: "/ улирал", yearly: "/ жил", once: "нэг удаа" }[tier.period] || tier.period;
+                    return (
+                      <div key={i} style={{
+                        border: i === 0 ? "2px solid #7c3aed" : "1.5px solid rgba(124,58,237,0.12)",
+                        borderRadius: "14px", padding: "18px 20px",
+                        background: i === 0 ? "linear-gradient(135deg, #f5f0ff 0%, #fdfcff 100%)" : "#fdfcff",
+                        position: "relative",
+                      }}>
+                        {i === 0 && (
+                          <span className="cd-sans" style={{
+                            position: "absolute", top: "-10px", left: "16px",
+                            background: "#7c3aed", color: "#fff",
+                            fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em",
+                            padding: "3px 10px", borderRadius: "20px",
+                          }}>POPULAR</span>
+                        )}
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <div>
+                            <p className="cd-sans" style={{ fontSize: "15px", fontWeight: 700, color: "#1a0533", margin: "0 0 3px" }}>{tier.name}</p>
+                            {tier.description && (
+                              <p className="cd-sans" style={{ fontSize: "12px", color: "#888", margin: 0 }}>{tier.description}</p>
+                            )}
+                          </div>
+                          <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "16px" }}>
+                            <p className="cd-display" style={{ fontSize: "22px", fontWeight: 800, color: "#7c3aed", margin: "0 0 1px", letterSpacing: "-0.03em" }}>
+                              ₮{Number(tier.price).toLocaleString()}
+                            </p>
+                            <p className="cd-sans" style={{ fontSize: "11px", color: "#bbb", margin: 0, fontWeight: 600 }}>{periodLabel}</p>
+                          </div>
+                        </div>
+                        {tier.features && (
+                          <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(124,58,237,0.08)" }}>
+                            {tier.features.split(",").map(f => f.trim()).filter(Boolean).map((feat, fi) => (
+                              <div key={fi} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "5px" }}>
+                                <svg width="12" height="12" fill="none" stroke="#22c55e" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                                <span className="cd-sans" style={{ fontSize: "12px", color: "#555" }}>{feat}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <p className="cd-sans" style={{ fontSize: "14px", color: "#555", marginBottom: "20px", lineHeight: 1.7 }}>
+                Гишүүнчлэлийн нарийвчилсан мэдээлэл авахын тулд клубтай холбогдоно уу.
+              </p>
+            )}
+            <div style={{ background: "#f5f0ff", border: "1px solid rgba(124,58,237,0.12)", borderRadius: "12px", padding: "14px 18px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px" }}>
+              <svg width="16" height="16" fill="none" stroke="#7c3aed" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <p className="cd-sans" style={{ fontSize: "13px", color: "#5b21b6", margin: 0 }}>
+                Бүртгүүлэхийн тулд <strong>{club.email}</strong> рүү имэйл илгээнэ үү.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "10px" }}>
+              <a
+                href={`mailto:${club.email}?subject=Membership inquiry — ${club.name}`}
+                className="cd-sans"
+                style={{
+                  flex: 1, padding: "14px", textAlign: "center",
+                  background: "linear-gradient(135deg, #7c3aed, #4c1d95)", color: "#fff",
+                  border: "none", borderRadius: "10px", fontWeight: 700, fontSize: "14px",
+                  cursor: "pointer", boxShadow: "0 4px 16px rgba(124,58,237,0.3)",
+                  textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                }}
+              >
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Имэйл илгээх →
+              </a>
+              <button
+                onClick={handleJoin}
+                disabled={actionLoading}
+                className="cd-sans"
+                style={{
+                  padding: "14px 20px", background: enrolled ? "#fef2f2" : "#f5f0ff",
+                  color: enrolled ? "#ef4444" : "#7c3aed",
+                  border: `1.5px solid ${enrolled ? "rgba(239,68,68,0.2)" : "rgba(124,58,237,0.2)"}`,
+                  borderRadius: "10px", fontWeight: 700, fontSize: "13px", cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {actionLoading ? "..." : enrolled ? "Leave" : "Quick join"}
+              </button>
+            </div>
+
+            <p className="cd-sans" style={{ textAlign: "center", fontSize: "11.5px", color: "#c4b5fd", marginTop: "14px" }}>
+              Та хэзээ ч профайлаасаа клубаас гарах боломжтой.
             </p>
           </div>
         </div>

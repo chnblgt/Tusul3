@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import { useDarkMode } from "./useDarkMode";
 import { useRouter } from "next/router";
 
 export default function Header({ user = null }) {
   const router = useRouter();
+  const { dark } = useDarkMode();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
   const [signinHover, setSigninHover] = useState(false);
@@ -61,10 +63,12 @@ export default function Header({ user = null }) {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800;1,9..144,700&family=DM+Sans:wght@400;500;600&display=swap');
+
         @keyframes dropIn {
           from { opacity: 0; transform: translateY(-8px) scale(0.96); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
         }
+
         .hdr-nav-link {
           position: relative;
           text-decoration: none;
@@ -74,6 +78,7 @@ export default function Header({ user = null }) {
           transition: color 0.2s;
           font-family: 'DM Sans', sans-serif;
           padding-bottom: 3px;
+          color: var(--text-secondary);
         }
         .hdr-nav-link::after {
           content: '';
@@ -84,21 +89,42 @@ export default function Header({ user = null }) {
           transition: width 0.25s ease;
           border-radius: 2px;
         }
+        .hdr-nav-link:hover { color: #7c3aed !important; }
         .hdr-nav-link:hover::after { width: 100%; }
+
+        /* Dropdown */
+        .hdr-dropdown {
+          background: var(--bg-card);
+          border: 1px solid var(--border-subtle);
+        }
+        .hdr-dropdown-item {
+          color: var(--text-primary) !important;
+        }
+        .hdr-dropdown-item:hover {
+          background: var(--bg-input) !important;
+        }
+        .hdr-dropdown-name {
+          color: var(--text-primary);
+        }
+        .hdr-dropdown-username {
+          color: var(--text-muted);
+        }
+        .hdr-dropdown-divider {
+          background: var(--border-subtle);
+        }
       `}</style>
 
       <header style={{
-        background: "rgba(255,253,255,0.94)",
-        borderBottom: "1px solid rgba(124,58,237,0.1)",
+        background: "var(--bg-card)",
+        borderBottom: "2px solid transparent",
+        borderImage: "linear-gradient(90deg, #4c1d95, #7c3aed, #c4b5fd, #7c3aed, #4c1d95) 1",
         position: "sticky",
         top: 0,
-        zIndex: 1000,
+        zIndex: 100,
         fontFamily: "'DM Sans', sans-serif",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
+        transition: "background 0.3s",
+        boxShadow: "0 2px 16px rgba(26,5,51,0.10)",
       }}>
-        <div style={{ height: "2px", background: "linear-gradient(90deg, #4c1d95, #7c3aed, #c4b5fd, #7c3aed, #4c1d95)" }} />
-
         <div style={{
           maxWidth: "1200px",
           margin: "0 auto",
@@ -115,7 +141,8 @@ export default function Header({ user = null }) {
             <span style={{
               fontFamily: "'Fraunces', serif",
               fontSize: "20px", fontWeight: 800,
-              color: "#1a0533", letterSpacing: "-0.03em",
+              color: "var(--text-primary)", letterSpacing: "-0.03em",
+              transition: "color 0.3s",
             }}>
               Duguilan.mn
             </span>
@@ -126,7 +153,10 @@ export default function Header({ user = null }) {
               <a key={label} href={href} className="hdr-nav-link"
                 onMouseEnter={() => setHoveredLink(label)}
                 onMouseLeave={() => setHoveredLink(null)}
-                style={{ color: hoveredLink === label ? "#7c3aed" : "#555", fontSize: "16px" }}
+                style={{
+                  color: hoveredLink === label ? "#7c3aed" : "var(--text-secondary)",
+                  fontSize: "16px",
+                }}
               >
                 {label}
               </a>
@@ -142,7 +172,7 @@ export default function Header({ user = null }) {
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: "16px", fontWeight: 500,
-                    color: signinHover ? "#7c3aed" : "#555",
+                    color: signinHover ? "#7c3aed" : "var(--text-secondary)",
                     textDecoration: "none", transition: "color 0.2s",
                   }}
                 >
@@ -206,36 +236,41 @@ export default function Header({ user = null }) {
               </button>
 
               {loggedIn && dropdownOpen && (
-                <div style={{
+                <div className="hdr-dropdown" style={{
                   position: "absolute", top: "calc(100% + 12px)", right: 0,
-                  background: "#fff",
-                  border: "1px solid rgba(124,58,237,0.1)",
                   borderRadius: "14px",
-                  boxShadow: "0 20px 60px rgba(26,5,51,0.12), 0 2px 8px rgba(124,58,237,0.06)",
+                  boxShadow: "0 20px 60px rgba(26,5,51,0.18), 0 2px 8px rgba(124,58,237,0.1)",
                   minWidth: "210px", zIndex: 2000, overflow: "hidden",
                   animation: "dropIn 0.18s cubic-bezier(.22,.68,0,1.2)",
                 }}>
-                  <div style={{ padding: "16px 18px 12px", borderBottom: "1px solid #f5f0ff" }}>
-                    <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "15px", color: "#1a0533", margin: "0 0 2px", letterSpacing: "-0.02em" }}>
+                  <div style={{ padding: "16px 18px 12px", borderBottom: "1px solid var(--border-subtle)" }}>
+                    <p className="hdr-dropdown-name" style={{
+                      fontFamily: "'Fraunces', serif", fontWeight: 700,
+                      fontSize: "15px", margin: "0 0 2px", letterSpacing: "-0.02em",
+                    }}>
                       {displayName}
                     </p>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#9879d4", margin: 0, fontWeight: 500 }}>
+                    <p className="hdr-dropdown-username" style={{
+                      fontFamily: "'DM Sans', sans-serif", fontSize: "12px",
+                      margin: 0, fontWeight: 500,
+                    }}>
                       @{currentUser?.username || ""}
                     </p>
                   </div>
 
                   {[
                     { label: "My Profile", href: "/profile", icon: <><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></> },
-                    { label: "Settings", href: "/settings", icon: <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></> },
+                    { label: "Settings",   href: "/settings", icon: <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></> },
                   ].map(({ label, href, icon }) => (
                     <a key={label} href={href}
-                      onMouseEnter={e => e.currentTarget.style.background = "#f8f4ff"}
+                      className="hdr-dropdown-item"
+                      onMouseEnter={e => e.currentTarget.style.background = "var(--bg-input)"}
                       onMouseLeave={e => e.currentTarget.style.background = "none"}
                       style={{
                         display: "flex", alignItems: "center", gap: "10px",
                         padding: "10px 18px",
                         fontFamily: "'DM Sans', sans-serif", fontSize: "13.5px", fontWeight: 500,
-                        color: "#333", textDecoration: "none",
+                        textDecoration: "none",
                       }}
                     >
                       <svg width="14" height="14" fill="none" stroke="#7c3aed" strokeWidth="2" viewBox="0 0 24 24">{icon}</svg>
@@ -243,11 +278,11 @@ export default function Header({ user = null }) {
                     </a>
                   ))}
 
-                  <div style={{ height: "1px", background: "#f5f0ff", margin: "2px 0" }} />
+                  <div className="hdr-dropdown-divider" style={{ height: "1px", margin: "2px 0" }} />
 
                   <button
                     onClick={handleSignOut}
-                    onMouseEnter={e => e.currentTarget.style.background = "#fff5f5"}
+                    onMouseEnter={e => e.currentTarget.style.background = dark ? "rgba(220,57,43,0.12)" : "#fff5f5"}
                     onMouseLeave={e => e.currentTarget.style.background = "none"}
                     style={{
                       display: "flex", alignItems: "center", gap: "10px",

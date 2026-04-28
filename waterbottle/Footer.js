@@ -1,4 +1,8 @@
+import { useDarkMode } from "./useDarkMode";
+
 export default function Footer() {
+  const { dark } = useDarkMode();
+
   return (
     <>
       <style>{`
@@ -6,7 +10,6 @@ export default function Footer() {
         .ft-logo { font-family: 'Fraunces', serif; }
         .ft-body { font-family: 'DM Sans', sans-serif; }
         .ft-link {
-          color: #a08ac0;
           text-decoration: none;
           font-size: 13px;
           font-family: 'DM Sans', sans-serif;
@@ -15,106 +18,132 @@ export default function Footer() {
           display: block;
           line-height: 1;
         }
-        .ft-link:hover { color: #e9d5ff; }
         .ft-social {
           width: 36px; height: 36px;
-          border: 1px solid rgba(167,139,250,0.2);
           border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
           cursor: pointer; transition: all 0.2s;
           font-size: 11px; font-weight: 700;
-          color: #a08ac0; text-decoration: none;
+          text-decoration: none;
           font-family: 'DM Sans', sans-serif;
           letter-spacing: 0.02em;
         }
-        .ft-social:hover {
-          border-color: #7c3aed;
-          color: #e9d5ff;
-          transform: translateY(-2px);
-          background: rgba(124,58,237,0.15);
-        }
       `}</style>
 
-      <footer>
-       <div style={{
-  height: "120px",
-  background: "linear-gradient(to bottom, #ffffff 0%, #f8f5ff 20%, #ede6ff 38%, #d4c8f0 52%, #9b88c8 68%, #43385d 85%, #0d0118 100%)",
-}} />
-        <div style={{ background: "#0d0118" }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "52px 36px 44px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "56px", marginBottom: "52px" }}>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "18px" }}>
-                  <img src="/assets/logo_white.png" alt="Logo" width={30} height={30} style={{ borderRadius: "7px" }} />
-                  <span className="ft-logo" style={{ fontSize: "17px", fontWeight: 800, letterSpacing: "-0.03em" }}>
-                    <span style={{ color: "#fff" }}>Duguilan</span><span style={{ color: "#fff" }}>.mn</span>
-                  </span>
-                </div>
-                <p style={{ color: "#7a6090", fontSize: "13px", lineHeight: 1.75, maxWidth: "220px", fontFamily: "'DM Sans', sans-serif", margin: "0 0 22px" }}>
-                  Discover clubs, events, and experiences across Mongolia.
-                </p>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <a className="ft-social">FB</a>
-                  <a className="ft-social">IG</a>
-                  <a className="ft-social">TW</a>
-                </div>
-              </div>
-              <div>
-                <h3 style={{
-                  color: "#5b3d8a", fontSize: "10px", fontWeight: 700,
-                  letterSpacing: "0.14em", textTransform: "uppercase",
-                  marginBottom: "20px", fontFamily: "'DM Sans', sans-serif",
+      <footer style={{ background: "var(--bg-card)", borderTop: "2px solid var(--border-subtle)", transition: "background 0.3s, border-color 0.3s", boxShadow: "0 -4px 24px rgba(26,5,51,0.10)", position: "relative", zIndex: 10 }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "52px 36px 44px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "56px", marginBottom: "52px" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "18px" }}>
+                <img src="/assets/logo1.png" alt="Logo" width={30} height={30} style={{ borderRadius: "7px" }} />
+                <span className="ft-logo" style={{
+                  fontSize: "17px", fontWeight: 800, letterSpacing: "-0.03em",
+                  color: "var(--text-primary)", transition: "color 0.3s",
                 }}>
-                  Navigate
-                </h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                  {[
-                    { label: "Home", href: "/page" },
-                    { label: "Categories", href: "/page1" },
-                    { label: "Events", href: "#" },
-                    { label: "About Us", href: "#" },
-                    { label: "Register Club", href: "/club-register" },
-                  ].map(({ label, href }) => (
-                    <a key={label} href={href} className="ft-link">{label}</a>
-                  ))}
-                </div>
+                  Duguilan<span style={{ color: "#7c3aed" }}>.mn</span>
+                </span>
               </div>
-              <div>
-                <h3 style={{
-                  color: "#5b3d8a", fontSize: "10px", fontWeight: 700,
-                  letterSpacing: "0.14em", textTransform: "uppercase",
-                  marginBottom: "20px", fontFamily: "'DM Sans', sans-serif",
-                }}>
-                  Contact
-                </h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                  {[
-                    "Ulaanbaatar, Mongolia",
-                    "info@duguilan.mn",
-                    "+976 99116769",
-                  ].map(t => (
-                    <span key={t} style={{ color: "#7a6090", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}>{t}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div style={{
-              borderTop: "1px solid rgba(124,58,237,0.12)",
-              paddingTop: "28px",
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-            }}>
-              <p style={{ color: "#ffffff", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}>
-                © 2026 Duguilan.mn — School Project
-              </p>
-              <span style={{
-                fontSize: "10.5px", color: "#ffffff",
-                fontWeight: 700, letterSpacing: "0.1em",
-                textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif",
+              <p style={{
+                color: "var(--text-muted)", fontSize: "13px", lineHeight: 1.75,
+                maxWidth: "220px", fontFamily: "'DM Sans', sans-serif",
+                margin: "0 0 22px", transition: "color 0.3s",
               }}>
-                Made by Enjoy Crew
-              </span>
+                Discover clubs, events, and experiences across Mongolia.
+              </p>
+              <div style={{ display: "flex", gap: "8px" }}>
+                {["FB", "IG", "TW"].map(s => (
+                  <a key={s} className="ft-social" style={{
+                    border: `1px solid var(--border-subtle)`,
+                    background: dark ? "rgba(124,58,237,0.08)" : "rgba(124,58,237,0.04)",
+                    color: "var(--text-muted)",
+                    transition: "all 0.2s",
+                  }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = "#7c3aed";
+                      e.currentTarget.style.color = dark ? "#c4b5fd" : "#7c3aed";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.background = "rgba(124,58,237,0.15)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = "var(--border-subtle)";
+                      e.currentTarget.style.color = "var(--text-muted)";
+                      e.currentTarget.style.transform = "none";
+                      e.currentTarget.style.background = dark ? "rgba(124,58,237,0.08)" : "rgba(124,58,237,0.04)";
+                    }}
+                  >{s}</a>
+                ))}
+              </div>
             </div>
+            <div>
+              <h3 style={{
+                color: "var(--text-muted)", fontSize: "10px", fontWeight: 700,
+                letterSpacing: "0.14em", textTransform: "uppercase",
+                marginBottom: "20px", fontFamily: "'DM Sans', sans-serif",
+                transition: "color 0.3s",
+              }}>
+                Navigate
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                {[
+                  { label: "Home",           href: "/page" },
+                  { label: "Categories",     href: "/page1" },
+                  { label: "Events",         href: "#" },
+                  { label: "About Us",       href: "#" },
+                  { label: "Register Club",  href: "/club-register" },
+                ].map(({ label, href }) => (
+                  <a key={label} href={href} className="ft-link"
+                    style={{ color: "var(--text-muted)" }}
+                    onMouseEnter={e => e.currentTarget.style.color = "#7c3aed"}
+                    onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
+                  >{label}</a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 style={{
+                color: "var(--text-muted)", fontSize: "10px", fontWeight: 700,
+                letterSpacing: "0.14em", textTransform: "uppercase",
+                marginBottom: "20px", fontFamily: "'DM Sans', sans-serif",
+                transition: "color 0.3s",
+              }}>
+                Contact
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                {[
+                  "Ulaanbaatar, Mongolia",
+                  "info@duguilan.mn",
+                  "+976 99116769",
+                ].map(t => (
+                  <span key={t} style={{
+                    color: "var(--text-muted)", fontSize: "13px",
+                    fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                    transition: "color 0.3s",
+                  }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{
+            borderTop: "1px solid var(--border-subtle)",
+            paddingTop: "28px",
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            transition: "border-color 0.3s",
+          }}>
+            <p style={{
+              color: "var(--text-secondary)", fontSize: "12px",
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+              transition: "color 0.3s",
+            }}>
+              © 2026 Duguilan.mn — School Project
+            </p>
+            <span style={{
+              fontSize: "10.5px", color: "var(--text-muted)",
+              fontWeight: 700, letterSpacing: "0.1em",
+              textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif",
+              transition: "color 0.3s",
+            }}>
+              Made by Enjoy Crew
+            </span>
           </div>
         </div>
       </footer>
