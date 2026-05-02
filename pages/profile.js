@@ -5,6 +5,12 @@ import Footer from "@/waterbottle/Footer";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+async function safeJson(res) {
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch { return null; }
+}
+
 const fetchAPI = (url, options = {}) =>
   fetch(url, {
     ...options,
@@ -39,9 +45,9 @@ const fonts = `
   .pp-tab.active { color: var(--text-primary); font-weight:700; }
   .pp-tab.active::after {
     content:''; position:absolute; bottom:-1px; left:0; right:0;
-    height:2px; background:#7c3aed; border-radius:2px 2px 0 0;
+    height:2px; background:var(--accent); border-radius:2px 2px 0 0;
   }
-  .pp-tab:hover:not(.active) { color:#7c3aed; }
+  .pp-tab:hover:not(.active) { color:var(--accent); }
 
   .pp-club-card {
     background: var(--bg-card);
@@ -60,7 +66,7 @@ const fonts = `
     font-family:'DM Sans',sans-serif;
     transition:border-color .2s,box-shadow .2s,background 0.3s,color 0.3s;
   }
-  .pp-input:focus { border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.1); }
+  .pp-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
   .pp-input::placeholder { color: var(--text-muted) !important; }
 
   .pp-modal-overlay {
@@ -87,7 +93,7 @@ const fonts = `
     display:flex; align-items:center; gap:8px;
     padding:11px 20px; border-radius:10px;
     border:1.5px solid var(--border-subtle);
-    background:var(--bg-card); color:#7c3aed;
+    background:var(--bg-card); color:var(--accent);
     font-size:13.5px; font-weight:600; cursor:pointer;
     font-family:'DM Sans',sans-serif;
     transition:all .18s; margin-bottom:6px;
@@ -126,6 +132,7 @@ export default function ProfilePage() {
   const [saveLoading,  setSaveLoading]  = useState(false);
   const [saveError,    setSaveError]    = useState("");
   const [avatarPreview, setAvatarPreview] = useState(null);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(()=>{
@@ -136,9 +143,9 @@ export default function ProfilePage() {
     if (u.avatar) setAvatarPreview(u.avatar);
 
     fetchAPI(`${API}/myClubs/${u.id}`)
-      .then(r=>r.json())
+      .then(r=>safeJson(r))
       .then(data=>{
-        if (data.success) {
+        if (data?.success) {
           setClubs(data.clubs.map((c,i)=>({
             ...c, enrolled:true,
             accent:["#22c55e","#a855f7","#f97316","#3b82f6","#ef4444"][i%5],
@@ -148,42 +155,24 @@ export default function ProfilePage() {
       }).catch(()=>{});
 
     fetchAPI(`${API}/clubs`)
-      .then(r=>r.json())
-      .then(data=>{ if (data.success) setTotalClubs(data.clubs.length); })
+      .then(r=>safeJson(r))
+      .then(data=>{ if (data?.success) setTotalClubs(data.clubs?.length ?? 0); })
       .catch(()=>{});
 
     fetchAPI(`${API}/stats`)
-      .then(r=>r.json())
-      .then(data=>{ if (data.success) setTotalMembers(data.memberCount ?? 0); })
+      .then(r=>safeJson(r))
+      .then(data=>{ if (data?.success) setTotalMembers(data.memberCount ?? 0); })
       .catch(()=>{});
   }, []);
 
   function handleAvatarChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const dataUrl = ev.target.result;
-      setAvatarPreview(dataUrl);
-      setEditData(d => ({ ...d, avatar: dataUrl }));
-      // Auto-save avatar immediately to the server and localStorage
-      try {
-        const res = await fetchAPI(`${API}/updateUser/${saved.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...saved, avatar: dataUrl }),
-        });
-        if (res.ok) {
-          const updated = { ...saved, avatar: dataUrl };
-          setSaved(updated);
-          setUser(updated);
-          localStorage.setItem("user", JSON.stringify(updated));
-        }
-      } catch (err) {
-        console.error("Avatar save failed:", err);
-      }
-    };
-    reader.readAsDataURL(file);
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
+    setPendingAvatarFile(file);
+    // reset input so same file can be re-selected
+    e.target.value = "";
   }
 
   async function toggleEnroll(clubId) {
@@ -204,19 +193,36 @@ export default function ProfilePage() {
   async function handleSave() {
     setSaveError(""); setSaveLoading(true);
     try {
+      let avatarUrl = saved.avatar;
+      if (pendingAvatarFile) {
+        const formData = new FormData();
+        formData.append("avatar", pendingAvatarFile);
+        const uploadRes = await fetchAPI(`${API}/uploadAvatar/${saved.id}`, {
+          method: "POST",
+          body: formData,
+        });
+        const uploadResult = await safeJson(uploadRes);
+        if (uploadResult?.success && uploadResult.avatarUrl) {
+          avatarUrl = uploadResult.avatarUrl;
+        }
+      }
+
       const res = await fetchAPI(`${API}/updateUser/${saved.id}`, {
         method:"PUT", headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
           name:editData.name, bio:editData.bio,
           location:editData.location, phone:editData.phone,
-          avatar: editData.avatar,
+          avatar: avatarUrl,
         }),
       });
-      const result = await res.json();
+      const result = await safeJson(res);
+      if (!result) { setSaveError("Сервертэй холбогдож чадсангүй."); return; }
       if (!res.ok) { setSaveError(result.message || "Хадгалахад алдаа гарлаа"); return; }
-      const updated = {...saved,...editData};
+      const updated = {...saved, ...editData, avatar: avatarUrl};
       setSaved(updated);
       setUser(updated);
+      setAvatarPreview(avatarUrl);
+      setPendingAvatarFile(null);
       localStorage.setItem("user", JSON.stringify(updated));
       setEditOpen(false);
     } catch { setSaveError("Сервертэй холбогдож чадсангүй."); }
@@ -226,7 +232,7 @@ export default function ProfilePage() {
   const enrolledClubs = clubs.filter(c=>c.enrolled);
 
   const labelStyle = {
-    fontSize:"11px",fontWeight:700,color:"#9879d4",letterSpacing:".1em",
+    fontSize:"11px",fontWeight:700,color:"var(--text-muted)",letterSpacing:".1em",
     textTransform:"uppercase",display:"block",marginBottom:"7px",fontFamily:"'DM Sans',sans-serif",
   };
 
@@ -234,14 +240,14 @@ export default function ProfilePage() {
     <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",background:"var(--bg-page)",transition:"background 0.3s"}}>
       <style>{fonts}</style>
       <Header user={saved}/>
-      <div style={{height:"220px",background:"linear-gradient(135deg,#0d0118 0%,#1a0533 45%,#2d0a57 75%,#3b0764 100%)",position:"relative",overflow:"hidden"}}>
+      <div style={{height:"220px",background:"linear-gradient(135deg,var(--bg-section) 0%,var(--bg-card) 100%)",position:"relative",overflow:"hidden"}}>
         <svg aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none"}}>
           <defs>
             <pattern id="prof-hatch" width="36" height="36" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
-              <line x1="0" y1="0" x2="0" y2="36" stroke="#a78bfa" strokeWidth="0.5" strokeOpacity="0.12"/>
+              <line x1="0" y1="0" x2="0" y2="36" stroke="var(--accent)" strokeWidth="0.5" strokeOpacity="0.12"/>
             </pattern>
             <pattern id="prof-dots" width="22" height="22" patternUnits="userSpaceOnUse">
-              <circle cx="1.5" cy="1.5" r="1" fill="#c4b5fd" fillOpacity="0.08"/>
+              <circle cx="1.5" cy="1.5" r="1" fill="var(--accent)" fillOpacity="0.08"/>
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#prof-hatch)"/>
@@ -250,7 +256,7 @@ export default function ProfilePage() {
         <div style={{position:"absolute",top:"-80px",right:"-80px",width:"320px",height:"320px",borderRadius:"50%",background:"rgba(124,58,237,.13)",animation:"pp-orb1 9s ease-in-out infinite",pointerEvents:"none"}}/>
         <div style={{position:"absolute",bottom:"-60px",left:"18%",width:"200px",height:"200px",borderRadius:"50%",background:"rgba(167,139,250,.08)",animation:"pp-orb2 12s ease-in-out infinite",pointerEvents:"none"}}/>
         {saved.username && (
-          <div style={{position:"absolute",bottom:"20px",left:"48px",fontFamily:"'Fraunces',serif",fontSize:"72px",fontWeight:800,color:"rgba(167,139,250,.06)",letterSpacing:"-0.06em",lineHeight:1,userSelect:"none",pointerEvents:"none"}}>
+          <div style={{position:"absolute",bottom:"20px",left:"48px",fontFamily:"'Fraunces',serif",fontSize:"72px",fontWeight:800,color:"var(--accent-soft)",letterSpacing:"-0.06em",lineHeight:1,userSelect:"none",pointerEvents:"none"}}>
             @{saved.username}
           </div>
         )}
@@ -263,19 +269,16 @@ export default function ProfilePage() {
               <div
                 className="pp-avatar-wrap"
                 style={{position:"relative",width:"120px",height:"120px",borderRadius:"50%",flexShrink:0}}
-                onClick={()=>fileInputRef.current?.click()}
-                title="Click to change photo"
               >
                 <div style={{
                   width:"120px",height:"120px",borderRadius:"50%",
                   border:"4px solid var(--bg-card)",
-                  background:"linear-gradient(135deg,#4c1d95,#1a0533)",
+                  background:"var(--accent)",
                   color:"#fff",fontFamily:"'Fraunces',serif",
                   fontSize:"36px",fontWeight:800,
                   display:"flex",alignItems:"center",justifyContent:"center",
                   overflow:"hidden",
                   boxShadow:"0 8px 32px rgba(26,5,51,.28),0 0 0 1px rgba(124,58,237,.15)",
-                  cursor:"pointer",
                   transition:"box-shadow 0.2s",
                 }}>
                   {(avatarPreview || saved.avatar)
@@ -283,25 +286,6 @@ export default function ProfilePage() {
                     : getInitials(saved.name || "U")
                   }
                 </div>
-                <div className="pp-avatar-upload">
-                  <svg width="22" height="22" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                    <circle cx="12" cy="13" r="4"/>
-                  </svg>
-                </div>
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                style={{display:"none"}}
-                onChange={handleAvatarChange}
-              />
-              <div style={{position:"absolute",bottom:"2px",right:"2px",width:"28px",height:"28px",borderRadius:"50%",background:"linear-gradient(135deg,#7c3aed,#4c1d95)",border:"2.5px solid var(--bg-card)",boxShadow:"0 2px 8px rgba(124,58,237,.4)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}} onClick={()=>fileInputRef.current?.click()} title="Change photo">
-                <svg width="13" height="13" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                  <circle cx="12" cy="13" r="4"/>
-                </svg>
               </div>
             </div>
 
@@ -371,7 +355,7 @@ export default function ProfilePage() {
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"14px",marginBottom:"40px"}}>
             {[
-              { val:enrolledClubs.length, label:"Clubs joined",    icon:"🏆", color:"#7c3aed" },
+              { val:enrolledClubs.length, label:"Clubs joined",    icon:"🏆", color:"var(--accent)" },
               { val:totalClubs,           label:"Clubs available", icon:"🌐", color:"#3b82f6" },
               { val:totalMembers,         label:"Total members",   icon:"👥", color:"#22c55e" },
             ].map(({val,label,icon,color})=>(
@@ -413,7 +397,7 @@ export default function ProfilePage() {
                   <span className="pp-sans" style={{
                     marginLeft:"7px",fontSize:"10px",fontWeight:700,
                     background:activeTab===id?"rgba(124,58,237,.12)":"var(--bg-input)",
-                    color:activeTab===id?"#7c3aed":"var(--text-muted)",
+                    color:activeTab===id?"var(--accent)":"var(--text-muted)",
                     borderRadius:"20px",padding:"2px 7px",
                     transition:"all 0.3s",
                   }}>
@@ -436,7 +420,7 @@ export default function ProfilePage() {
                   </p>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:"14px"}}>
                     {enrolledClubs.map(club=>(
-                      <div key={club.id} className="pp-club-card">
+                      <div key={club.id} className="pp-club-card" onClick={()=>router.push(`/club-detail?id=${club.id}`)}>
                         {club.banner ? (
                           <div style={{height:"72px",borderRadius:"10px",overflow:"hidden",marginBottom:"16px",background:club.bg}}>
                             {(() => {
@@ -465,7 +449,7 @@ export default function ProfilePage() {
                         <button onClick={()=>toggleEnroll(club.id)} className="pp-sans" style={{
                           width:"100%",padding:"9px",borderRadius:"8px",
                           border:"1.5px solid var(--border-subtle)",
-                          background:"none",color:"#7c3aed",
+                          background:"none",color:"var(--accent)",
                           fontSize:"12.5px",fontWeight:600,cursor:"pointer",
                           transition:"background .15s",
                         }}
@@ -482,7 +466,7 @@ export default function ProfilePage() {
                   <div style={{width:"68px",height:"68px",borderRadius:"20px",background:"var(--bg-input)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px",fontSize:"30px"}}>🏆</div>
                   <h3 className="pp-display" style={{fontSize:"22px",color:"var(--text-primary)",marginBottom:"8px",fontWeight:800,transition:"color 0.3s"}}>No clubs yet</h3>
                   <p className="pp-sans" style={{color:"var(--text-muted)",fontSize:"14px",marginBottom:"24px",transition:"color 0.3s"}}>Browse clubs and join one that interests you</p>
-                  <a href="/page1" className="pp-sans" style={{background:"linear-gradient(135deg,#7c3aed,#4c1d95)",color:"#fff",padding:"13px 28px",borderRadius:"10px",fontWeight:700,fontSize:"14px",textDecoration:"none"}}>
+                  <a href="/page1" className="pp-sans" style={{background:"var(--accent)",color:"var(--text-on-accent)",padding:"13px 28px",borderRadius:"10px",fontWeight:700,fontSize:"14px",textDecoration:"none"}}>
                     Browse clubs →
                   </a>
                 </div>
@@ -505,7 +489,7 @@ export default function ProfilePage() {
                 <div style={{textAlign:"center",padding:"60px 0"}}>
                   <div style={{fontSize:"34px",marginBottom:"12px"}}>📭</div>
                   <p className="pp-sans" style={{color:"var(--text-muted)",fontSize:"14px",transition:"color 0.3s"}}>No club activity yet — join a club!</p>
-                  <a href="/page1" className="pp-sans" style={{display:"inline-block",marginTop:"16px",background:"linear-gradient(135deg,#7c3aed,#4c1d95)",color:"#fff",padding:"10px 24px",borderRadius:"9px",fontWeight:700,fontSize:"13px",textDecoration:"none"}}>
+                  <a href="/page1" className="pp-sans" style={{display:"inline-block",marginTop:"16px",background:"var(--accent)",color:"var(--text-on-accent)",padding:"10px 24px",borderRadius:"9px",fontWeight:700,fontSize:"13px",textDecoration:"none"}}>
                     Browse clubs →
                   </a>
                 </div>
@@ -530,12 +514,12 @@ export default function ProfilePage() {
       </main>
       <Footer/>
       {editOpen && (
-        <div className="pp-modal-overlay" onClick={e=>e.target===e.currentTarget&&setEditOpen(false)}>
+        <div className="pp-modal-overlay" onClick={e=>{ if(e.target===e.currentTarget){ setEditOpen(false); setEditData(saved); setAvatarPreview(saved.avatar||null); setPendingAvatarFile(null); }}}>
           <div className="pp-modal">
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"28px"}}>
               <h2 className="pp-display" style={{fontSize:"22px",fontWeight:800,color:"var(--text-primary)",margin:0,transition:"color 0.3s"}}>Edit Profile</h2>
-              <button onClick={()=>setEditOpen(false)} style={{background:"none",border:"none",cursor:"pointer",color:"var(--text-muted)",padding:0,transition:"color .15s"}}
-                onMouseEnter={e=>e.currentTarget.style.color="#7c3aed"} onMouseLeave={e=>e.currentTarget.style.color="var(--text-muted)"}>
+              <button onClick={()=>{ setEditOpen(false); setEditData(saved); setAvatarPreview(saved.avatar||null); setPendingAvatarFile(null); }} style={{background:"none",border:"none",cursor:"pointer",color:"var(--text-muted)",padding:0,transition:"color .15s"}}
+                onMouseEnter={e=>e.currentTarget.style.color="var(--accent)"} onMouseLeave={e=>e.currentTarget.style.color="var(--text-muted)"}>
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
@@ -552,7 +536,7 @@ export default function ProfilePage() {
               >
                 <div style={{
                   width:"64px",height:"64px",borderRadius:"50%",overflow:"hidden",
-                  background:"linear-gradient(135deg,#4c1d95,#1a0533)",
+                  background:"var(--accent)",
                   display:"flex",alignItems:"center",justifyContent:"center",
                   color:"#fff",fontFamily:"'Fraunces',serif",fontSize:"20px",fontWeight:800,
                 }}>
@@ -568,6 +552,13 @@ export default function ProfilePage() {
                   </svg>
                 </div>
               </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{display:"none"}}
+                onChange={handleAvatarChange}
+              />
               <div style={{flex:1}}>
                 <p className="pp-sans" style={{fontSize:"13.5px",fontWeight:600,color:"var(--text-primary)",margin:"0 0 6px",transition:"color 0.3s"}}>Profile photo</p>
                 <button
@@ -577,21 +568,21 @@ export default function ProfilePage() {
                   style={{
                     display:"inline-flex",alignItems:"center",gap:"6px",
                     padding:"7px 14px",borderRadius:"8px",
-                    border:"1.5px solid rgba(124,58,237,0.4)",
-                    background:"rgba(124,58,237,0.08)",
-                    color:"#7c3aed",fontSize:"12.5px",fontWeight:600,
+                    border:"1.5px solid var(--accent-soft)",
+                    background:"var(--accent-soft)",
+                    color:"var(--accent)",fontSize:"12.5px",fontWeight:600,
                     cursor:"pointer",fontFamily:"'DM Sans',sans-serif",
                     transition:"all .15s",
                   }}
-                  onMouseEnter={e=>{e.currentTarget.style.background="rgba(124,58,237,0.16)";e.currentTarget.style.borderColor="rgba(124,58,237,0.7)";}}
-                  onMouseLeave={e=>{e.currentTarget.style.background="rgba(124,58,237,0.08)";e.currentTarget.style.borderColor="rgba(124,58,237,0.4)";}}
+                  onMouseEnter={e=>{e.currentTarget.style.background="var(--accent-soft)";e.currentTarget.style.borderColor="var(--accent)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.background="var(--accent-soft)";e.currentTarget.style.borderColor="var(--accent-soft)";}}
                 >
                   <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                   </svg>
-                  {avatarPreview ? "Change photo" : "Upload photo"}
+                  {pendingAvatarFile ? "Change photo" : "Upload photo"}
                 </button>
-                {avatarPreview && (
+                {pendingAvatarFile && (
                   <p className="pp-sans" style={{fontSize:"11px",color:"#22c55e",margin:"5px 0 0",fontWeight:500}}>✓ New photo ready</p>
                 )}
               </div>
@@ -620,7 +611,7 @@ export default function ProfilePage() {
             </div>
 
             <div style={{display:"flex",gap:"12px",marginTop:"28px"}}>
-              <button onClick={()=>setEditOpen(false)} className="pp-sans" style={{
+              <button onClick={()=>{ setEditOpen(false); setEditData(saved); setAvatarPreview(saved.avatar||null); setPendingAvatarFile(null); }} className="pp-sans" style={{
                 flex:1,padding:"13px",borderRadius:"9px",
                 border:"1.5px solid var(--border-subtle)",
                 background:"none",color:"var(--text-secondary)",
@@ -633,7 +624,7 @@ export default function ProfilePage() {
               </button>
               <button onClick={handleSave} disabled={saveLoading} className="pp-sans" style={{
                 flex:1,padding:"13px",borderRadius:"9px",border:"none",
-                background:"linear-gradient(135deg,#7c3aed,#4c1d95)",
+                background:"var(--accent)",
                 color:"#fff",fontSize:"14px",fontWeight:700,
                 cursor:saveLoading?"not-allowed":"pointer",
                 opacity:saveLoading?.7:1,transition:"opacity .15s",
