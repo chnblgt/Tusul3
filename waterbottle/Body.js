@@ -176,7 +176,7 @@ export default function Body() {
           borderRight: "1px solid var(--border-subtle)",
         }}>
           <div className="bd-a1" style={{ marginBottom: "28px" }}>
-            <span className="bd-tag">Mongolia's Club Platform</span>
+            <span className="bd-tag">Mongolia's Simplest Club Platform</span>
           </div>
 
           <h1 className="bd-a2" style={{

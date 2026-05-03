@@ -160,6 +160,8 @@ export default function ClubDetailPage() {
     }
   }
 
+  const isOwner = user && club && String(club.owner_id) === String(user.id);
+
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-page)" }}>
       <style>{fonts}</style>
@@ -251,12 +253,19 @@ export default function ClubDetailPage() {
                       color: "var(--text-primary)", letterSpacing: "-0.03em",
                       margin: 0, lineHeight: 1.15, transition: "color 0.3s",
                     }}>{club.name}</h1>
-                    {enrolled && (
+                    {enrolled && !isOwner && (
                       <span className="cd-sans" style={{
                         fontSize: "11px", fontWeight: 700, padding: "3px 10px",
                         borderRadius: "20px", background: "rgba(34,197,94,0.1)",
                         color: "#22c55e", border: "1px solid rgba(34,197,94,0.2)",
                       }}>✓ Enrolled</span>
+                    )}
+                    {isOwner && (
+                      <span className="cd-sans" style={{
+                        fontSize: "11px", fontWeight: 700, padding: "3px 10px",
+                        borderRadius: "20px", background: "rgba(124,58,237,0.1)",
+                        color: "#7c3aed", border: "1px solid rgba(124,58,237,0.2)",
+                      }}>👑 Owner</span>
                     )}
                   </div>
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -335,21 +344,44 @@ export default function ClubDetailPage() {
                 </div>
               )}
             </div>
+
+            {/* RIGHT SIDEBAR */}
             <div style={{ position: "sticky", top: "24px" }} className="cd-fadein">
-              <div className="cd-info-card" style={{ marginBottom: "16px" }}>
-                <button
-                  onClick={handleJoin}
-                  disabled={joining}
-                  className={enrolled ? "cd-leave-btn" : "cd-join-btn"}
-                >
-                  {joining ? "..." : enrolled ? "Leave club" : user ? "Join club" : "Sign in to join"}
-                </button>
-                {!user && (
-                  <p className="cd-sans" style={{ fontSize: "12px", color: "var(--text-muted)", textAlign: "center", margin: "10px 0 0", transition: "color 0.3s" }}>
-                    <a href="/signin" style={{ color: "#7c3aed", fontWeight: 600, textDecoration: "none" }}>Sign in</a> or <a href="/signup" style={{ color: "#7c3aed", fontWeight: 600, textDecoration: "none" }}>create account</a>
-                  </p>
-                )}
-              </div>
+
+              {/* OWNER ACTIONS */}
+              {isOwner ? (
+                <div className="cd-info-card" style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <button
+                    onClick={() => router.push(`/club-edit?id=${id}`)}
+                    className="cd-join-btn"
+                  >
+                    ✏️ Edit Club
+                  </button>
+                  <button
+                    onClick={() => router.push(`/club-owner-dashboard?id=${id}`)}
+                    className="cd-leave-btn"
+                  >
+                    👥 View Members
+                  </button>
+                </div>
+              ) : (
+                <div className="cd-info-card" style={{ marginBottom: "16px" }}>
+                  <button
+                    onClick={handleJoin}
+                    disabled={joining}
+                    className={enrolled ? "cd-leave-btn" : "cd-join-btn"}
+                  >
+                    {joining ? "..." : enrolled ? "Leave club" : user ? "Join club" : "Sign in to join"}
+                  </button>
+                  {!user && (
+                    <p className="cd-sans" style={{ fontSize: "12px", color: "var(--text-muted)", textAlign: "center", margin: "10px 0 0", transition: "color 0.3s" }}>
+                      <a href="/signin" style={{ color: "#7c3aed", fontWeight: 600, textDecoration: "none" }}>Sign in</a> or <a href="/signup" style={{ color: "#7c3aed", fontWeight: 600, textDecoration: "none" }}>create account</a>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* CONTACT CARD */}
               <div className="cd-info-card">
                 <p className="cd-sans" style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 16px", transition: "color 0.3s" }}>Contact</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -383,7 +415,7 @@ export default function ClubDetailPage() {
                       {club.website.replace(/^https?:\/\//, "")}
                     </a>
                   )}
-                  {!club.address && !club.district ? null : (
+                  {(club.address || club.district) && (
                     <div className="cd-sans" style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "13.5px", color: "var(--text-secondary)", transition: "color 0.3s" }}>
                       <div style={{ width: "32px", height: "32px", borderRadius: "9px", background: "var(--bg-input)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "1px", transition: "background 0.3s" }}>
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>

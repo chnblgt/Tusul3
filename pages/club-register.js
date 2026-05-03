@@ -20,17 +20,14 @@ const CATEGORIES = [
   "Wrestling", "Boxing", "Judo", "Athletics", "Other",
 ];
 
-// Payment step only appears for paid clubs
 const ALL_STEPS = ["Basic Info", "Media", "Pricing", "Payment", "Location & Contact"];
 
-// Mongolian banks
 const MN_BANKS = [
   "Хаан банк", "Голомт банк", "Хас банк", "Төрийн банк",
   "Тээвэр хөгжлийн банк", "Капитал банк", "Ариг банк", "Богд банк",
   "Карго банк", "М банк",
 ];
 
-// Preset belt colors — clubs can also add custom ranks
 const PRESET_DANS = [
   { label: "White",  color: "#f8f8f8", border: "#ddd" },
   { label: "Yellow", color: "#fef08a", border: "#ca8a04" },
@@ -57,21 +54,6 @@ const fonts = `
     100%{transform:translateY(280px) rotate(540deg);opacity:0}
   }
 
-  .reg-success-card {
-    background:rgba(255,255,255,0.97);
-    backdrop-filter:blur(24px);
-    border:1.5px solid rgba(124,58,237,0.1);
-    border-radius:28px;
-    padding:56px 52px 52px;
-    box-shadow:0 32px 80px rgba(124,58,237,0.12),0 4px 20px rgba(26,5,51,0.05);
-    text-align:center;
-    position:relative;
-    overflow:hidden;
-  }
-  .reg-success-card::before {
-    content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
-    background:linear-gradient(90deg,transparent,rgba(124,58,237,0.25),transparent);
-  }
   .reg-btn-primary {
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
     padding:15px 36px;background:linear-gradient(135deg,#7c3aed,#4c1d95);
@@ -122,116 +104,21 @@ const extraStyles = `
   }
 `;
 
-function Confetti() {
-  const items = Array.from({ length: 22 }, (_, i) => ({
-    color: ["#7c3aed","#a78bfa","#c4b5fd","#22c55e","#fbbf24","#ec4899","#38bdf8"][i % 7],
-    left: `${5 + (i * 4.4) % 90}%`,
-    delay: `${(i * 0.07).toFixed(2)}s`,
-    dur: `${0.7 + (i % 5) * 0.14}s`,
-    size: i % 3 === 0 ? 9 : 6,
-    circle: i % 4 === 0,
-  }));
-  return (
-    <div style={{ position:"absolute", top:0, left:0, right:0, height:"260px", overflow:"hidden", pointerEvents:"none", zIndex:0 }}>
-      {items.map((p, i) => (
-        <div key={i} style={{ position:"absolute", top:"-10px", left:p.left, width:`${p.size}px`, height:`${p.circle ? p.size : p.size * 1.7}px`, borderRadius: p.circle ? "50%" : "2px", background: p.color, animation:`reg-confetti ${p.dur} ${p.delay} ease-in both` }}/>
-      ))}
-    </div>
-  );
-}
-
-function SubmittedPage({ clubName }) {
-  const steps = [
-    { done:true,  label:"Клуб бүртгэгдлээ",   sub:"Таны мэдээлэл хүлээн авлаа" },
-    { done:true,  label:"Имэйл илгээлээ",       sub:"Баталгаажуулах линк очсон байна" },
-    { done:false, label:"Admin хянаж байна",     sub:"Ихэвчлэн 24 цагийн дотор" },
-    { done:false, label:"Клуб нийтлэгдэнэ",      sub:"Browse хуудсанд харагдана" },
-  ];
-  return (
-    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", background:"radial-gradient(ellipse at 20% 20%, #ede9fe 0%, #f5f0ff 30%, #faf8ff 60%, #ffffff 100%)" }}>
-      <style>{fonts}</style>
-      <div style={{ height:3, background:"linear-gradient(90deg,#4c1d95,#7c3aed,#c4b5fd,#7c3aed,#4c1d95)" }}/>
-      <nav style={{ padding:"20px 36px" }}>
-        <a href="/page" style={{ display:"inline-flex", alignItems:"center", gap:10, textDecoration:"none" }}>
-          <div style={{ width:32, height:32, borderRadius:10, background:"linear-gradient(135deg,#1a0533,#3b0764)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <span style={{ color:"#c4b5fd", fontWeight:800, fontSize:15, fontFamily:"'Fraunces',serif" }}>D</span>
-          </div>
-          <span className="reg-display" style={{ fontSize:19, color:"#1a0533" }}>Duguilan<span style={{ color:"#7c3aed" }}>.mn</span></span>
-        </a>
-      </nav>
-      <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"16px 16px 72px" }}>
-        <div style={{ width:"100%", maxWidth:520, animation:"reg-fadeUp .5s cubic-bezier(.22,1,.36,1) both" }}>
-          <div className="reg-success-card">
-            <Confetti/>
-            <div style={{ position:"relative", width:88, height:88, margin:"0 auto 28px", zIndex:1 }}>
-              {[0,1].map(i => (
-                <div key={i} style={{ position:"absolute", inset:0, borderRadius:"50%", border:"2px solid rgba(34,197,94,0.22)", animation:`reg-ripple 2.2s ${i*0.6}s ease-out infinite` }}/>
-              ))}
-              <div style={{ position:"absolute", inset:0, borderRadius:"24px", background:"linear-gradient(145deg,#dcfce7,#bbf7d0)", border:"2px solid rgba(34,197,94,0.2)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <svg width="38" height="38" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                  <polyline points="20 6 9 17 4 12" style={{ strokeDasharray:50, animation:"reg-check .6s .3s cubic-bezier(.22,1,.36,1) both" }}/>
-                </svg>
-              </div>
-            </div>
-            <div style={{ position:"relative", zIndex:1 }}>
-              <h1 className="reg-display" style={{ fontSize:28, fontWeight:800, color:"#1a0533", letterSpacing:"-0.03em", lineHeight:1.2, margin:"0 0 10px" }}>Клуб бүртгэгдлээ! 🎉</h1>
-              <p className="reg-sans" style={{ fontSize:15, color:"#555", lineHeight:1.8, margin:"0 0 6px" }}>
-                <strong style={{ color:"#1a0533" }}>{clubName}</strong> амжилттай бүртгэгдлээ.
-              </p>
-              <p className="reg-sans" style={{ fontSize:13.5, color:"#9879d4", lineHeight:1.7, margin:"0 0 32px" }}>
-                Имэйл хаяг руу баталгаажуулах линк илгээлээ.
-              </p>
-              <div style={{ background:"linear-gradient(135deg,#fdfcff,#f8f4ff)", border:"1.5px solid rgba(124,58,237,0.1)", borderRadius:18, padding:"22px 24px", marginBottom:32, textAlign:"left" }}>
-                <p className="reg-sans" style={{ fontSize:10, fontWeight:800, color:"#9879d4", letterSpacing:".12em", textTransform:"uppercase", margin:"0 0 18px" }}>Клубийн явц</p>
-                {steps.map((s, i) => (
-                  <div key={i} style={{ display:"flex", gap:14, alignItems:"flex-start", paddingBottom: i < steps.length-1 ? 16 : 0 }}>
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", flexShrink:0 }}>
-                      <div style={{ width:28, height:28, borderRadius:"50%", background: s.done ? "linear-gradient(135deg,#22c55e,#16a34a)" : "rgba(124,58,237,0.06)", border:`1.5px solid ${s.done ? "#22c55e" : "rgba(124,58,237,0.14)"}`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                        {s.done ? <svg width="11" height="11" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                          : <span className="reg-sans" style={{ fontSize:10, fontWeight:700, color:"#c4b5fd" }}>{i+1}</span>}
-                      </div>
-                      {i < steps.length-1 && <div style={{ width:2, height:18, marginTop:4, background: s.done ? "linear-gradient(to bottom,#22c55e,rgba(124,58,237,0.1))" : "rgba(124,58,237,0.1)" }}/>}
-                    </div>
-                    <div style={{ paddingTop:3 }}>
-                      <p className="reg-sans" style={{ fontSize:13, fontWeight:700, color: s.done ? "#1a0533" : "#9879d4", margin:"0 0 2px" }}>{s.label}</p>
-                      <p className="reg-sans" style={{ fontSize:11.5, color:"#bbb", lineHeight:1.5, margin:0 }}>{s.sub}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"center" }}>
-                <a href="/page1" className="reg-btn-primary" style={{ width:"100%", maxWidth:300 }}>Browse clubs →</a>
-                <a href="/page" className="reg-btn-ghost" style={{ width:"100%", maxWidth:300 }}>← Нүүр хуудас руу буцах</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function ClubRegisterPage() {
-  const [step, setStep]           = useState(0);
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState("");
+  const router = useRouter();
+  const [step, setStep]       = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState("");
 
   const [form, setForm] = useState({
-    // Step 0
     clubName: "", category: "", description: "", foundedYear: "",
-    // Step 1
     logo: null, logoPreview: null, bannerPhotos: [], bannerPreviews: [],
-    // Step 2
     pricingType: "free",
     tiers: [{ name: "Basic", price: "", period: "monthly", description: "", features: "" }],
-    // Step 3 — Payment (paid clubs only)
-    dans: [],           // [{ label, color, price }]
-    customDan: "",
-    paymentMethod: "qpay",          // "qpay" | "bank" | "both"
+    dans: [], customDan: "",
+    paymentMethod: "qpay",
     qpayMerchantId: "",
     bankName: "", bankAccount: "", bankAccountName: "",
-    // Step 4 — Location
     address: "", district: "", email: "", phone: "", website: "",
     lat: null, lng: null,
   });
@@ -241,7 +128,6 @@ export default function ClubRegisterPage() {
 
   function setField(key, value) { setForm(f => ({ ...f, [key]: value })); }
 
-  // Dans helpers
   function togglePresetDan(preset) {
     setForm(f => {
       const exists = f.dans.find(d => d.label === preset.label);
@@ -257,7 +143,6 @@ export default function ClubRegisterPage() {
   function removeDan(label) { setForm(f => ({ ...f, dans: f.dans.filter(d => d.label !== label) })); }
   function setDanPrice(label, price) { setForm(f => ({ ...f, dans: f.dans.map(d => d.label === label ? { ...d, price } : d) })); }
 
-  // Media helpers
   function handleLogoUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -272,14 +157,12 @@ export default function ClubRegisterPage() {
     setForm(f => ({ ...f, bannerPhotos: f.bannerPhotos.filter((_, idx) => idx !== i), bannerPreviews: f.bannerPreviews.filter((_, idx) => idx !== i) }));
   }
 
-  // Tier helpers
   function addTier() { setForm(f => ({ ...f, tiers: [...f.tiers, { name: "", price: "", period: "monthly", description: "", features: "" }] })); }
   function removeTier(i) { setForm(f => ({ ...f, tiers: f.tiers.filter((_, idx) => idx !== i) })); }
   function setTierField(i, key, value) { setForm(f => ({ ...f, tiers: f.tiers.map((t, idx) => idx === i ? { ...t, [key]: value } : t) })); }
 
   function handleMapPick(lat, lng) { setForm(f => ({ ...f, lat, lng })); }
 
-  // Skip Payment step for free clubs
   const STEPS = form.pricingType === "paid" ? ALL_STEPS : ALL_STEPS.filter(s => s !== "Payment");
 
   function canProceed() {
@@ -301,11 +184,19 @@ export default function ClubRegisterPage() {
   async function handleSubmit() {
     setError(""); setLoading(true);
     try {
+      const stored = localStorage.getItem("user");
+      if (!stored) { router.push("/signin"); return; }
+      const user = JSON.parse(stored);
+
       const fd = new FormData();
-      fd.append("name", form.clubName); fd.append("category", form.category);
-      fd.append("description", form.description); fd.append("email", form.email);
-      fd.append("address", form.address); fd.append("district", form.district);
+      fd.append("name", form.clubName);
+      fd.append("category", form.category);
+      fd.append("description", form.description);
+      fd.append("email", form.email);
+      fd.append("address", form.address);
+      fd.append("district", form.district);
       fd.append("pricingType", form.pricingType);
+      fd.append("owner_id", user.id);
       if (form.foundedYear) fd.append("foundedYear", form.foundedYear);
       if (form.phone)       fd.append("phone", form.phone);
       if (form.website)     fd.append("website", form.website);
@@ -314,24 +205,24 @@ export default function ClubRegisterPage() {
       if (form.lng != null) fd.append("lng", form.lng);
       form.bannerPhotos.forEach(file => fd.append("bannerPhotos", file));
       if (form.pricingType === "paid") {
-        if (form.tiers.length)      fd.append("tiers", JSON.stringify(form.tiers));
-        if (form.dans.length)       fd.append("dans",  JSON.stringify(form.dans));
-        fd.append("paymentMethod",  form.paymentMethod);
-        if (form.qpayMerchantId)    fd.append("qpayMerchantId",  form.qpayMerchantId);
-        if (form.bankName)          fd.append("bankName",         form.bankName);
-        if (form.bankAccount)       fd.append("bankAccount",      form.bankAccount);
-        if (form.bankAccountName)   fd.append("bankAccountName",  form.bankAccountName);
+        if (form.tiers.length)    fd.append("tiers", JSON.stringify(form.tiers));
+        if (form.dans.length)     fd.append("dans",  JSON.stringify(form.dans));
+        fd.append("paymentMethod", form.paymentMethod);
+        if (form.qpayMerchantId)  fd.append("qpayMerchantId",  form.qpayMerchantId);
+        if (form.bankName)        fd.append("bankName",         form.bankName);
+        if (form.bankAccount)     fd.append("bankAccount",      form.bankAccount);
+        if (form.bankAccountName) fd.append("bankAccountName",  form.bankAccountName);
       }
+
       const response = await fetchAPI(`${API}/registerClub`, { method: "POST", body: fd });
       const result   = await response.json();
       if (!response.ok) { setError(result.message || "Клуб бүртгэхэд алдаа гарлаа"); return; }
-      setSubmitted(true);
+
+      router.push(`/club-owner-dashboard?clubId=${result.clubId}`);
     } catch {
       setError("Сервертэй холбогдож чадсангүй. Backend ажиллаж байгаа эсэхийг шалгана уу.");
     } finally { setLoading(false); }
   }
-
-  if (submitted) return <SubmittedPage clubName={form.clubName} />;
 
   const inp = { width:"100%", padding:"13px 16px", border:"1.5px solid rgba(124,58,237,0.2)", borderRadius:"10px", fontSize:"14px", color:"#1a0533", background:"#fdfcff", outline:"none", boxSizing:"border-box", fontFamily:"'DM Sans', sans-serif", transition:"border-color 0.2s, box-shadow 0.2s" };
   const labelStyle = { fontSize:"11px", fontWeight:700, color:"#9879d4", letterSpacing:"0.1em", textTransform:"uppercase", display:"block", marginBottom:"7px", fontFamily:"'DM Sans', sans-serif" };
@@ -493,8 +384,6 @@ export default function ClubRegisterPage() {
             {/* ── STEP: Payment (paid clubs only) ── */}
             {stepName === "Payment" && (
               <div style={{ display:"flex", flexDirection:"column", gap:"32px" }}>
-
-                {/* Dans / Belt Ranks */}
                 <div>
                   <label style={labelStyle}>
                     Dans / Belt Ranks
@@ -503,8 +392,6 @@ export default function ClubRegisterPage() {
                   <p className="reg-sans" style={{ fontSize:"12.5px", color:"#9879d4", marginBottom:"14px", lineHeight:1.6 }}>
                     Click a belt to add it to your club. You can also type a custom rank. Each dan can have its own upgrade fee.
                   </p>
-
-                  {/* Preset belt chips */}
                   <div style={{ display:"flex", flexWrap:"wrap", gap:"8px", marginBottom:"16px" }}>
                     {PRESET_DANS.map(p => {
                       const active = !!form.dans.find(d => d.label === p.label);
@@ -518,8 +405,6 @@ export default function ClubRegisterPage() {
                       );
                     })}
                   </div>
-
-                  {/* Custom dan */}
                   <div style={{ display:"flex", gap:"10px", marginBottom:"20px" }}>
                     <input style={{ ...inp, flex:1 }} placeholder="Custom rank e.g. 1st Kyu, Beginner…"
                       value={form.customDan} onChange={e => setField("customDan", e.target.value)}
@@ -529,8 +414,6 @@ export default function ClubRegisterPage() {
                       + Add
                     </button>
                   </div>
-
-                  {/* Dan list with prices */}
                   {form.dans.length > 0 ? (
                     <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
                       <p className="reg-sans" style={{ fontSize:"11px", fontWeight:700, color:"#9879d4", letterSpacing:"0.08em", textTransform:"uppercase", margin:0 }}>Upgrade fee per rank (₮)</p>
@@ -555,7 +438,6 @@ export default function ClubRegisterPage() {
 
                 <div style={{ height:"1px", background:"rgba(124,58,237,0.08)" }}/>
 
-                {/* Payment method */}
                 <div>
                   <label style={labelStyle}>How will members pay? *</label>
                   <p className="reg-sans" style={{ fontSize:"12.5px", color:"#9879d4", marginBottom:"14px", lineHeight:1.6 }}>
@@ -563,9 +445,9 @@ export default function ClubRegisterPage() {
                   </p>
                   <div style={{ display:"flex", gap:"10px", marginBottom:"24px" }}>
                     {[
-                      { value:"qpay", label:"QPay only",     emoji:"📱" },
-                      { value:"bank", label:"Bank transfer",  emoji:"🏦" },
-                      { value:"both", label:"Both",           emoji:"✅" },
+                      { value:"qpay", label:"QPay only",    emoji:"📱" },
+                      { value:"bank", label:"Bank transfer", emoji:"🏦" },
+                      { value:"both", label:"Both",          emoji:"✅" },
                     ].map(opt => (
                       <button key={opt.value} className="payment-tab" onClick={() => setField("paymentMethod", opt.value)}
                         style={{ border:`1.5px solid ${form.paymentMethod===opt.value?"#7c3aed":"rgba(124,58,237,0.15)"}`, background:form.paymentMethod===opt.value?"#f5f0ff":"#fff", color:form.paymentMethod===opt.value?"#7c3aed":"#888" }}>
@@ -573,8 +455,6 @@ export default function ClubRegisterPage() {
                       </button>
                     ))}
                   </div>
-
-                  {/* QPay */}
                   {(form.paymentMethod==="qpay"||form.paymentMethod==="both") && (
                     <div style={{ padding:"24px", borderRadius:"14px", background:"#fdfcff", border:"1.5px solid rgba(124,58,237,0.12)", marginBottom:"16px" }}>
                       <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"16px" }}>
@@ -585,12 +465,10 @@ export default function ClubRegisterPage() {
                       <label style={labelStyle}>QPay Merchant / Invoice Receiver ID *</label>
                       <input style={inp} placeholder="e.g. MYCLUB_MN" value={form.qpayMerchantId} onChange={e => setField("qpayMerchantId", e.target.value)} {...focusHandlers}/>
                       <p className="reg-sans" style={{ fontSize:"11.5px", color:"#bbb", marginTop:"6px" }}>
-                        This is the merchant name or ID from your QPay Business account. Members will see a QR code to scan and pay.
+                        This is the merchant name or ID from your QPay Business account.
                       </p>
                     </div>
                   )}
-
-                  {/* Bank */}
                   {(form.paymentMethod==="bank"||form.paymentMethod==="both") && (
                     <div style={{ padding:"24px", borderRadius:"14px", background:"#fdfcff", border:"1.5px solid rgba(124,58,237,0.12)" }}>
                       <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"20px" }}>
@@ -610,9 +488,6 @@ export default function ClubRegisterPage() {
                           <div><label style={labelStyle}>Account Number *</label><input style={inp} placeholder="e.g. 1234567890" value={form.bankAccount} onChange={e => setField("bankAccount", e.target.value)} {...focusHandlers}/></div>
                           <div><label style={labelStyle}>Account Holder Name *</label><input style={inp} placeholder="e.g. Duguilan FC ХХК" value={form.bankAccountName} onChange={e => setField("bankAccountName", e.target.value)} {...focusHandlers}/></div>
                         </div>
-                        <p className="reg-sans" style={{ fontSize:"11.5px", color:"#bbb", margin:0 }}>
-                          Members will see these details when paying their fee. Make sure the name matches exactly.
-                        </p>
                       </div>
                     </div>
                   )}
@@ -632,8 +507,6 @@ export default function ClubRegisterPage() {
                     {["Сүхбаатар","Баянзүрх","Хан-Уул","Баянгол","Чингэлтэй","Сонгинохайрхан","Налайх","Багануур","Багахангай"].map(d => <option key={d}>{d}</option>)}
                   </select>
                 </div>
-
-                {/* Map */}
                 <div>
                   <label style={labelStyle}>Pin Your Location <span style={{ fontWeight:400, textTransform:"none", letterSpacing:0, color:"#bbb", marginLeft:6 }}>— click to drop a pin</span></label>
                   <div style={{ background:form.lat?"#f0fdf4":"#f5f0ff", border:`1px solid ${form.lat?"rgba(34,197,94,0.25)":"rgba(124,58,237,0.15)"}`, borderRadius:"10px", padding:"10px 14px", marginBottom:"10px", display:"flex", alignItems:"center", gap:"8px" }}>
@@ -654,15 +527,12 @@ export default function ClubRegisterPage() {
                     <MapPicker pickMode={true} onPick={handleMapPick} pickedLat={form.lat} pickedLng={form.lng} height="300px"/>
                   </div>
                 </div>
-
                 <div style={{ height:"1px", background:"rgba(124,58,237,0.08)" }}/>
                 <div><label style={labelStyle}>Contact Email *</label><input style={inp} type="email" placeholder="club@email.com" value={form.email} onChange={e => setField("email", e.target.value)} {...focusHandlers}/></div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px" }}>
                   <div><label style={labelStyle}>Phone</label><input style={inp} type="tel" placeholder="+976 ···" value={form.phone} onChange={e => setField("phone", e.target.value)}/></div>
                   <div><label style={labelStyle}>Website</label><input style={inp} type="url" placeholder="https://…" value={form.website} onChange={e => setField("website", e.target.value)}/></div>
                 </div>
-
-                {/* Summary */}
                 <div style={{ background:"#f5f0ff", border:"1px solid rgba(124,58,237,0.12)", borderRadius:"14px", padding:"20px 24px", marginTop:"8px" }}>
                   <p className="reg-sans" style={{ fontSize:"11px", fontWeight:700, color:"#9879d4", letterSpacing:"0.1em", textTransform:"uppercase", margin:"0 0 14px" }}>Summary</p>
                   {[
