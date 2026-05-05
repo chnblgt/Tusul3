@@ -300,7 +300,7 @@ export default function SignUpPage() {
                   <em style={{ fontStyle: "italic", fontWeight: 400 }}>account.</em>
                 </h1>
                 <p className="au-sans" style={{ fontSize: "14px", fontWeight: 300, color: "var(--text-muted)", margin: 0 }}>
-                  Join Duguilan.mn today.
+                  Join Duguilan.com today.
                 </p>
               </div>
               <div style={{

@@ -343,7 +343,7 @@ export default function VerifyEmailPage() {
           {status !== "loading" && (
             <p className="ve-sans" style={{ textAlign:"center", fontSize:12, color:"#c4b5fd", marginTop:24, fontWeight:500, lineHeight:1.6 }}>
               Асуух зүйл байвал{" "}
-              <a href="mailto:info@duguilan.mn" style={{ color:"#9879d4", fontWeight:700, textDecoration:"none" }}>info@duguilan.mn</a>
+              <a href="mailto:info@duguilan.com" style={{ color:"#9879d4", fontWeight:700, textDecoration:"none" }}>info@duguilan.com</a>
               {" "}руу хандана уу
             </p>
           )}

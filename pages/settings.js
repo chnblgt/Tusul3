@@ -212,7 +212,7 @@ export default function SettingsPage() {
                 <div className="st-section">
                   <div className="st-section-header">
                     <h2 className="st-display" style={{ color: "var(--text-primary)" }}>Appearance</h2>
-                    <p className="st-sans" style={{ color: "var(--text-muted)" }}>Choose how Duguilan.mn looks for you.</p>
+                    <p className="st-sans" style={{ color: "var(--text-muted)" }}>Choose how Duguilan.com looks for you.</p>
                   </div>
                   <div className="st-section-body">
                     <div style={{ padding: "24px 28px 8px" }}>
@@ -497,7 +497,7 @@ export default function SettingsPage() {
                     <div className="st-row">
                       <div>
                         <p className="st-sans st-label" style={{ color: "var(--text-primary)" }}>Username</p>
-                        <p className="st-sans st-hint" style={{ color: "var(--text-muted)" }}>Your unique handle on Duguilan.mn.</p>
+                        <p className="st-sans st-hint" style={{ color: "var(--text-muted)" }}>Your unique handle on Duguilan.com.</p>
                       </div>
                       <div style={{
                         background: "var(--bg-input)", border: "1.5px solid var(--border-subtle)",
@@ -512,7 +512,7 @@ export default function SettingsPage() {
                     <div className="st-row">
                       <div>
                         <p className="st-sans st-label" style={{ color: "var(--text-primary)" }}>Member since</p>
-                        <p className="st-sans st-hint" style={{ color: "var(--text-muted)" }}>When you joined Duguilan.mn.</p>
+                        <p className="st-sans st-hint" style={{ color: "var(--text-muted)" }}>When you joined Duguilan.com.</p>
                       </div>
                       <span className="st-sans" style={{ fontSize: "14px", color: "var(--text-muted)" }}>
                         {user?.created_at ? new Date(user.created_at).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" }) : "—"}

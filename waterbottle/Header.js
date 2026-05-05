@@ -199,7 +199,7 @@ export default function Header({ user = null }) {
               letterSpacing: "-0.01em",
               fontStyle: "normal",
             }}>
-              Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.mn</span>
+              Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.com</span>
             </span>
           </a>
 

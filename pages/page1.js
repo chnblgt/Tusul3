@@ -367,7 +367,7 @@ export default function CategoriesPage() {
                   color: "var(--text-primary)", margin: "0 0 8px",
                   letterSpacing: "-0.02em", transition: "color 0.3s",
                 }}>
-                  List your club on <em style={{ fontStyle: "italic" }}>Duguilan.mn</em>
+                  List your club on <em style={{ fontStyle: "italic" }}>Duguilan.com</em>
                 </h3>
                 <p className="p1-sans" style={{ fontSize: "13px", fontWeight: 300, color: "var(--text-secondary)", margin: 0, lineHeight: 1.75 }}>
                   Reach hundreds of students for free.

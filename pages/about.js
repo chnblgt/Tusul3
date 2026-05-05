@@ -4,11 +4,11 @@ import Footer from "@/waterbottle/Footer";
 const FONT = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');`;
 
 const team = [
-  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API",       color: "#5533bb" },
-  { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API",       color: "#2563eb" },
-  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Engineering",          color: "#0d9488" },
-  { name: "Delgermurun Ganbold",     role: "Graphic Designer",     focus: "UI & Design Systems", color: "#ca8a04" },
-  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "API Integration",      color: "#db2777" },
+    { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API & playboy, alcoholic, hoe",       color: "#2563eb" },
+ { name: "Delgermurun Ganbold",     role: "Angiin huuhed",     focus: "Banned from EON & 170cm", color: "#baf007" },
+  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API & pedo",       color: "#5533bb" },
+  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Chill guy, zugeer hamt baisan",          color: "#0d9488" },
+  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "Benttei huuhed",      color: "#db2777" },
 ];
 
 const CSS = `
@@ -74,7 +74,7 @@ export default function AboutPage() {
               color: "var(--text-secondary)", maxWidth: "580px",
               margin: "0 auto", transition: "color 0.35s",
             }}>
-              Duguilan.mn provides quick access to clubs and activities across Ulaanbaatar. Every student deserves an easy way to discover their passions and turn free time into meaningful growth.
+              Duguilan.com provides quick access to clubs and activities across Ulaanbaatar. Every student deserves an easy way to discover their passions and turn free time into meaningful growth.
             </p>
           </div>
         </section>
@@ -113,7 +113,7 @@ export default function AboutPage() {
                   fontSize: "15px", fontWeight: 300, lineHeight: 1.85,
                   color: "var(--text-secondary)", margin: 0, transition: "color 0.35s",
                 }}>
-                  Duguilan.mn bridges that gap by centralising information and helping club leaders reach the people who need them most.
+                  Duguilan.com bridges that gap by centralising information and helping club leaders reach the people who need them most.
                 </p>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", paddingTop: "10px" }}>

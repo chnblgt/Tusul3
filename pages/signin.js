@@ -274,7 +274,7 @@ export default function SignInPage() {
               fontSize: "14px", fontWeight: 300,
               color: "var(--text-muted)", margin: 0, transition: "color 0.35s",
             }}>
-              Sign in to your Duguilan.mn account.
+              Sign in to your Duguilan.com account.
             </p>
           </div>
           {unverified && (

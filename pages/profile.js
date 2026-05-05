@@ -478,7 +478,7 @@ export default function ProfilePage() {
               <div className="pp-activity-row">
                 <div style={{width:"42px",height:"42px",borderRadius:"12px",flexShrink:0,background:"rgba(124,58,237,.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"19px"}}>✨</div>
                 <div style={{flex:1}}>
-                  <p className="pp-sans" style={{fontSize:"14px",color:"var(--text-primary)",fontWeight:500,margin:0,transition:"color 0.3s"}}>Created Duguilan.mn account</p>
+                  <p className="pp-sans" style={{fontSize:"14px",color:"var(--text-primary)",fontWeight:500,margin:0,transition:"color 0.3s"}}>Created Duguilan.com account</p>
                 </div>
                 <span className="pp-sans" style={{fontSize:"12px",color:"var(--text-muted)",fontWeight:500,transition:"color 0.3s"}}>
                   {saved.created_at ? new Date(saved.created_at).toLocaleDateString() : ""}
