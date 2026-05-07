@@ -127,6 +127,7 @@ export default function ProfilePage() {
   const [editData,     setEditData]     = useState(DEFAULT_USER);
   const [saved,        setSaved]        = useState(DEFAULT_USER);
   const [clubs,        setClubs]        = useState([]);
+  const [ownedClubs,   setOwnedClubs]   = useState([]);
   const [totalClubs,   setTotalClubs]   = useState(0);
   const [totalMembers, setTotalMembers] = useState(0);
   const [saveLoading,  setSaveLoading]  = useState(false);
@@ -146,18 +147,28 @@ export default function ProfilePage() {
       .then(r=>safeJson(r))
       .then(data=>{
         if (data?.success) {
-          setClubs(data.clubs.map((c,i)=>({
+          const mapped = data.clubs.map((c,i)=>({
             ...c, enrolled:true,
             accent:["#22c55e","#a855f7","#f97316","#3b82f6","#ef4444"][i%5],
             bg:    ["#f0fdf4","#faf5ff","#fff7ed","#eff6ff","#fef2f2"][i%5],
-          })));
+          }));
+          setClubs(mapped);
         }
       }).catch(()=>{});
 
     fetchAPI(`${API}/clubs`)
       .then(r=>safeJson(r))
-      .then(data=>{ if (data?.success) setTotalClubs(data.clubs?.length ?? 0); })
-      .catch(()=>{});
+      .then(data=>{
+        if (data?.success) {
+          const owned = (data.clubs||[]).filter(c=>String(c.owner_id)===String(u.id)).map((c,i)=>({
+            ...c,
+            accent:["#22c55e","#a855f7","#f97316","#3b82f6","#ef4444"][i%5],
+            bg:    ["#f0fdf4","#faf5ff","#fff7ed","#eff6ff","#fef2f2"][i%5],
+          }));
+          setOwnedClubs(owned);
+          setTotalClubs(data.clubs?.length ?? 0);
+        }
+      }).catch(()=>{});
 
     fetchAPI(`${API}/stats`)
       .then(r=>safeJson(r))
@@ -390,7 +401,7 @@ export default function ProfilePage() {
             ))}
           </div>
           <div style={{borderBottom:"1px solid var(--border-subtle)",marginBottom:"36px",display:"flex",transition:"border-color 0.3s"}}>
-            {[["clubs","My Clubs"],["activity","Activity"]].map(([id,lbl])=>(
+            {[["clubs","My Clubs"],["myclubs","My Club"],["activity","Activity"]].map(([id,lbl])=>(
               <button key={id} className={`pp-tab${activeTab===id?" active":""}`} onClick={()=>setActiveTab(id)}>
                 {lbl}
                 {id==="clubs" && (
@@ -402,6 +413,17 @@ export default function ProfilePage() {
                     transition:"all 0.3s",
                   }}>
                     {enrolledClubs.length}
+                  </span>
+                )}
+                {id==="myclubs" && ownedClubs.length > 0 && (
+                  <span className="pp-sans" style={{
+                    marginLeft:"7px",fontSize:"10px",fontWeight:700,
+                    background:activeTab===id?"rgba(124,58,237,.12)":"var(--bg-input)",
+                    color:activeTab===id?"var(--accent)":"var(--text-muted)",
+                    borderRadius:"20px",padding:"2px 7px",
+                    transition:"all 0.3s",
+                  }}>
+                    {ownedClubs.length}
                   </span>
                 )}
               </button>
@@ -473,12 +495,89 @@ export default function ProfilePage() {
               )}
             </div>
           )}
+          {activeTab==="myclubs" && (
+            <div>
+              {ownedClubs.length > 0 ? (
+                <div>
+                  <p className="pp-sans" style={{
+                    fontSize:"10.5px",fontWeight:700,color:"var(--text-muted)",
+                    letterSpacing:".12em",textTransform:"uppercase",margin:"0 0 18px",
+                    transition:"color 0.3s",
+                  }}>
+                    Owned · {ownedClubs.length}
+                  </p>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:"14px"}}>
+                    {ownedClubs.map(club=>(
+                      <div key={club.id} className="pp-club-card">
+                        {club.banner ? (
+                          <div style={{height:"72px",borderRadius:"10px",overflow:"hidden",marginBottom:"16px",background:club.bg}}>
+                            {(()=>{
+                              try { const imgs=JSON.parse(club.banner); return <img src={imgs[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>; }
+                              catch { return null; }
+                            })()}
+                          </div>
+                        ) : (
+                          <div style={{height:"56px",borderRadius:"10px",marginBottom:"16px",background:`linear-gradient(135deg,${club.accent}18,${club.accent}08)`,border:`1px solid ${club.accent}18`}}/>
+                        )}
+                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"12px"}}>
+                          <div style={{width:"42px",height:"42px",borderRadius:"11px",background:club.bg,border:`1.5px solid ${club.accent}22`,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
+                            {club.logo
+                              ? <img src={club.logo} alt={club.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                              : <span style={{fontSize:"18px",fontWeight:800,color:club.accent,fontFamily:"'Fraunces',serif"}}>{club.name[0]}</span>
+                            }
+                          </div>
+                          <span className="pp-sans" style={{fontSize:"10px",fontWeight:700,letterSpacing:".08em",textTransform:"uppercase",padding:"3px 8px",borderRadius:"5px",background:"rgba(124,58,237,.1)",color:"var(--accent)",border:"1px solid rgba(124,58,237,.2)"}}>
+                            Owner
+                          </span>
+                        </div>
+                        <div className="pp-display" style={{fontSize:"16px",fontWeight:800,color:"var(--text-primary)",marginBottom:"4px",transition:"color 0.3s"}}>{club.name}</div>
+                        <div className="pp-sans" style={{fontSize:"12px",color:"var(--text-muted)",marginBottom:"14px",transition:"color 0.3s"}}>{club.category}</div>
+                        <div style={{display:"flex",gap:"8px"}}>
+                          <button onClick={()=>router.push(`/club-detail?id=${club.id}`)} className="pp-sans" style={{
+                            flex:1,padding:"9px",borderRadius:"8px",
+                            border:"1.5px solid var(--border-subtle)",
+                            background:"none",color:"var(--text-secondary)",
+                            fontSize:"12.5px",fontWeight:600,cursor:"pointer",
+                            transition:"background .15s",
+                          }}
+                            onMouseEnter={e=>e.currentTarget.style.background="var(--accent-soft)"}
+                            onMouseLeave={e=>e.currentTarget.style.background="none"}>
+                            View Club
+                          </button>
+                          <button onClick={()=>router.push(`/club-edit?id=${club.id}`)} className="pp-sans" style={{
+                            flex:1,padding:"9px",borderRadius:"8px",
+                            border:"1.5px solid var(--accent)",
+                            background:"var(--accent)",color:"var(--text-on-accent)",
+                            fontSize:"12.5px",fontWeight:700,cursor:"pointer",
+                            transition:"opacity .15s",
+                          }}
+                            onMouseEnter={e=>e.currentTarget.style.opacity="0.85"}
+                            onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+                            Edit Club
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div style={{textAlign:"center",padding:"80px 0"}}>
+                  <div style={{width:"68px",height:"68px",borderRadius:"20px",background:"var(--bg-input)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px",fontSize:"30px"}}>🏠</div>
+                  <h3 className="pp-display" style={{fontSize:"22px",color:"var(--text-primary)",marginBottom:"8px",fontWeight:800,transition:"color 0.3s"}}>No owned clubs</h3>
+                  <p className="pp-sans" style={{color:"var(--text-muted)",fontSize:"14px",marginBottom:"24px",transition:"color 0.3s"}}>You haven't registered a club yet</p>
+                  <a href="/register-club" className="pp-sans" style={{background:"var(--accent)",color:"var(--text-on-accent)",padding:"13px 28px",borderRadius:"10px",fontWeight:700,fontSize:"14px",textDecoration:"none"}}>
+                    Register a Club →
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
           {activeTab==="activity" && (
             <div style={{display:"flex",flexDirection:"column",gap:"12px"}}>
               <div className="pp-activity-row">
                 <div style={{width:"42px",height:"42px",borderRadius:"12px",flexShrink:0,background:"rgba(124,58,237,.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"19px"}}>✨</div>
                 <div style={{flex:1}}>
-                  <p className="pp-sans" style={{fontSize:"14px",color:"var(--text-primary)",fontWeight:500,margin:0,transition:"color 0.3s"}}>Created Duguilan.mn account</p>
+                  <p className="pp-sans" style={{fontSize:"14px",color:"var(--text-primary)",fontWeight:500,margin:0,transition:"color 0.3s"}}>Created Duguilan.com account</p>
                 </div>
                 <span className="pp-sans" style={{fontSize:"12px",color:"var(--text-muted)",fontWeight:500,transition:"color 0.3s"}}>
                   {saved.created_at ? new Date(saved.created_at).toLocaleDateString() : ""}

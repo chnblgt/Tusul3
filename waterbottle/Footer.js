@@ -85,7 +85,7 @@ export default function Footer() {
                   color: "var(--text-primary)",
                   letterSpacing: "-0.01em",
                 }}>
-                  Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.mn</span>
+                  Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.com</span>
                 </span>
               </a>
               <p style={{
@@ -161,7 +161,7 @@ export default function Footer() {
               fontSize: "12px", fontWeight: 400,
               color: "var(--text-muted)", margin: 0,
             }}>
-              &copy; 2026 Duguilan.mn &mdash; Nest IT School
+              &copy; 2026 Duguilan.com &mdash; Nest IT School
             </p>
             <p style={{
               fontFamily: "'DM Sans', sans-serif",

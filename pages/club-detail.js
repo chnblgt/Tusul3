@@ -6,13 +6,16 @@ import Footer from "@/waterbottle/Footer";
 
 const MapPicker = dynamic(() => import("@/waterbottle/Mapcomponent"), { ssr: false });
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API = "/api";
 
-const fetchAPI = (url, options = {}) =>
-  fetch(url, {
-    ...options,
-    headers: { "ngrok-skip-browser-warning": "true", ...options.headers },
-  });
+const fetchAPI = async (url, options = {}) => {
+  try {
+    return await fetch(url, {
+      ...options,
+      headers: { "ngrok-skip-browser-warning": "true", ...options.headers },
+    });
+  } catch { throw new Error("NETWORK_ERROR"); }
+};
 
 const CATEGORY_STYLES = {
   football:   { accent: "#22c55e", bg: "#f0fdf4" },
@@ -36,7 +39,7 @@ const CATEGORY_STYLES = {
 
 function getCategoryStyle(category) {
   const key = (category || "").toLowerCase();
-  return CATEGORY_STYLES[key] || { accent: "#7c3aed", bg: "#f5f0ff" };
+  return CATEGORY_STYLES[key] || { accent: "var(--accent)", bg: "var(--accent-soft)" };
 }
 
 const fonts = `
@@ -47,59 +50,121 @@ const fonts = `
   @keyframes cd-fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
   .cd-fadein { animation: cd-fadeUp 0.45s cubic-bezier(.22,1,.36,1) both; }
 
-  .cd-join-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 14px 36px;
-    background: linear-gradient(135deg,#7c3aed,#4c1d95);
-    color: #fff; border: none; border-radius: 14px;
-    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
-    cursor: pointer; transition: transform .18s, box-shadow .18s;
-    box-shadow: 0 8px 28px rgba(124,58,237,0.38);
-    width: 100%;
+  .cd-info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px; padding: 22px;
+    transition: background 0.35s, border-color 0.35s;
   }
-  .cd-join-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(124,58,237,.52); }
+
+  .cd-join-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 28px; width: 100%;
+    background: var(--accent); color: var(--text-on-accent);
+    border: none; border-radius: 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.18s;
+    box-shadow: 0 4px 16px var(--accent-glow);
+  }
+  .cd-join-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 24px var(--accent-glow); }
   .cd-join-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
   .cd-leave-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 14px 36px;
-    background: none; color: #7c3aed;
-    border: 1.5px solid rgba(124,58,237,0.3); border-radius: 14px;
-    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
-    cursor: pointer; transition: all .18s; width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 28px; width: 100%;
+    background: transparent; color: var(--accent);
+    border: 1.5px solid var(--border-subtle); border-radius: 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.18s;
   }
-  .cd-leave-btn:hover { background: rgba(124,58,237,.06); border-color: rgba(124,58,237,.6); }
+  .cd-leave-btn:hover { background: var(--accent-soft); border-color: var(--border-card); }
 
-  .cd-info-card {
-    background: var(--bg-card);
-    border: 1.5px solid var(--border-card);
-    border-radius: 18px; padding: 24px;
-    transition: background 0.3s, border-color 0.3s;
+  .cd-action-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px 20px; width: 100%;
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px; cursor: pointer; transition: all 0.18s;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    background: var(--bg-input); color: var(--text-secondary);
   }
+  .cd-action-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--border-card); }
+  .cd-action-btn.primary {
+    background: var(--accent); color: var(--text-on-accent);
+    border-color: var(--accent);
+    box-shadow: 0 3px 12px var(--accent-glow);
+  }
+  .cd-action-btn.primary:hover { opacity: 0.9; }
+
+  .cd-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; padding: 24px;
+  }
+  .cd-modal {
+    background: var(--bg-card); border-radius: 20px;
+    padding: 32px; max-width: 480px; width: 100%;
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-drop);
+    animation: cd-fadeUp 0.3s cubic-bezier(.22,1,.36,1) both;
+  }
+  .cd-tier-opt {
+    border: 1.5px solid var(--border-subtle); border-radius: 12px;
+    padding: 16px 18px; cursor: pointer; transition: all 0.18s;
+    background: var(--bg-input);
+  }
+  .cd-tier-opt:hover { border-color: var(--border-card); background: var(--accent-soft); }
+  .cd-tier-opt.selected { border-color: var(--accent); background: var(--accent-soft); }
+
+  .cd-member-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--border-subtle);
+  }
+  .cd-member-row:last-child { border-bottom: none; }
 
   .cd-back {
     display: inline-flex; align-items: center; gap: 7px;
     font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
-    color: var(--text-secondary); background: var(--bg-card);
+    color: var(--text-muted); background: var(--bg-card);
     border: 1px solid var(--border-subtle); border-radius: 8px;
     padding: 8px 14px; cursor: pointer; text-decoration: none;
-    transition: all 0.2s; margin-bottom: 28px; display: inline-flex;
+    transition: all 0.2s; margin-bottom: 28px;
   }
-  .cd-back:hover { background: rgba(124,58,237,.06); color: #7c3aed; border-color: rgba(124,58,237,.3); }
+  .cd-back:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--border-card); }
+
+  .cd-card-label {
+    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+    color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase;
+    margin: 0 0 12px; transition: color 0.35s;
+  }
+
+  .cd-contact-link {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 13.5px;
+    color: var(--text-secondary); text-decoration: none; transition: color 0.2s;
+  }
+  .cd-contact-link:hover { color: var(--accent); }
+  .cd-contact-icon {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: var(--bg-input); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.35s;
+  }
 `;
 
 export default function ClubDetailPage() {
   const router = useRouter();
   const { id } = router.query;
 
-  const [club,     setClub]     = useState(null);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState("");
-  const [enrolled, setEnrolled] = useState(false);
-  const [joining,  setJoining]  = useState(false);
-  const [user,     setUser]     = useState(null);
-  const [banners,  setBanners]  = useState([]);
-  const [bannerIdx,setBannerIdx]= useState(0);
+  const [club,          setClub]          = useState(null);
+  const [loading,       setLoading]       = useState(true);
+  const [error,         setError]         = useState("");
+  const [enrolled,      setEnrolled]      = useState(false);
+  const [joining,       setJoining]       = useState(false);
+  const [user,          setUser]          = useState(null);
+  const [banners,       setBanners]       = useState([]);
+  const [bannerIdx,     setBannerIdx]     = useState(0);
+  const [members,       setMembers]       = useState([]);
+  const [selectedTier,  setSelectedTier]  = useState(null);
+  const [showTierModal, setShowTierModal] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
@@ -118,11 +183,13 @@ export default function ClubDetailPage() {
             const imgs = JSON.parse(data.club.banner || "[]");
             if (Array.isArray(imgs)) setBanners(imgs);
           } catch { setBanners([]); }
-        } else {
-          setError("Клуб олдсонгүй");
-        }
+        } else { setError("Клуб олдсонгүй"); }
       })
-      .catch(() => setError("Сервертэй холбогдож чадсангүй"))
+      .catch(e => setError(
+        e.message === "NETWORK_ERROR"
+          ? "Сервертэй холбогдож чадсангүй — backend ажиллаж байгаа эсэхийг шалгана уу."
+          : "Клуб ачааллахад алдаа гарлаа."
+      ))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -130,77 +197,97 @@ export default function ClubDetailPage() {
     if (!user || !id) return;
     fetchAPI(`${API}/myClubs/${user.id}`)
       .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          setEnrolled(data.clubs.some(c => String(c.id) === String(id)));
-        }
-      })
+      .then(data => { if (data.success) setEnrolled(data.clubs.some(c => String(c.id) === String(id))); })
+      .catch(() => {});
+  }, [user, id]);
+
+  useEffect(() => {
+    if (!user || !id) return;
+    fetchAPI(`${API}/club/${id}/members`, { headers: { "x-user-id": String(user.id) } })
+      .then(r => r.json())
+      .then(data => { if (data.success) setMembers(data.members || []); })
       .catch(() => {});
   }, [user, id]);
 
   async function handleJoin() {
     if (!user) { router.push("/signin"); return; }
-    setJoining(true);
-    try {
-      if (enrolled) {
+    if (enrolled) {
+      setJoining(true);
+      try {
         await fetchAPI(`${API}/leaveClub/${user.id}/${id}`, { method: "DELETE" });
         setEnrolled(false);
-      } else {
-        await fetchAPI(`${API}/joinClub`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user.id, clubId: id }),
-        });
-        setEnrolled(true);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setJoining(false);
+      } catch (e) { console.error(e); }
+      finally { setJoining(false); }
+      return;
     }
+    if (club.pricing_type === "paid" && tiers.length > 0) { setShowTierModal(true); return; }
+    setJoining(true);
+    try {
+      await fetchAPI(`${API}/joinClub`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, clubId: id }),
+      });
+      setEnrolled(true);
+    } catch (e) { console.error(e); }
+    finally { setJoining(false); }
+  }
+
+  async function handleConfirmJoin() {
+    if (!selectedTier) return;
+    setJoining(true);
+    try {
+      await fetchAPI(`${API}/joinClub`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, clubId: id, tierId: selectedTier.name, tierPrice: selectedTier.price }),
+      });
+      setEnrolled(true); setShowTierModal(false);
+    } catch (e) { console.error(e); }
+    finally { setJoining(false); }
   }
 
   const isOwner = user && club && String(club.owner_id) === String(user.id);
+  const tiers   = club ? (() => { try { return JSON.parse(club.tiers || "[]"); } catch { return []; } })() : [];
 
-  if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-page)" }}>
+  const shell = (body) => (
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-page)", transition: "background 0.35s, color 0.35s" }}>
       <style>{fonts}</style>
-      <Header />
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p className="cd-sans" style={{ color: "var(--text-muted)", fontSize: "15px" }}>Ачааллаж байна...</p>
-      </div>
-      <Footer />
+      <Header />{body}<Footer />
     </div>
   );
 
-  if (error || !club) return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-page)" }}>
-      <style>{fonts}</style>
-      <Header />
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
-        <div style={{ fontSize: "48px" }}>😕</div>
-        <p className="cd-display" style={{ fontSize: "22px", color: "var(--text-primary)", fontWeight: 800 }}>{error || "Клуб олдсонгүй"}</p>
-        <a href="/page1" className="cd-sans" style={{ color: "#7c3aed", fontWeight: 600, fontSize: "14px" }}>← Browse clubs</a>
+  if (loading) return shell(
+    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <p className="cd-sans" style={{ color: "var(--text-muted)", fontSize: "15px" }}>Ачааллаж байна…</p>
+    </div>
+  );
+
+  if (error || !club) return shell(
+    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16, padding: "32px", textAlign: "center" }}>
+      <div style={{ width: 56, height: 56, borderRadius: 14, background: "var(--accent-soft)", border: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <svg width="22" height="22" fill="none" stroke="var(--accent)" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       </div>
-      <Footer />
+      <p className="cd-display" style={{ fontSize: "22px", color: "var(--text-primary)", fontWeight: 800 }}>{error || "Клуб олдсонгүй"}</p>
+      <div style={{ display: "flex", gap: 12 }}>
+        <button onClick={() => window.location.reload()} className="cd-sans"
+          style={{ padding: "10px 22px", background: "var(--accent)", color: "var(--text-on-accent)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
+          Retry
+        </button>
+        <a href="/page1" className="cd-sans"
+          style={{ padding: "10px 22px", color: "var(--accent)", fontWeight: 600, fontSize: 14, border: "1.5px solid var(--border-subtle)", borderRadius: 10, textDecoration: "none", display: "inline-flex", alignItems: "center", background: "var(--bg-card)" }}>
+          ← Browse clubs
+        </a>
+      </div>
     </div>
   );
 
   const { accent, bg } = getCategoryStyle(club.category);
-  const tiers = (() => { try { return JSON.parse(club.tiers || "[]"); } catch { return []; } })();
 
-  return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-page)", transition: "background 0.3s" }}>
-      <style>{fonts}</style>
-      <Header />
-      <div style={{ position: "relative", height: "280px", background: `linear-gradient(135deg, #0d0118 0%, #1a0533 50%, #2d0a57 100%)`, overflow: "hidden" }}>
+  return shell(
+    <>
+      <div style={{ position: "relative", height: "260px", background: "var(--bg-section)", overflow: "hidden" }}>
         {banners.length > 0 ? (
           <>
-            <img
-              src={banners[bannerIdx]}
-              alt="banner"
-              style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.55 }}
-            />
+            <img src={banners[bannerIdx]} alt="banner" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.7 }} />
             {banners.length > 1 && (
               <div style={{ position: "absolute", bottom: "16px", left: "50%", transform: "translateX(-50%)", display: "flex", gap: "6px" }}>
                 {banners.map((_, i) => (
@@ -209,23 +296,20 @@ export default function ClubDetailPage() {
                     borderRadius: "4px", border: "none", cursor: "pointer",
                     background: i === bannerIdx ? "#fff" : "rgba(255,255,255,0.4)",
                     transition: "all 0.2s", padding: 0,
-                  }}/>
+                  }} />
                 ))}
               </div>
             )}
           </>
         ) : (
-          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${accent}22, ${accent}08)` }}/>
+          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${accent}18, ${accent}06)` }} />
         )}
-        <svg aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
-          <defs><pattern id="cd-dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#c4b5fd" fillOpacity="0.07"/></pattern></defs>
-          <rect width="100%" height="100%" fill="url(#cd-dots)"/>
-        </svg>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, var(--bg-page) 100%)" }} />
       </div>
 
       <main style={{ flex: 1 }}>
         <div style={{ maxWidth: "960px", margin: "0 auto", padding: "0 32px 96px" }}>
-          <div style={{ paddingTop: "28px" }}>
+          <div style={{ paddingTop: "20px" }}>
             <a href="/page1" className="cd-back">
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
               Browse clubs
@@ -234,87 +318,59 @@ export default function ClubDetailPage() {
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "32px", alignItems: "start" }}>
             <div className="cd-fadein">
-              <div style={{ display: "flex", alignItems: "flex-start", gap: "20px", marginBottom: "28px" }}>
-                <div style={{
-                  width: "72px", height: "72px", borderRadius: "18px", flexShrink: 0,
-                  background: bg, border: `2px solid ${accent}28`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  overflow: "hidden", boxShadow: `0 4px 16px ${accent}20`,
-                }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "20px", marginBottom: "24px" }}>
+                <div style={{ width: "68px", height: "68px", borderRadius: "16px", flexShrink: 0, background: bg, border: `2px solid ${accent}28`, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", boxShadow: `0 4px 16px ${accent}20` }}>
                   {club.logo
-                    ? <img src={club.logo} alt={club.name} style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
-                    : <span style={{ fontFamily: "'Fraunces',serif", fontSize: "28px", fontWeight: 800, color: accent }}>{club.name[0]}</span>
+                    ? <img src={club.logo} alt={club.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <span style={{ fontFamily: "'Fraunces',serif", fontSize: "26px", fontWeight: 800, color: accent }}>{club.name[0]}</span>
                   }
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "6px" }}>
-                    <h1 className="cd-display" style={{
-                      fontSize: "clamp(1.6rem,3.5vw,2.2rem)", fontWeight: 800,
-                      color: "var(--text-primary)", letterSpacing: "-0.03em",
-                      margin: 0, lineHeight: 1.15, transition: "color 0.3s",
-                    }}>{club.name}</h1>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
+                    <h1 className="cd-display" style={{ fontSize: "clamp(1.6rem,3.5vw,2.2rem)", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.03em", margin: 0, lineHeight: 1.15 }}>
+                      {club.name}
+                    </h1>
                     {enrolled && !isOwner && (
-                      <span className="cd-sans" style={{
-                        fontSize: "11px", fontWeight: 700, padding: "3px 10px",
-                        borderRadius: "20px", background: "rgba(34,197,94,0.1)",
-                        color: "#22c55e", border: "1px solid rgba(34,197,94,0.2)",
-                      }}>✓ Enrolled</span>
+                      <span className="cd-sans" style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px", background: "rgba(34,197,94,0.1)", color: "#16a34a", border: "1px solid rgba(34,197,94,0.2)" }}>Enrolled</span>
                     )}
                     {isOwner && (
-                      <span className="cd-sans" style={{
-                        fontSize: "11px", fontWeight: 700, padding: "3px 10px",
-                        borderRadius: "20px", background: "rgba(124,58,237,0.1)",
-                        color: "#7c3aed", border: "1px solid rgba(124,58,237,0.2)",
-                      }}>👑 Owner</span>
+                      <span className="cd-sans" style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px", background: "var(--accent-soft)", color: "var(--accent)", border: "1px solid var(--border-subtle)" }}>Owner</span>
                     )}
                   </div>
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    <span className="cd-sans" style={{
-                      fontSize: "11px", fontWeight: 700, padding: "4px 10px",
-                      borderRadius: "6px", background: bg, color: accent,
-                      letterSpacing: "0.06em", textTransform: "uppercase",
-                    }}>{club.category}</span>
-                    <span className="cd-sans" style={{
-                      fontSize: "11px", fontWeight: 700, padding: "4px 10px",
-                      borderRadius: "6px",
-                      background: club.pricing_type === "free" ? "rgba(34,197,94,0.1)" : "rgba(124,58,237,0.1)",
-                      color: club.pricing_type === "free" ? "#22c55e" : "#7c3aed",
-                    }}>{club.pricing_type === "free" ? "Free" : "Paid"}</span>
+                    <span className="cd-sans" style={{ fontSize: "11px", fontWeight: 700, padding: "4px 10px", borderRadius: "6px", background: bg, color: accent, letterSpacing: "0.06em", textTransform: "uppercase" }}>{club.category}</span>
+                    <span className="cd-sans" style={{ fontSize: "11px", fontWeight: 700, padding: "4px 10px", borderRadius: "6px", background: club.pricing_type === "free" ? "rgba(34,197,94,0.1)" : "var(--accent-soft)", color: club.pricing_type === "free" ? "#16a34a" : "var(--accent)" }}>
+                      {club.pricing_type === "free" ? "Free" : "Paid"}
+                    </span>
                     {club.founded_year && (
-                      <span className="cd-sans" style={{
-                        fontSize: "11px", fontWeight: 600, padding: "4px 10px",
-                        borderRadius: "6px", background: "var(--bg-input)", color: "var(--text-muted)",
-                        transition: "all 0.3s",
-                      }}>Est. {club.founded_year}</span>
+                      <span className="cd-sans" style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "6px", background: "var(--bg-input)", color: "var(--text-muted)" }}>
+                        Est. {club.founded_year}
+                      </span>
                     )}
                   </div>
                 </div>
               </div>
-              <div className="cd-info-card" style={{ marginBottom: "20px" }}>
-                <p className="cd-sans" style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 12px", transition: "color 0.3s" }}>About</p>
-                <p className="cd-sans" style={{ fontSize: "15px", color: "var(--text-secondary)", lineHeight: 1.75, margin: 0, transition: "color 0.3s" }}>{club.description}</p>
+              <div className="cd-info-card" style={{ marginBottom: "16px" }}>
+                <p className="cd-card-label">About</p>
+                <p className="cd-sans" style={{ fontSize: "15px", color: "var(--text-secondary)", lineHeight: 1.75, margin: 0 }}>{club.description}</p>
               </div>
               {club.pricing_type === "paid" && tiers.length > 0 && (
-                <div className="cd-info-card" style={{ marginBottom: "20px" }}>
-                  <p className="cd-sans" style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 16px", transition: "color 0.3s" }}>Membership Tiers</p>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div className="cd-info-card" style={{ marginBottom: "16px" }}>
+                  <p className="cd-card-label">Membership Tiers</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                     {tiers.map((tier, i) => (
-                      <div key={i} style={{
-                        padding: "16px 18px", borderRadius: "12px",
-                        background: "var(--bg-input)", border: "1.5px solid var(--border-subtle)",
-                        transition: "all 0.3s",
-                      }}>
+                      <div key={i} style={{ padding: "16px 18px", borderRadius: "12px", background: "var(--bg-input)", border: "1px solid var(--border-subtle)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                          <span className="cd-sans" style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", transition: "color 0.3s" }}>{tier.name}</span>
-                          <span className="cd-sans" style={{ fontSize: "14px", fontWeight: 800, color: "#7c3aed" }}>
+                          <span className="cd-sans" style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>{tier.name}</span>
+                          <span className="cd-sans" style={{ fontSize: "14px", fontWeight: 800, color: "var(--accent)" }}>
                             ₮{tier.price}<span style={{ fontSize: "11px", fontWeight: 500, color: "var(--text-muted)" }}>/{tier.period || "mo"}</span>
                           </span>
                         </div>
-                        {tier.description && <p className="cd-sans" style={{ fontSize: "13px", color: "var(--text-muted)", margin: "0 0 6px", lineHeight: 1.5, transition: "color 0.3s" }}>{tier.description}</p>}
+                        {tier.description && <p className="cd-sans" style={{ fontSize: "13px", color: "var(--text-muted)", margin: "0 0 6px", lineHeight: 1.5 }}>{tier.description}</p>}
                         {tier.features && (
                           <ul style={{ margin: 0, paddingLeft: "16px" }}>
                             {tier.features.split(",").map((f, j) => (
-                              <li key={j} className="cd-sans" style={{ fontSize: "12.5px", color: "var(--text-muted)", lineHeight: 1.7, transition: "color 0.3s" }}>{f.trim()}</li>
+                              <li key={j} className="cd-sans" style={{ fontSize: "12.5px", color: "var(--text-muted)", lineHeight: 1.7 }}>{f.trim()}</li>
                             ))}
                           </ul>
                         )}
@@ -324,100 +380,112 @@ export default function ClubDetailPage() {
                 </div>
               )}
               {club.lat && club.lng && (
-                <div className="cd-info-card" style={{ marginBottom: "20px" }}>
-                  <p className="cd-sans" style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 12px", transition: "color 0.3s" }}>Location</p>
+                <div className="cd-info-card" style={{ marginBottom: "16px" }}>
+                  <p className="cd-card-label">Location</p>
                   {club.address && (
-                    <p className="cd-sans" style={{ fontSize: "13.5px", color: "var(--text-secondary)", margin: "0 0 12px", display: "flex", alignItems: "center", gap: "6px", transition: "color 0.3s" }}>
+                    <p className="cd-sans" style={{ fontSize: "13.5px", color: "var(--text-secondary)", margin: "0 0 12px", display: "flex", alignItems: "center", gap: "6px" }}>
                       <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                       {club.address}{club.district ? `, ${club.district}` : ""}
                     </p>
                   )}
-                  <div style={{ borderRadius: "12px", overflow: "hidden", border: "1.5px solid var(--border-subtle)" }}>
-                    <MapPicker
-                      pickMode={false}
-                      pickedLat={parseFloat(club.lat)}
-                      pickedLng={parseFloat(club.lng)}
-                      height="240px"
-                      zoom={15}
-                    />
+                  <div style={{ borderRadius: "12px", overflow: "hidden", border: "1px solid var(--border-subtle)" }}>
+                    <MapPicker pickMode={false} pickedLat={parseFloat(club.lat)} pickedLng={parseFloat(club.lng)} height="240px" zoom={15} />
                   </div>
                 </div>
               )}
             </div>
-
-            {/* RIGHT SIDEBAR */}
             <div style={{ position: "sticky", top: "24px" }} className="cd-fadein">
-
-              {/* OWNER ACTIONS */}
               {isOwner ? (
-                <div className="cd-info-card" style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <button
-                    onClick={() => router.push(`/club-edit?id=${id}`)}
-                    className="cd-join-btn"
-                  >
-                    ✏️ Edit Club
-                  </button>
-                  <button
-                    onClick={() => router.push(`/club-owner-dashboard?id=${id}`)}
-                    className="cd-leave-btn"
-                  >
-                    👥 View Members
-                  </button>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div className="cd-info-card" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <p className="cd-card-label">Manage</p>
+                    <button onClick={() => router.push(`/club-edit?id=${id}`)} className="cd-action-btn primary">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      Edit Club
+                    </button>
+                    <button onClick={() => router.push(`/club-owner-dashboard?clubId=${id}`)} className="cd-action-btn">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                      Full Dashboard
+                    </button>
+                  </div>
+                  <div className="cd-info-card">
+                    <p className="cd-card-label">
+                      Members <span style={{ color: "var(--accent)" }}>({members.length})</span>
+                    </p>
+                    {members.length === 0 ? (
+                      <p className="cd-sans" style={{ fontSize: "13px", color: "var(--text-muted)", textAlign: "center", padding: "12px 0" }}>No members yet</p>
+                    ) : (
+                      <div style={{ maxHeight: "220px", overflowY: "auto" }}>
+                        {members.slice(0, 8).map((m, i) => (
+                          <div key={m.id || i} className="cd-member-row">
+                            <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "var(--accent-soft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+                              {m.photo
+                                ? <img src={m.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                : <span className="cd-sans" style={{ fontSize: "12px", fontWeight: 700, color: "var(--accent)" }}>{(m.name || "?")[0].toUpperCase()}</span>
+                              }
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p className="cd-sans" style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--text-primary)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.name || "Unknown"}</p>
+                              {m.tier_name && <p className="cd-sans" style={{ fontSize: "10.5px", color: "var(--accent)", margin: 0 }}>{m.tier_name}</p>}
+                            </div>
+                          </div>
+                        ))}
+                        {members.length > 8 && (
+                          <button onClick={() => router.push(`/club-owner-dashboard?clubId=${id}`)} className="cd-sans"
+                            style={{ width: "100%", marginTop: "10px", padding: "8px", background: "var(--accent-soft)", border: "none", borderRadius: "8px", color: "var(--accent)", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
+                            +{members.length - 8} more →
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
-                <div className="cd-info-card" style={{ marginBottom: "16px" }}>
-                  <button
-                    onClick={handleJoin}
-                    disabled={joining}
-                    className={enrolled ? "cd-leave-btn" : "cd-join-btn"}
-                  >
-                    {joining ? "..." : enrolled ? "Leave club" : user ? "Join club" : "Sign in to join"}
-                  </button>
-                  {!user && (
-                    <p className="cd-sans" style={{ fontSize: "12px", color: "var(--text-muted)", textAlign: "center", margin: "10px 0 0", transition: "color 0.3s" }}>
-                      <a href="/signin" style={{ color: "#7c3aed", fontWeight: 600, textDecoration: "none" }}>Sign in</a> or <a href="/signup" style={{ color: "#7c3aed", fontWeight: 600, textDecoration: "none" }}>create account</a>
-                    </p>
-                  )}
-                </div>
+                <>
+                  <div className="cd-info-card" style={{ marginBottom: "14px" }}>
+                    <button onClick={handleJoin} disabled={joining} className={enrolled ? "cd-leave-btn" : "cd-join-btn"}>
+                      {joining ? "…" : enrolled ? "Leave club" : user ? "Join club" : "Sign in to join"}
+                    </button>
+                    {!user && (
+                      <p className="cd-sans" style={{ fontSize: "12px", color: "var(--text-muted)", textAlign: "center", margin: "10px 0 0" }}>
+                        <a href="/signin" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</a>
+                        {" or "}
+                        <a href="/signup" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>create account</a>
+                      </p>
+                    )}
+                  </div>
+                </>
               )}
-
-              {/* CONTACT CARD */}
               <div className="cd-info-card">
-                <p className="cd-sans" style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 16px", transition: "color 0.3s" }}>Contact</p>
+                <p className="cd-card-label">Contact</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   {club.email && (
-                    <a href={`mailto:${club.email}`} className="cd-sans" style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13.5px", color: "var(--text-secondary)", textDecoration: "none", transition: "color 0.2s" }}
-                      onMouseEnter={e => e.currentTarget.style.color = "#7c3aed"}
-                      onMouseLeave={e => e.currentTarget.style.color = "var(--text-secondary)"}>
-                      <div style={{ width: "32px", height: "32px", borderRadius: "9px", background: "var(--bg-input)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.3s" }}>
+                    <a href={`mailto:${club.email}`} className="cd-contact-link">
+                      <div className="cd-contact-icon">
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                       </div>
                       {club.email}
                     </a>
                   )}
                   {club.phone && (
-                    <a href={`tel:${club.phone}`} className="cd-sans" style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13.5px", color: "var(--text-secondary)", textDecoration: "none", transition: "color 0.2s" }}
-                      onMouseEnter={e => e.currentTarget.style.color = "#7c3aed"}
-                      onMouseLeave={e => e.currentTarget.style.color = "var(--text-secondary)"}>
-                      <div style={{ width: "32px", height: "32px", borderRadius: "9px", background: "var(--bg-input)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.3s" }}>
+                    <a href={`tel:${club.phone}`} className="cd-contact-link">
+                      <div className="cd-contact-icon">
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.55a16 16 0 0 0 6.29 6.29l1.42-1.42a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                       </div>
                       {club.phone}
                     </a>
                   )}
                   {club.website && (
-                    <a href={club.website} target="_blank" rel="noopener noreferrer" className="cd-sans" style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13.5px", color: "var(--text-secondary)", textDecoration: "none", transition: "color 0.2s" }}
-                      onMouseEnter={e => e.currentTarget.style.color = "#7c3aed"}
-                      onMouseLeave={e => e.currentTarget.style.color = "var(--text-secondary)"}>
-                      <div style={{ width: "32px", height: "32px", borderRadius: "9px", background: "var(--bg-input)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.3s" }}>
+                    <a href={club.website} target="_blank" rel="noopener noreferrer" className="cd-contact-link">
+                      <div className="cd-contact-icon">
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                       </div>
                       {club.website.replace(/^https?:\/\//, "")}
                     </a>
                   )}
                   {(club.address || club.district) && (
-                    <div className="cd-sans" style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "13.5px", color: "var(--text-secondary)", transition: "color 0.3s" }}>
-                      <div style={{ width: "32px", height: "32px", borderRadius: "9px", background: "var(--bg-input)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "1px", transition: "background 0.3s" }}>
+                    <div className="cd-contact-link">
+                      <div className="cd-contact-icon">
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                       </div>
                       <span>{club.address}{club.district ? `, ${club.district}` : ""}</span>
@@ -429,7 +497,57 @@ export default function ClubDetailPage() {
           </div>
         </div>
       </main>
-      <Footer />
-    </div>
+      {showTierModal && (
+        <div className="cd-modal-overlay" onClick={() => setShowTierModal(false)}>
+          <div className="cd-modal" onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
+              <div>
+                <h2 className="cd-display" style={{ fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 4px", letterSpacing: "-0.02em" }}>Choose a Tier</h2>
+                <p className="cd-sans" style={{ fontSize: "13px", color: "var(--text-muted)", margin: 0 }}>
+                  Select your membership to join <strong style={{ color: "var(--text-primary)" }}>{club.name}</strong>
+                </p>
+              </div>
+              <button onClick={() => setShowTierModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "20px", lineHeight: 1, padding: "4px" }}>✕</button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
+              {tiers.map((tier, i) => (
+                <div key={i} className={`cd-tier-opt${selectedTier?.name === tier.name ? " selected" : ""}`} onClick={() => setSelectedTier(tier)}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: tier.description ? "6px" : 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <div style={{ width: "18px", height: "18px", borderRadius: "50%", border: `2px solid ${selectedTier?.name === tier.name ? "var(--accent)" : "var(--border-subtle)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        {selectedTier?.name === tier.name && <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--accent)" }} />}
+                      </div>
+                      <span className="cd-sans" style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>{tier.name}</span>
+                    </div>
+                    <span className="cd-sans" style={{ fontSize: "15px", fontWeight: 800, color: "var(--accent)" }}>
+                      ₮{Number(tier.price).toLocaleString()}
+                      <span style={{ fontSize: "11px", fontWeight: 500, color: "var(--text-muted)" }}>/{tier.period || "mo"}</span>
+                    </span>
+                  </div>
+                  {tier.description && <p className="cd-sans" style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: "0 0 0 28px", lineHeight: 1.5 }}>{tier.description}</p>}
+                  {tier.features && (
+                    <ul style={{ margin: "6px 0 0 28px", paddingLeft: "14px" }}>
+                      {tier.features.split(",").map((f, j) => (
+                        <li key={j} className="cd-sans" style={{ fontSize: "12px", color: "var(--text-muted)", lineHeight: 1.6 }}>{f.trim()}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: "var(--accent-soft)", borderRadius: "10px", padding: "12px 14px", marginBottom: "20px", display: "flex", gap: "8px", alignItems: "flex-start" }}>
+              <svg width="14" height="14" fill="none" stroke="var(--accent)" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <p className="cd-sans" style={{ fontSize: "12px", color: "var(--accent)", margin: 0, lineHeight: 1.5 }}>Payment is collected by the club owner. You'll get confirmation once verified.</p>
+            </div>
+
+            <button onClick={handleConfirmJoin} disabled={!selectedTier || joining} className="cd-join-btn" style={{ opacity: (!selectedTier || joining) ? 0.5 : 1 }}>
+              {joining ? "Joining…" : selectedTier ? `Join as ${selectedTier.name} — ₮${Number(selectedTier.price).toLocaleString()}` : "Select a tier to continue"}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

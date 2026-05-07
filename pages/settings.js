@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
+import { useTheme } from "@/waterbottle/useTheme";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -69,6 +70,7 @@ const THEME_META = {
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { setTheme } = useTheme();
   const [user, setUser] = useState(null);
   const [activeTheme, setActiveTheme] = useState("light");
   const [activeSection, setActiveSection] = useState("appearance");
@@ -98,8 +100,7 @@ export default function SettingsPage() {
 
   function applyTheme(t) {
     setActiveTheme(t);
-    localStorage.setItem("theme", t);
-    document.documentElement.setAttribute("data-theme", t);
+    setTheme(t);
   }
 
   function handleAvatarChange(e) {
@@ -212,7 +213,7 @@ export default function SettingsPage() {
                 <div className="st-section">
                   <div className="st-section-header">
                     <h2 className="st-display" style={{ color: "var(--text-primary)" }}>Appearance</h2>
-                    <p className="st-sans" style={{ color: "var(--text-muted)" }}>Choose how Duguilan.mn looks for you.</p>
+                    <p className="st-sans" style={{ color: "var(--text-muted)" }}>Choose how Duguilan.com looks for you.</p>
                   </div>
                   <div className="st-section-body">
                     <div style={{ padding: "24px 28px 8px" }}>
@@ -263,17 +264,17 @@ export default function SettingsPage() {
                               </div>
                               <div style={{
                                 padding: "8px 10px",
-                                background: "var(--bg-card)",
+                                background: meta.card,
                                 display: "flex", alignItems: "center", justifyContent: "space-between",
                               }}>
                                 <div style={{ textAlign: "left" }}>
                                   <p className="st-sans" style={{
                                     fontSize: "12px", fontWeight: active ? 700 : 600,
-                                    color: active ? "var(--accent)" : "var(--text-primary)",
+                                    color: active ? meta.accent : meta.text,
                                     margin: 0, lineHeight: 1.2,
                                   }}>{meta.emoji} {meta.label}</p>
                                   <p className="st-sans" style={{
-                                    fontSize: "10px", color: "var(--text-muted)",
+                                    fontSize: "10px", color: meta.preview.mutedColor,
                                     margin: "2px 0 0", lineHeight: 1.2,
                                   }}>{meta.desc}</p>
                                 </div>
@@ -315,7 +316,7 @@ export default function SettingsPage() {
                         }}>D</div>
                         <div style={{ flex: 1 }}>
                           <p className="st-display" style={{ margin: 0, fontSize: "15px", color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
-                            Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.mn</span>
+                            Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.com</span>
                           </p>
                           <p className="st-sans" style={{ margin: "3px 0 0", fontSize: "12px", color: "var(--text-muted)", fontWeight: 400 }}>
                             Currently: <strong style={{ color: "var(--accent)" }}>{THEME_META[activeTheme]?.label} mode</strong>
@@ -497,7 +498,7 @@ export default function SettingsPage() {
                     <div className="st-row">
                       <div>
                         <p className="st-sans st-label" style={{ color: "var(--text-primary)" }}>Username</p>
-                        <p className="st-sans st-hint" style={{ color: "var(--text-muted)" }}>Your unique handle on Duguilan.mn.</p>
+                        <p className="st-sans st-hint" style={{ color: "var(--text-muted)" }}>Your unique handle on Duguilan.com.</p>
                       </div>
                       <div style={{
                         background: "var(--bg-input)", border: "1.5px solid var(--border-subtle)",
@@ -512,7 +513,7 @@ export default function SettingsPage() {
                     <div className="st-row">
                       <div>
                         <p className="st-sans st-label" style={{ color: "var(--text-primary)" }}>Member since</p>
-                        <p className="st-sans st-hint" style={{ color: "var(--text-muted)" }}>When you joined Duguilan.mn.</p>
+                        <p className="st-sans st-hint" style={{ color: "var(--text-muted)" }}>When you joined Duguilan.com.</p>
                       </div>
                       <span className="st-sans" style={{ fontSize: "14px", color: "var(--text-muted)" }}>
                         {user?.created_at ? new Date(user.created_at).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" }) : "—"}

@@ -25,9 +25,7 @@ export default function Header({ user = null }) {
 
   useEffect(() => {
     refreshUser();
-    // Re-check on every client-side navigation so the avatar always reflects current login state
     router.events?.on("routeChangeComplete", refreshUser);
-    // Re-check if localStorage changes (e.g. after sign-in in same tab)
     window.addEventListener("storage", refreshUser);
     return () => {
       router.events?.off("routeChangeComplete", refreshUser);
@@ -182,7 +180,6 @@ export default function Header({ user = null }) {
           padding: "0 32px", height: "64px",
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
-          {/* Logo — only .mn is italic */}
           <a href="/page" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{
               width: "30px", height: "30px",
@@ -199,18 +196,14 @@ export default function Header({ user = null }) {
               letterSpacing: "-0.01em",
               fontStyle: "normal",
             }}>
-              Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.mn</span>
+              Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.com</span>
             </span>
           </a>
-
-          {/* Nav */}
           <nav style={{ display: "flex", alignItems: "center", gap: "28px" }}>
             {navLinks.map(({ label, href }) => (
               <a key={label} href={href} className="hdr-nav-link">{label}</a>
             ))}
           </nav>
-
-          {/* Right — NO theme button here, it lives in Settings */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {!loggedIn ? (
               <>

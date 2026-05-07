@@ -74,7 +74,7 @@ export default function AboutPage() {
               color: "var(--text-secondary)", maxWidth: "580px",
               margin: "0 auto", transition: "color 0.35s",
             }}>
-              Duguilan.mn provides quick access to clubs and activities across Ulaanbaatar. Every student deserves an easy way to discover their passions and turn free time into meaningful growth.
+              Duguilan.com provides quick access to clubs and activities across Ulaanbaatar. Every student deserves an easy way to discover their passions and turn free time into meaningful growth.
             </p>
           </div>
         </section>
@@ -113,7 +113,7 @@ export default function AboutPage() {
                   fontSize: "15px", fontWeight: 300, lineHeight: 1.85,
                   color: "var(--text-secondary)", margin: 0, transition: "color 0.35s",
                 }}>
-                  Duguilan.mn bridges that gap by centralising information and helping club leaders reach the people who need them most.
+                  Duguilan.com bridges that gap by centralising information and helping club leaders reach the people who need them most.
                 </p>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", paddingTop: "10px" }}>

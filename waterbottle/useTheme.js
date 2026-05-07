@@ -13,18 +13,25 @@ export function useTheme() {
   }, []);
 
   function cycle() {
-    setMode(prev => {
-      const next = MODES[(MODES.indexOf(prev) + 1) % MODES.length];
-      localStorage.setItem("theme", next);
-      document.documentElement.setAttribute("data-theme", next);
-      return next;
-    });
+    const current = document.documentElement.getAttribute("data-theme") || "light";
+    const safe = MODES.includes(current) ? current : "light";
+    const next = MODES[(MODES.indexOf(safe) + 1) % MODES.length];
+    localStorage.setItem("theme", next);
+    document.documentElement.setAttribute("data-theme", next);
+    setMode(next);
+  }
+
+  function setTheme(t) {
+    if (!MODES.includes(t)) return;
+    localStorage.setItem("theme", t);
+    document.documentElement.setAttribute("data-theme", t);
+    setMode(t);
   }
 
   const dark = mode === "dark" || mode === "purple";
   const toggle = cycle;
 
-  return { mode, cycle, dark, toggle };
+  return { mode, cycle, dark, toggle, setTheme };
 }
 
 export function useDarkMode() {

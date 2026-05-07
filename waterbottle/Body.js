@@ -210,7 +210,7 @@ export default function Body() {
             {[
               { val: animClubs > 0 ? `${animClubs}+` : "—", label: "Active clubs" },
               { val: animCats > 0 ? `${animCats}+` : "—", label: "Categories" },
-              { val: "Free", label: "Always" },
+              { val: "Always", label: "Simple" },
             ].map(({ val, label }, i) => (
               <div key={label} style={{
                 paddingRight: "32px",
@@ -477,7 +477,7 @@ export default function Body() {
               color: "var(--text-primary)", margin: "0 0 12px",
               letterSpacing: "-0.02em", transition: "color 0.35s",
             }}>
-              List your club on <em style={{ fontStyle: "italic", color: "var(--accent)" }}>Duguilan.mn</em>
+              List your club on <em style={{ fontStyle: "italic", color: "var(--accent)" }}>Duguilan.com</em>
             </h2>
             <p style={{
               fontFamily: "'DM Sans', sans-serif",

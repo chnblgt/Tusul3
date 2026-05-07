@@ -1,0 +1,83 @@
+:root,
+[data-theme="light"] {
+  --bg-page:        #ffffff;
+  --bg-hero:        radial-gradient(ellipse at 30% 50%, #ede9fe 0%, #f5f0ff 40%, #fdfcff 70%, #fff 100%);
+  --bg-section:     #ffffff;
+  --bg-card:        #ffffff;
+  --bg-card-border: rgba(124, 58, 237, 0.1);
+  --bg-input:       #fdfcff;
+  --bg-header:      rgba(255, 253, 255, 0.94);
+  --bg-footer:      #0d0118;
+
+  --text-primary:   #1a0533;
+  --text-secondary: #555555;
+  --text-muted:     #888888;
+  --text-accent:    #7c3aed;
+  --text-on-dark:   #ffffff;
+
+  --border-subtle:  rgba(124, 58, 237, 0.1);
+  --border-card:    rgba(26, 5, 51, 0.08);
+
+  --shadow-card:    0 4px 24px rgba(26, 5, 51, 0.07);
+  --shadow-card-hover: 0 20px 52px rgba(26, 5, 51, 0.1);
+
+  --input-text:     #1a0533;
+  --input-border:   rgba(124, 58, 237, 0.2);
+
+  scrollbar-color: #c4b5fd #f5f0ff;
+}
+
+[data-theme="dark"] {
+  --bg-page:        #0d0118;
+  --bg-hero:        radial-gradient(ellipse at 30% 50%, #1a0533 0%, #120028 40%, #0d0118 70%, #0d0118 100%);
+  --bg-section:     #110020;
+  --bg-card:        #1a0533;
+  --bg-card-border: rgba(167, 139, 250, 0.15);
+  --bg-input:       #1e0840;
+  --bg-header:      rgba(13, 1, 24, 0.96);
+  --bg-footer:      #080010;
+
+  --text-primary:   #f0e8ff;
+  --text-secondary: #c4b5fd;
+  --text-muted:     #9879d4;
+  --text-accent:    #a78bfa;
+  --text-on-dark:   #ffffff;
+
+  --border-subtle:  rgba(167, 139, 250, 0.15);
+  --border-card:    rgba(167, 139, 250, 0.12);
+
+  --shadow-card:    0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 20px 52px rgba(0, 0, 0, 0.5);
+
+  --input-text:     #e9d5ff;
+  --input-border:   rgba(167, 139, 250, 0.3);
+
+  scrollbar-color: #4c1d95 #1a0533;
+}
+
+html, body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.dm-card {
+  background: var(--bg-card);
+  border-color: var(--bg-card-border);
+  color: var(--text-primary);
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.dm-input {
+  background: var(--bg-input);
+  color: var(--input-text);
+  border-color: var(--input-border);
+}
+
+.dm-text-primary   { color: var(--text-primary); }
+.dm-text-secondary { color: var(--text-secondary); }
+.dm-text-muted     { color: var(--text-muted); }
+.dm-text-accent    { color: var(--text-accent); }
+.dm-bg-page    { background: var(--bg-page); }
+.dm-bg-section { background: var(--bg-section); }
+.dm-bg-card    { background: var(--bg-card); }

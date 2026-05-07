@@ -4,7 +4,7 @@ function verifyEmailHtml(displayName, verifyLink, note = '') {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Имэйл баталгаажуулах — Duguilan.mn</title>
+  <title>Имэйл баталгаажуулах — Duguilan.com</title>
 </head>
 <body style="margin:0;padding:0;background:#f0ebff;font-family:'Helvetica Neue',Arial,sans-serif;">
 
@@ -16,7 +16,7 @@ function verifyEmailHtml(displayName, verifyLink, note = '') {
         <tr>
           <td align="center" style="padding-bottom:28px;">
             <p style="margin:0;font-size:22px;font-weight:800;color:#1a0533;letter-spacing:-0.02em;">
-              Duguilan<span style="color:#7c3aed;">.mn</span>
+              Duguilan<span style="color:#7c3aed;">.com</span>
             </p>
             <p style="margin:4px 0 0;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#9879d4;">
               Nest IT School
@@ -130,7 +130,7 @@ function verifyEmailHtml(displayName, verifyLink, note = '') {
         <tr>
           <td align="center" style="padding-top:32px;">
             <p style="margin:0 0 5px;font-size:12px;font-weight:700;letter-spacing:0.06em;color:#7c3aed;">
-              Duguilan.mn
+              Duguilan.com
             </p>
             <p style="margin:0 0 5px;font-size:11px;color:#9879d4;">
               Nest IT School &mdash; Ulaanbaatar, Mongolia

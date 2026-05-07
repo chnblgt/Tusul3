@@ -8,6 +8,22 @@ const fetchAPI = (url, opts = {}) =>
 
 const CATEGORIES = ["Football","Basketball","Volleyball","Tennis","Swimming","Chess","Music","Art","Dance","Drama","Coding","Science","Wrestling","Boxing","Judo","Athletics","Other"];
 
+// ── Shared design tokens (same as signin) ──────────────────────────────────
+const COLORS = {
+  "--bg-page":        "#fafaf8",
+  "--bg-card":        "#ffffff",
+  "--bg-input":       "#f3efe8",
+  "--text-primary":   "#1a1714",
+  "--text-secondary": "#3a342c",
+  "--text-muted":     "#7a6f65",
+  "--text-on-accent": "#ffffff",
+  "--border-subtle":  "rgba(0,0,0,0.08)",
+  "--border-card":    "rgba(0,0,0,0.06)",
+  "--border-input":   "rgba(0,0,0,0.13)",
+  "--text-accent":    "#6030c8",
+  "--accent-soft":    "rgba(96,48,200,0.08)",
+};
+
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
   .au-serif { font-family: 'Cormorant Garamond', serif; }
@@ -16,40 +32,52 @@ const CSS = `
   @keyframes au-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
   .au-card { animation: au-up 0.6s cubic-bezier(0.16,1,0.3,1) both; }
 
+  /* ── Inputs: bigger, darker text ── */
   .au-input {
-    width: 100%; padding: 12px 16px;
-    border: 1px solid var(--input-border); border-radius: 8px;
-    font-size: 14px; font-family: 'Outfit', sans-serif; font-weight: 400;
-    color: var(--input-text); background: var(--bg-input);
-    outline: none; box-sizing: border-box;
+    width: 100%;
+    padding: 15px 18px;
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    color: #1a1714;                    /* hard-coded dark — never washed-out beige */
+    background: var(--bg-input);
+    outline: none;
+    box-sizing: border-box;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
+  .au-input::placeholder { color: #9a8f82; font-weight: 300; }
   .au-input:focus {
     border-color: var(--text-accent);
-    box-shadow: 0 0 0 3px rgba(96,48,200,0.08);
+    box-shadow: 0 0 0 3px var(--accent-soft);
   }
 
+  /* ── Labels ── */
   .au-label {
     font-family: 'Outfit', sans-serif;
     font-size: 10px; font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--text-muted); display: block; margin-bottom: 7px;
+    color: var(--text-muted); display: block; margin-bottom: 8px;
   }
 
+  /* ── Primary button — dark fill ── */
   .au-btn-primary {
-    width: 100%; padding: 12px;
-    background: var(--text-primary); color: var(--bg-page);
+    width: 100%; padding: 15px;
+    background: var(--text-primary);
+    color: var(--bg-page);
     border: none; border-radius: 8px;
-    font-size: 13px; font-weight: 600; letter-spacing: 0.04em;
+    font-size: 14px; font-weight: 600; letter-spacing: 0.04em;
     font-family: 'Outfit', sans-serif; cursor: pointer;
     transition: all 0.2s;
   }
   .au-btn-primary:hover { background: var(--text-accent); transform: translateY(-1px); }
   .au-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
+  /* ── Error ── */
   .au-error {
     background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
-    border-radius: 8px; padding: 10px 14px;
+    border-radius: 8px; padding: 11px 15px;
     font-size: 13px; color: #dc2626; font-family: 'Outfit', sans-serif;
   }
 
@@ -62,9 +90,9 @@ const CSS = `
 function PasswordStrength({ pw }) {
   if (!pw) return null;
   const s = pw.length < 8
-    ? { label: "Weak", color: "#ef4444", w: "33%" }
+    ? { label: "Weak",   color: "#ef4444", w: "33%" }
     : pw.length < 12
-    ? { label: "Fair", color: "#f59e0b", w: "66%" }
+    ? { label: "Fair",   color: "#f59e0b", w: "66%" }
     : { label: "Strong", color: "#22c55e", w: "100%" };
   return (
     <div style={{ marginTop: "6px" }}>
@@ -97,25 +125,25 @@ function VerifyPrompt({ email, type, onResend, resendLoading, resendMsg }) {
   return (
     <div style={{ textAlign: "center" }}>
       <div style={{
-        width: "64px", height: "64px",
-        border: "1px solid var(--border-subtle)", borderRadius: "12px",
+        width: "80px", height: "80px",
+        border: "1px solid var(--border-subtle)", borderRadius: "16px",
         display: "flex", alignItems: "center", justifyContent: "center",
-        margin: "0 auto 24px", fontSize: "28px",
+        margin: "0 auto 28px", fontSize: "36px",
         background: "var(--bg-input)",
       }}>✉️</div>
 
       <h2 className="au-serif" style={{
-        fontSize: "28px", fontWeight: 300,
-        color: "var(--text-primary)", margin: "0 0 12px",
-        letterSpacing: "-0.02em", transition: "color 0.3s",
+        fontSize: "38px", fontWeight: 300,
+        color: "var(--text-primary)", margin: "0 0 14px",
+        letterSpacing: "-0.02em",
       }}>
         Check your<br /><em style={{ fontStyle: "italic" }}>email.</em>
       </h2>
 
-      <p className="au-sans" style={{ color: "var(--text-muted)", fontSize: "13px", fontWeight: 300, lineHeight: 1.7, margin: "0 0 8px" }}>
+      <p className="au-sans" style={{ color: "var(--text-muted)", fontSize: "15px", fontWeight: 300, lineHeight: 1.7, margin: "0 0 6px" }}>
         We sent a verification link to
       </p>
-      <p className="au-sans" style={{ color: "var(--text-accent)", fontWeight: 600, fontSize: "14px", margin: "0 0 28px", wordBreak: "break-all" }}>
+      <p className="au-sans" style={{ color: "#1a1714", fontWeight: 700, fontSize: "16px", margin: "0 0 28px", wordBreak: "break-all" }}>
         {email}
       </p>
 
@@ -123,23 +151,23 @@ function VerifyPrompt({ email, type, onResend, resendLoading, resendMsg }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "20px" }}>
           {[0, 0.2, 0.4].map((delay, i) => (
             <div key={i} style={{
-              width: "7px", height: "7px", borderRadius: "50%",
-              background: "var(--text-accent)",
+              width: "8px", height: "8px", borderRadius: "50%",
+              background: "#64748b",
               animation: `au-pulse 1.4s ease-in-out ${delay}s infinite`,
             }} />
           ))}
-          <span className="au-sans" style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 400, marginLeft: "6px" }}>
+          <span className="au-sans" style={{ fontSize: "14px", color: "var(--text-muted)", fontWeight: 400, marginLeft: "6px" }}>
             Waiting for verification…
           </span>
         </div>
       )}
 
       {resendMsg
-        ? <p className="au-sans" style={{ color: "#22c55e", fontSize: "13px", fontWeight: 600, marginBottom: "16px" }}>{resendMsg}</p>
+        ? <p className="au-sans" style={{ color: "#22c55e", fontSize: "15px", fontWeight: 600, marginBottom: "16px" }}>{resendMsg}</p>
         : <button className="au-sans" onClick={onResend} disabled={resendLoading} style={{
             background: "none", border: "1px solid var(--border-subtle)",
-            borderRadius: "8px", padding: "9px 20px",
-            color: "var(--text-accent)", fontWeight: 600, fontSize: "13px",
+            borderRadius: "8px", padding: "11px 28px",
+            color: "var(--text-accent)", fontWeight: 600, fontSize: "15px",
             cursor: resendLoading ? "not-allowed" : "pointer",
             opacity: resendLoading ? 0.6 : 1, marginBottom: "20px",
             fontFamily: "'Outfit', sans-serif",
@@ -148,7 +176,7 @@ function VerifyPrompt({ email, type, onResend, resendLoading, resendMsg }) {
           </button>
       }
 
-      <p className="au-sans" style={{ fontSize: "13px", color: "var(--text-muted)", marginTop: "12px" }}>
+      <p className="au-sans" style={{ fontSize: "15px", color: "var(--text-muted)", marginTop: "12px" }}>
         <a href="/signin" style={{ color: "var(--text-accent)", fontWeight: 600, textDecoration: "none" }}>← Back to sign in</a>
       </p>
     </div>
@@ -157,29 +185,27 @@ function VerifyPrompt({ email, type, onResend, resendLoading, resendMsg }) {
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [mode, setMode] = useState("user");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [verifyEmail, setVerifyEmail] = useState("");
-  const [verifyType, setVerifyType] = useState("");
+  const [mode,          setMode]          = useState("user");
+  const [loading,       setLoading]       = useState(false);
+  const [error,         setError]         = useState("");
+  const [verifyEmail,   setVerifyEmail]   = useState("");
+  const [verifyType,    setVerifyType]    = useState("");
   const [resendLoading, setResendLoading] = useState(false);
-  const [resendMsg, setResendMsg] = useState("");
+  const [resendMsg,     setResendMsg]     = useState("");
 
-  // User fields
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [showPw, setShowPw] = useState(false);
-  const [showCf, setShowCf] = useState(false);
+  const [confirm,  setConfirm]  = useState("");
+  const [showPw,   setShowPw]   = useState(false);
+  const [showCf,   setShowCf]   = useState(false);
 
-  // Club fields
-  const [clubName, setClubName] = useState("");
+  const [clubName,     setClubName]     = useState("");
   const [clubCategory, setClubCategory] = useState("");
-  const [clubEmail, setClubEmail] = useState("");
-  const [clubPhone, setClubPhone] = useState("");
-  const [clubWebsite, setClubWebsite] = useState("");
-  const [clubDesc, setClubDesc] = useState("");
+  const [clubEmail,    setClubEmail]    = useState("");
+  const [clubPhone,    setClubPhone]    = useState("");
+  const [clubWebsite,  setClubWebsite]  = useState("");
+  const [clubDesc,     setClubDesc]     = useState("");
 
   const match    = confirm && password === confirm;
   const mismatch = confirm && password !== confirm;
@@ -210,7 +236,7 @@ export default function SignUpPage() {
       const fd = new FormData();
       fd.append("name", clubName); fd.append("category", clubCategory);
       fd.append("email", clubEmail); fd.append("description", clubDesc);
-      if (clubPhone) fd.append("phone", clubPhone);
+      if (clubPhone)   fd.append("phone",   clubPhone);
       if (clubWebsite) fd.append("website", clubWebsite);
       const r = await fetchAPI(`${API}/registerClub`, { method: "POST", body: fd });
       const d = await r.json();
@@ -234,45 +260,40 @@ export default function SignUpPage() {
   }
 
   const inp = { className: "au-input", autoComplete: "new-password" };
-  const eyeOpen   = <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>;
-  const eyeClosed = <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>;
 
-  // Hardcode light/beige colours — signup page is always light regardless of theme
-  const LIGHT = {
-    "--bg-page":        "#fafaf8",
-    "--bg-card":        "#ffffff",
-    "--bg-input":       "#f3efe8",
-    "--text-primary":   "#1a1714",
-    "--text-secondary": "#4a4238",
-    "--text-muted":     "#9a8f82",
-    "--text-on-accent": "#ffffff",
-    "--border-subtle":  "rgba(0,0,0,0.07)",
-    "--border-card":    "rgba(0,0,0,0.06)",
-    "--border-input":   "rgba(0,0,0,0.11)",
-    "--accent":         "#1d6fbc",
-    "--accent-soft":    "rgba(29,111,188,0.08)",
-    "--accent-glow":    "rgba(29,111,188,0.18)",
-  };
+  const eyeOpen = (
+    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+  );
+  const eyeClosed = (
+    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fafaf8", display: "flex", flexDirection: "column", ...LIGHT }}>
+    <div style={{ minHeight: "100vh", background: "#fafaf8", display: "flex", flexDirection: "column", ...COLORS }}>
       <style>{CSS}</style>
       <div style={{
-        padding: "20px 32px",
+        padding: "22px 40px",
         borderBottom: "1px solid var(--border-subtle)",
         background: "var(--bg-card)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         transition: "background 0.3s",
       }}>
-        <a href="/page" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "24px", height: "24px", background: "var(--text-primary)", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <img src="/assets/logo_white.png" alt="" width={14} height={14} />
+        <a href="/page" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ width: "30px", height: "30px", background: "var(--text-primary)", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <img src="/assets/logo_white.png" alt="" width={17} height={17} />
           </div>
-          <span className="au-serif" style={{ fontSize: "18px", fontWeight: 600, fontStyle: "normal", color: "var(--text-primary)", letterSpacing: "0.01em" }}>
-            Duguilan<span style={{ fontStyle: "italic", color: "var(--text-accent)" }}>.mn</span>
+          <span className="au-serif" style={{ fontSize: "22px", fontWeight: 600, fontStyle: "normal", color: "var(--text-primary)", letterSpacing: "0.01em" }}>
+            Duguilan<span style={{ fontStyle: "italic", color: "var(--text-accent)" }}>.com</span>
           </span>
         </a>
-        <a href="/signin" className="au-sans" style={{ fontSize: "13px", fontWeight: 500, color: "var(--text-muted)", textDecoration: "none", transition: "color 0.2s" }}
+        <a href="/signin" className="au-sans"
+          style={{ fontSize: "15px", fontWeight: 500, color: "var(--text-muted)", textDecoration: "none", transition: "color 0.2s" }}
           onMouseEnter={e => e.target.style.color = "var(--text-primary)"}
           onMouseLeave={e => e.target.style.color = "var(--text-muted)"}
         >
@@ -280,6 +301,7 @@ export default function SignUpPage() {
         </a>
       </div>
 
+      {/* ── Card ── */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 16px" }}>
         <div className="au-card" style={{ width: "100%", maxWidth: "440px" }}>
 
@@ -292,15 +314,15 @@ export default function SignUpPage() {
             <>
               <div style={{ marginBottom: "32px" }}>
                 <h1 className="au-serif" style={{
-                  fontSize: "36px", fontWeight: 300, lineHeight: 1.1,
+                  fontSize: "38px", fontWeight: 300, lineHeight: 1.1,
                   color: "var(--text-primary)", margin: "0 0 8px",
-                  letterSpacing: "-0.02em", transition: "color 0.3s",
+                  letterSpacing: "-0.02em",
                 }}>
                   Create an<br />
                   <em style={{ fontStyle: "italic", fontWeight: 400 }}>account.</em>
                 </h1>
                 <p className="au-sans" style={{ fontSize: "14px", fontWeight: 300, color: "var(--text-muted)", margin: 0 }}>
-                  Join Duguilan.mn today.
+                  Join Duguilan.com today.
                 </p>
               </div>
               <div style={{
@@ -310,9 +332,9 @@ export default function SignUpPage() {
               }}>
                 {[["user", "Personal"], ["club", "Club"]].map(([m, lbl]) => (
                   <button key={m} onClick={() => { setMode(m); setError(""); }} className="au-sans" style={{
-                    flex: 1, padding: "9px",
+                    flex: 1, padding: "10px",
                     borderRadius: "6px", border: "none", cursor: "pointer",
-                    fontSize: "13px", fontWeight: mode === m ? 600 : 400,
+                    fontSize: "14px", fontWeight: mode === m ? 600 : 400,
                     background: mode === m ? "var(--bg-card)" : "transparent",
                     color: mode === m ? "var(--text-primary)" : "var(--text-muted)",
                     boxShadow: mode === m ? "0 1px 6px rgba(0,0,0,0.08)" : "none",
@@ -322,9 +344,8 @@ export default function SignUpPage() {
               </div>
 
               {error && <div className="au-error" style={{ marginBottom: "20px" }}>{error}</div>}
-
               {mode === "user" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
                   <div>
                     <label className="au-label">Username</label>
                     <input {...inp} type="text" placeholder="your_username" value={username} onChange={e => setUsername(e.target.value)} />
@@ -336,8 +357,10 @@ export default function SignUpPage() {
                   <div>
                     <label className="au-label">Password</label>
                     <div style={{ position: "relative" }}>
-                      <input {...inp} type={showPw ? "text" : "password"} placeholder="Min. 8 characters" value={password} onChange={e => setPassword(e.target.value)} style={{ paddingRight: "42px" }} />
-                      <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0 }}>{showPw ? eyeClosed : eyeOpen}</button>
+                      <input {...inp} type={showPw ? "text" : "password"} placeholder="Min. 8 characters" value={password} onChange={e => setPassword(e.target.value)} style={{ paddingRight: "46px" }} />
+                      <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0 }}>
+                        {showPw ? eyeClosed : eyeOpen}
+                      </button>
                     </div>
                     <PasswordStrength pw={password} />
                   </div>
@@ -345,20 +368,21 @@ export default function SignUpPage() {
                     <label className="au-label">Confirm Password</label>
                     <div style={{ position: "relative" }}>
                       <input {...inp} type={showCf ? "text" : "password"} placeholder="Re-enter password" value={confirm} onChange={e => setConfirm(e.target.value)}
-                        style={{ paddingRight: "42px", borderColor: mismatch ? "#ef4444" : match ? "#22c55e" : undefined }} />
-                      <button type="button" onClick={() => setShowCf(!showCf)} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0 }}>{showCf ? eyeClosed : eyeOpen}</button>
+                        style={{ paddingRight: "46px", borderColor: mismatch ? "#ef4444" : match ? "#22c55e" : undefined }} />
+                      <button type="button" onClick={() => setShowCf(!showCf)} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0 }}>
+                        {showCf ? eyeClosed : eyeOpen}
+                      </button>
                     </div>
                     {mismatch && <span className="au-sans" style={{ fontSize: "11px", color: "#ef4444", fontWeight: 600, marginTop: "4px", display: "block" }}>Passwords don&apos;t match</span>}
-                    {match && <span className="au-sans" style={{ fontSize: "11px", color: "#22c55e", fontWeight: 600, marginTop: "4px", display: "block" }}>Passwords match ✓</span>}
+                    {match    && <span className="au-sans" style={{ fontSize: "11px", color: "#22c55e", fontWeight: 600, marginTop: "4px", display: "block" }}>Passwords match ✓</span>}
                   </div>
                   <button className="au-btn-primary" onClick={handleUserSignUp} disabled={loading} style={{ marginTop: "4px" }}>
                     {loading ? "Creating account…" : "Create Account →"}
                   </button>
                 </div>
               )}
-
               {mode === "club" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
                   <div>
                     <label className="au-label">Club Name</label>
                     <input {...inp} type="text" placeholder="e.g. Ulaanbaatar FC" value={clubName} onChange={e => setClubName(e.target.value)} />
