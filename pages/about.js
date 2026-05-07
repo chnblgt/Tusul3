@@ -4,11 +4,11 @@ import Footer from "@/waterbottle/Footer";
 const FONT = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');`;
 
 const team = [
-  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API",       color: "#5533bb" },
-  { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API",       color: "#2563eb" },
-  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Engineering",          color: "#0d9488" },
-  { name: "Delgermurun Ganbold",     role: "Graphic Designer",     focus: "UI & Design Systems", color: "#ca8a04" },
-  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "API Integration",      color: "#db2777" },
+    { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API & playboy, alcoholic, hoe",       color: "#2563eb" },
+ { name: "Delgermurun Ganbold",     role: "Angiin huuhed",     focus: "Banned from EON & 170cm", color: "#baf007" },
+  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API & pedo",       color: "#5533bb" },
+  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Chill guy, zugeer hamt baisan",          color: "#0d9488" },
+  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "Benttei huuhed",      color: "#db2777" },
 ];
 
 const CSS = `
