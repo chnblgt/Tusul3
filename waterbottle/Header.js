@@ -107,6 +107,7 @@ export default function Header({ user = null }) {
           border: 1px solid var(--border-subtle);
           border-radius: 8px;
           transition: all 0.2s;
+          white-space: nowrap;
         }
         .hdr-ghost:hover { color: var(--text-primary); border-color: var(--border-card); background: var(--bg-input); }
 
@@ -120,6 +121,7 @@ export default function Header({ user = null }) {
           background: var(--accent);
           transition: all 0.2s;
           letter-spacing: 0.02em;
+          white-space: nowrap;
         }
         .hdr-primary:hover { opacity: 0.88; transform: translateY(-1px); }
 
@@ -166,12 +168,14 @@ export default function Header({ user = null }) {
         }
         .hdr-dd-item:hover { background: var(--bg-input) !important; }
 
+        /* ── Burger: hidden on desktop ── */
         .hdr-burger {
           display: none;
           flex-direction: column; justify-content: center; gap: 5px;
           width: 36px; height: 36px;
           background: none; border: none; cursor: pointer; padding: 6px;
           border-radius: 8px; transition: background 0.2s;
+          flex-shrink: 0;
         }
         .hdr-burger:hover { background: var(--bg-input); }
         .hdr-burger span {
@@ -212,6 +216,7 @@ export default function Header({ user = null }) {
         }
         .hdr-mobile-link:hover { color: var(--accent); }
 
+        /* ── Responsive breakpoint ── */
         @media (max-width: 768px) {
           .hdr-nav-desktop { display: none !important; }
           .hdr-auth-desktop { display: none !important; }
@@ -231,8 +236,10 @@ export default function Header({ user = null }) {
           maxWidth: "1200px", margin: "0 auto",
           padding: "0 20px", height: "64px",
           display: "flex", alignItems: "center", justifyContent: "space-between",
+          gap: "12px",
         }}>
-          <Link href="/page" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Logo */}
+          <Link href="/page" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
             <div style={{
               width: "30px", height: "30px",
               background: "var(--accent)", borderRadius: "8px",
@@ -244,6 +251,7 @@ export default function Header({ user = null }) {
               fontFamily: "'DM Serif Display', serif",
               fontSize: "20px", color: "var(--text-primary)",
               letterSpacing: "-0.01em", fontStyle: "normal",
+              whiteSpace: "nowrap",
             }}>
               Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.com</span>
             </span>
@@ -301,7 +309,7 @@ export default function Header({ user = null }) {
             )}
           </div>
 
-          {/* Mobile burger */}
+          {/* Mobile burger — always last so it sits on the right */}
           <button
             className={`hdr-burger${mobileOpen ? " open" : ""}`}
             onClick={() => setMobileOpen(v => !v)}
