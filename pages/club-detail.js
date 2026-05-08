@@ -213,7 +213,8 @@ export default function ClubDetailPage() {
       fetchAPI(`${API}/clubs/${id}`).then(r => r.json()),
     ]).then(([statusData, clubData]) => {
       if (statusData.success) setMembershipStatus(statusData.payment_status);
-      if (clubData.success && (clubData.club.qpay_info || clubData.club.dans_info)) {
+      const isClubOwner = clubData.success && String(clubData.club.owner_id) === String(user.id);
+      if (!isClubOwner && clubData.success && (clubData.club.qpay_info || clubData.club.dans_info)) {
         const tierName = statusData.tier_name || null;
         let tierPrice  = null;
         try {
