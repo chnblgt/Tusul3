@@ -174,7 +174,7 @@ export default function SettingsPage() {
       <style>{css(T)}</style>
       <Header />
 
-      <main style={{ flex: 1, padding: "48px 24px" }}>
+      <main style={{ flex: 1, padding: "clamp(24px,4vw,48px) clamp(16px,3vw,24px)" }}>
         <div style={{ maxWidth: "860px", margin: "0 auto" }}>
 
           <div style={{ marginBottom: "36px" }}>
@@ -186,7 +186,7 @@ export default function SettingsPage() {
             </h1>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "28px", alignItems: "start" }}>
+          <div className="st-sidebar-grid" style={{ display: "grid", gridTemplateColumns: "min(200px, 30%) 1fr", gap: "28px", alignItems: "start" }}>
 
             <nav style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)", borderRadius: "16px", padding: "8px", position: "sticky", top: "96px" }}>
               {sections.map(s => (
@@ -222,7 +222,7 @@ export default function SettingsPage() {
                       <p className="st-sans" style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 16px" }}>
                         Theme
                       </p>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(160px,100%),1fr))", gap: "12px" }}>
                         {THEMES.map(t => {
                           const meta = THEME_META[t];
                           const active = activeTheme === t;
@@ -601,6 +601,14 @@ function css() {
     .st-input::placeholder { color: var(--text-muted) !important; }
 
     .st-nav-btn:hover { background: var(--accent-soft) !important; color: var(--accent) !important; }
+
+    @media (max-width: 640px) {
+      .st-sidebar-grid { grid-template-columns: 1fr !important; }
+      .st-sidebar-nav { position: static !important; display: flex; flex-direction: row; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px !important; padding: 4px !important; gap: 2px; }
+      .st-nav-btn { white-space: nowrap; }
+      .st-row { flex-wrap: wrap; gap: 12px; padding: 16px !important; }
+      .st-section-header { padding: 20px 16px 14px !important; }
+    }
   `;
 }
 

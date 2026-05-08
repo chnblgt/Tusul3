@@ -149,6 +149,12 @@ const fonts = `
     background: var(--bg-input); display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; transition: background 0.35s;
   }
+  @media (max-width: 900px) {
+    .cd-page-layout { flex-direction: column !important; }
+    .cd-sticky-sidebar { position: static !important; width: 100% !important; max-width: 100% !important; flex-shrink: 0; }
+    .cd-main-grid { grid-template-columns: 1fr !important; }
+  }
+
 `;
 
 export default function ClubDetailPage() {
@@ -355,7 +361,7 @@ export default function ClubDetailPage() {
       </div>
 
       <main style={{ flex: 1 }}>
-        <div style={{ maxWidth: "960px", margin: "0 auto", padding: "0 32px 96px" }}>
+        <div style={{ maxWidth: "960px", margin: "0 auto", padding: "0 clamp(16px,4vw,32px) 96px" }}>
           <div style={{ paddingTop: "20px" }}>
             <Link href="/page1" className="cd-back">
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -363,7 +369,7 @@ export default function ClubDetailPage() {
             </Link>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "32px", alignItems: "start" }}>
+          <div className="cd-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr min(300px, 100%)", gap: "32px", alignItems: "start" }}>
             <div className="cd-fadein">
               <div style={{ display: "flex", alignItems: "flex-start", gap: "20px", marginBottom: "24px" }}>
                 <div style={{ width: "68px", height: "68px", borderRadius: "16px", flexShrink: 0, background: bg, border: `2px solid ${accent}28`, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", boxShadow: `0 4px 16px ${accent}20` }}>

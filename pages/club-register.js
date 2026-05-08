@@ -121,6 +121,10 @@ const extraStyles = `
     font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:700;
     transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;
   }
+  @media (max-width: 640px) {
+    .reg-two-col { grid-template-columns: 1fr !important; }
+    .reg-progress-steps { overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 4px !important; }
+  }
 `;
 
 function Confetti() {
@@ -391,7 +395,7 @@ export default function ClubRegisterPage() {
 
           {error && <div style={{ background:"#fef2f2", border:"1px solid rgba(239,68,68,0.2)", borderRadius:"10px", padding:"12px 16px", marginBottom:"24px", fontSize:"13px", color:"#dc2626", fontFamily:"'DM Sans', sans-serif" }}>{error}</div>}
 
-          <div style={{ background:"#fff", border:"1.5px solid rgba(124,58,237,0.12)", borderRadius:"20px", padding:"48px", boxShadow:"0 4px 32px rgba(124,58,237,0.06)" }}>
+          <div style={{ background:"#fff", border:"1.5px solid rgba(124,58,237,0.12)", borderRadius:"20px", padding:"clamp(20px,4vw,48px)", boxShadow:"0 4px 32px rgba(124,58,237,0.06)" }}>
             {stepName === "Basic Info" && (
               <div style={{ display:"flex", flexDirection:"column", gap:"24px" }}>
                 <div><label style={labelStyle}>Club Name *</label><input style={inp} placeholder="e.g. Ulaanbaatar FC" value={form.clubName} onChange={e => setField("clubName", e.target.value)} {...focusHandlers}/></div>

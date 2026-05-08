@@ -35,7 +35,7 @@ const styles = `
   .ac-page {
     min-height: 100vh;
     background: #0d0118;
-    padding: 48px 24px 96px;
+    padding: clamp(24px,4vw,48px) clamp(16px,3vw,24px) 96px;
   }
 
   .ac-header {
@@ -95,7 +95,7 @@ const styles = `
     max-width: 860px; margin: 0 auto;
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(124,58,237,0.2);
-    border-radius: 24px; padding: 48px;
+    border-radius: 24px; padding: clamp(20px,4vw,48px);
     backdrop-filter: blur(12px);
   }
 
@@ -236,7 +236,7 @@ const styles = `
   .ac-reject-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .ac-empty {
-    text-align: center; padding: 48px 24px;
+    text-align: center; padding: clamp(24px,4vw,48px) clamp(16px,3vw,24px);
     font-family: 'DM Sans', sans-serif; font-size: 14px;
     color: rgba(255,255,255,0.2);
   }
@@ -305,7 +305,7 @@ export default function AdminCreateClub() {
           <div style={{
             background: "rgba(255,255,255,0.03)",
             border: "1px solid rgba(124,58,237,0.25)",
-            borderRadius: "20px", padding: "48px 40px",
+            borderRadius: "20px", padding: "clamp(20px,4vw,48px) clamp(20px,4vw,40px)",
             width: "100%", maxWidth: "380px",
           }}>
             <div className="ac-badge" style={{ marginBottom: "20px" }}>⚡ Admin Panel</div>

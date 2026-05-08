@@ -237,7 +237,7 @@ export default function SignInPage() {
       <style>{CSS}</style>
       <div id="g_id_hidden_btn" style={{ position: "absolute", opacity: 0, pointerEvents: "none" }} />
       <div style={{
-        padding: "22px 40px",
+        padding: "16px clamp(16px, 4vw, 40px)",
         borderBottom: "1px solid var(--border-subtle)",
         background: "var(--bg-card)",
         display: "flex", alignItems: "center", justifyContent: "space-between",

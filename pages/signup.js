@@ -279,7 +279,7 @@ export default function SignUpPage() {
     <div style={{ minHeight: "100vh", background: "#fafaf8", display: "flex", flexDirection: "column", ...COLORS }}>
       <style>{CSS}</style>
       <div style={{
-        padding: "22px 40px",
+        padding: "16px clamp(16px, 4vw, 40px)",
         borderBottom: "1px solid var(--border-subtle)",
         background: "var(--bg-card)",
         display: "flex", alignItems: "center", justifyContent: "space-between",

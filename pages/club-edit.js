@@ -97,6 +97,10 @@ const fonts = `
     transition: all 0.2s;
   }
   .ce-back-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--border-card); }
+  @media (max-width: 640px) {
+    .ce-two-col { grid-template-columns: 1fr !important; }
+  }
+
 `;
 
 export default function ClubEditPage() {
@@ -513,7 +517,7 @@ export default function ClubEditPage() {
                 <label className="ce-label">Contact Email *</label>
                 <input className="ce-input" type="email" value={form.email} onChange={e => setField("email", e.target.value)} placeholder="club@example.com" />
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))", gap: "16px" }}>
                 <div>
                   <label className="ce-label">Phone</label>
                   <input className="ce-input" type="tel" value={form.phone} onChange={e => setField("phone", e.target.value)} placeholder="+976 9999 9999" />
@@ -533,7 +537,7 @@ export default function ClubEditPage() {
             <p className="ce-sans" style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "20px", lineHeight: 1.6 }}>
               Гишүүд төлбөр хийхэд харуулах QPay QR код эсвэл данс мэдээлэл оруулна уу. Хэрэв үлдээвэл харуулахгүй.
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))", gap: "20px" }}>
               <div>
                 <label className="ce-label">
                   <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
@@ -583,7 +587,7 @@ export default function ClubEditPage() {
               Cancel
             </button>
             <button onClick={handleSave} disabled={saving} className="ce-sans"
-              style={{ padding: "12px 32px", borderRadius: "10px", background: "var(--accent)", border: "none", color: "var(--text-on-accent)", fontWeight: 700, fontSize: "14px", cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1, boxShadow: "0 4px 16px var(--accent-glow)", transition: "all 0.2s" }}>
+              style={{ padding: "clamp(20px,4vw,12px) clamp(16px,4vw,32px)", borderRadius: "10px", background: "var(--accent)", border: "none", color: "var(--text-on-accent)", fontWeight: 700, fontSize: "14px", cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1, boxShadow: "0 4px 16px var(--accent-glow)", transition: "all 0.2s" }}>
               {saving ? "Хадгалж байна…" : "Save Changes"}
             </button>
           </div>

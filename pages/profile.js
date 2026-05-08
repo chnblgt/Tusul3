@@ -118,6 +118,17 @@ const fonts = `
     border-radius:16px; transition:box-shadow .15s, background 0.3s, border-color 0.3s;
   }
   .pp-activity-row:hover { box-shadow:var(--shadow-card-hover); }
+
+  @media (max-width: 768px) {
+    .pp-header-row { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+    .pp-stat-grid { grid-template-columns: 1fr 1fr !important; }
+    .pp-tabs-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .pp-tab { padding: 12px 14px !important; font-size: 13px !important; white-space: nowrap; }
+    .pp-modal { padding: 24px !important; }
+  }
+  @media (max-width: 480px) {
+    .pp-stat-grid { grid-template-columns: 1fr !important; }
+  }
 `;
 
 export default function ProfilePage() {
@@ -275,8 +286,8 @@ export default function ProfilePage() {
       </div>
 
       <main style={{flex:1}}>
-        <div style={{maxWidth:"960px",margin:"0 auto",padding:"0 48px 96px"}}>
-          <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",marginTop:"-62px",paddingBottom:"28px",position:"relative",zIndex:10}}>
+        <div style={{maxWidth:"960px",margin:"0 auto",padding:"0 clamp(16px,4vw,48px) 96px"}}>
+          <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",marginTop:"-62px",paddingBottom:"28px",position:"relative",zIndex:10,flexWrap:"wrap",gap:"12px"}}>
             <div style={{position:"relative"}}>
               <div
                 className="pp-avatar-wrap"
@@ -365,7 +376,7 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"14px",marginBottom:"40px"}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(min(200px,100%),1fr))",gap:"14px",marginBottom:"40px"}}>
             {[
               { val:enrolledClubs.length, label:"Clubs joined",    icon:"🏆", color:"var(--accent)" },
               { val:totalClubs,           label:"Clubs available", icon:"🌐", color:"#3b82f6" },

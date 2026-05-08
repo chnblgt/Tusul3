@@ -57,6 +57,34 @@ export default function Footer() {
           color: var(--accent);
           background: var(--accent-soft);
         }
+
+        .ft-grid {
+          display: grid;
+          grid-template-columns: 1.8fr 1fr 1fr 1fr;
+          gap: 48px;
+          margin-bottom: 56px;
+        }
+
+        @media (max-width: 768px) {
+          .ft-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 40px;
+          }
+          .ft-brand-col {
+            grid-column: 1 / -1;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .ft-grid {
+            grid-template-columns: 1fr;
+            gap: 28px;
+          }
+          .ft-brand-col {
+            grid-column: auto;
+          }
+        }
       `}</style>
 
       <footer style={{
@@ -64,15 +92,10 @@ export default function Footer() {
         background: "var(--bg-card)",
         transition: "background 0.35s",
       }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "64px 32px 48px" }}>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "1.8fr 1fr 1fr 1fr",
-            gap: "48px",
-            marginBottom: "56px",
-          }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "clamp(40px, 6vw, 64px) clamp(20px, 4vw, 32px) clamp(32px, 5vw, 48px)" }}>
+          <div className="ft-grid">
             {/* Brand */}
-            <div>
+            <div className="ft-brand-col">
               <Link href="/page" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "18px" }}>
                 <div style={{
                   width: "26px", height: "26px",

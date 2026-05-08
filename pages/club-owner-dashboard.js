@@ -59,6 +59,12 @@ const fonts = `
   .od-badge-yellow { background: rgba(245,158,11,0.1); color: #b45309; border: 1px solid rgba(245,158,11,0.2); }
   .od-badge-red    { background: rgba(239,68,68,0.08); color: #dc2626; border: 1px solid rgba(239,68,68,0.15); }
 
+  @media (max-width: 640px) {
+    .od-tabs-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .od-tab { flex: 0 0 auto !important; white-space: nowrap; padding: 8px 10px !important; font-size: 11px !important; gap: 4px !important; }
+    .od-row { padding: 10px 12px !important; }
+  }
+
   .od-stat-card {
     background: var(--bg-card); border: 1px solid var(--border-subtle);
     border-radius: 16px; padding: 20px 24px;
@@ -319,7 +325,7 @@ export default function ClubOwnerDashboard() {
             </svg>
             <input className="od-search" placeholder="Search by name or email…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <div className="od-fadein" style={{ display: "flex", gap: "4px", background: "var(--bg-input)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "4px", marginBottom: "24px" }}>
+          <div className="od-fadein od-tabs-wrap" style={{ display: "flex", gap: "4px", background: "var(--bg-input)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "4px", marginBottom: "24px", overflowX: "auto" }}>
             <button className={`od-tab${activeTab === "members" ? " active" : ""}`} onClick={() => setActiveTab("members")}>
               Members
               <span style={{ background: "var(--bg-page)", border: "1px solid var(--border-subtle)", borderRadius: "20px", padding: "1px 8px", fontSize: "11px", color: "var(--text-muted)", fontWeight: 700 }}>{members.length}</span>

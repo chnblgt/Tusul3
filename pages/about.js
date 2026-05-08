@@ -35,6 +35,27 @@ const CSS = `
     background: var(--bg-card);
     transition: background 0.35s;
   }
+
+  .ab-story-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  @media (max-width: 768px) {
+    .ab-story-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ab-value-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .ab-member { padding: 20px; }
+  }
 `;
 
 export default function AboutPage() {
@@ -44,8 +65,9 @@ export default function AboutPage() {
       <Header />
 
       <main style={{ flex: 1 }}>
+        {/* Hero */}
         <section style={{
-          padding: "120px 32px 100px",
+          padding: "clamp(72px, 10vw, 120px) clamp(20px, 4vw, 32px) clamp(64px, 8vw, 100px)",
           borderBottom: "1px solid var(--border-subtle)",
           background: "var(--bg-card)", transition: "background 0.35s",
         }}>
@@ -59,7 +81,7 @@ export default function AboutPage() {
 
             <h1 style={{
               fontFamily: "'DM Serif Display', serif",
-              fontSize: "clamp(3rem, 7vw, 5rem)",
+              fontSize: "clamp(2.4rem, 7vw, 5rem)",
               fontWeight: 400, lineHeight: 1.1,
               color: "var(--text-primary)", margin: "0 0 28px",
               letterSpacing: "-0.03em", transition: "color 0.35s",
@@ -70,7 +92,7 @@ export default function AboutPage() {
 
             <p style={{
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: "16px", fontWeight: 300, lineHeight: 1.85,
+              fontSize: "clamp(14px, 2vw, 16px)", fontWeight: 300, lineHeight: 1.85,
               color: "var(--text-secondary)", maxWidth: "580px",
               margin: "0 auto", transition: "color 0.35s",
             }}>
@@ -79,9 +101,10 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section style={{ padding: "100px 32px", transition: "background 0.35s" }} className="ab-a2">
+        {/* Story */}
+        <section style={{ padding: "clamp(60px, 8vw, 100px) clamp(20px, 4vw, 32px)", transition: "background 0.35s" }} className="ab-a2">
           <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "80px", alignItems: "start" }}>
+            <div className="ab-story-grid">
               <div>
                 <span style={{
                   fontFamily: "'DM Sans', sans-serif",
@@ -91,7 +114,7 @@ export default function AboutPage() {
                 }}>Our Story</span>
                 <h2 style={{
                   fontFamily: "'DM Serif Display', serif",
-                  fontSize: "clamp(2rem, 4vw, 2.8rem)",
+                  fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
                   fontWeight: 400, lineHeight: 1.15,
                   color: "var(--text-primary)", margin: 0,
                   letterSpacing: "-0.02em", transition: "color 0.35s",
@@ -116,7 +139,7 @@ export default function AboutPage() {
                   Duguilan.com bridges that gap by centralising information and helping club leaders reach the people who need them most.
                 </p>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", paddingTop: "10px" }}>
+                <div className="ab-value-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", paddingTop: "10px" }}>
                   {[
                     { marker: "—", label: "Accessible", desc: "Free for everyone, always" },
                     { marker: "—", label: "Community-first", desc: "Built around connection" },
@@ -141,9 +164,11 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
-        <section style={{ padding: "100px 32px", background: "var(--bg-section)", transition: "background 0.35s" }} className="ab-a3">
+
+        {/* Team */}
+        <section style={{ padding: "clamp(60px, 8vw, 100px) clamp(20px, 4vw, 32px)", background: "var(--bg-section)", transition: "background 0.35s" }} className="ab-a3">
           <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-            <div style={{ textAlign: "center", marginBottom: "60px" }}>
+            <div style={{ textAlign: "center", marginBottom: "clamp(40px, 5vw, 60px)" }}>
               <span style={{
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em",
@@ -152,7 +177,7 @@ export default function AboutPage() {
               }}>The Team</span>
               <h2 style={{
                 fontFamily: "'DM Serif Display', serif",
-                fontSize: "clamp(2rem, 4vw, 2.8rem)",
+                fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
                 fontWeight: 400, lineHeight: 1.15,
                 color: "var(--text-primary)", margin: 0,
                 letterSpacing: "-0.02em", transition: "color 0.35s",
@@ -161,7 +186,7 @@ export default function AboutPage() {
               </h2>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "16px" }}>
               {team.map(({ name, role, focus, color }) => (
                 <div key={name} className="ab-member">
                   <div style={{

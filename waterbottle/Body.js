@@ -106,6 +106,54 @@ const G = `
     width: 3px; height: 3px; border-radius: 50%;
     background: var(--accent); opacity: 0.5; flex-shrink: 0;
   }
+
+  /* ── Responsive ── */
+  .bd-hero {
+    min-height: 90vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .bd-hero-left {
+    padding: 80px 64px 80px 60px;
+    display: flex; flex-direction: column; justify-content: center;
+    border-right: 1px solid var(--border-subtle);
+  }
+  .bd-hero-map {
+    position: relative; overflow: hidden; min-height: 400px;
+    zIndex: 0; isolation: isolate;
+  }
+  .bd-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .bd-feat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .bd-leaders-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 48px;
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .bd-hero { grid-template-columns: 1fr; min-height: auto; }
+    .bd-hero-left { padding: 60px 24px 48px; border-right: none; border-bottom: 1px solid var(--border-subtle); }
+    .bd-hero-map { min-height: 280px; }
+    .bd-steps-grid { grid-template-columns: 1fr; gap: 24px; }
+    .bd-feat-grid { grid-template-columns: 1fr; }
+    .bd-leaders-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  @media (max-width: 600px) {
+    .bd-hero-left { padding: 48px 16px 40px; }
+    .bd-section-pad { padding: 72px 16px !important; }
+    .bd-section-pad-bottom { padding: 0 16px 72px !important; }
+    .bd-leaders-pad { padding: 60px 16px !important; }
+  }
 `;
 
 function useCountUp(target, dur = 1200) {
@@ -167,23 +215,15 @@ export default function Body() {
       <style>{G}</style>
 
       {/* ── HERO ── */}
-      <section style={{
-        minHeight: "90vh",
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-      }}>
-        <div style={{
-          padding: "80px 64px 80px 60px",
-          display: "flex", flexDirection: "column", justifyContent: "center",
-          borderRight: "1px solid var(--border-subtle)",
-        }}>
+      <section className="bd-hero">
+        <div className="bd-hero-left">
           <div className="bd-a1" style={{ marginBottom: "28px" }}>
             <span className="bd-tag">Mongolia&apos;s Simplest Club Platform</span>
           </div>
 
           <h1 className="bd-a2" style={{
             fontFamily: "'DM Serif Display', serif",
-            fontSize: "clamp(2.8rem, 5vw, 4.2rem)",
+            fontSize: "clamp(2.4rem, 5vw, 4.2rem)",
             fontWeight: 400, lineHeight: 1.1,
             color: "var(--text-primary)",
             margin: "0 0 24px",
@@ -204,7 +244,7 @@ export default function Body() {
             Discover clubs, sports, arts, and tech communities across Ulaanbaatar. Built for teens who want to grow.
           </p>
 
-          <div className="bd-a4" style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "56px" }}>
+          <div className="bd-a4" style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "48px" }}>
             <Link href="/page1" className="bd-cta-fill">Explore clubs</Link>
             {!loggedIn && <Link href="/signup" className="bd-cta-ghost">Create account</Link>}
           </div>
@@ -216,20 +256,20 @@ export default function Body() {
               { val: "Always", label: "Simple" },
             ].map(({ val, label }, i) => (
               <div key={label} style={{
-                paddingRight: "32px",
-                paddingLeft: i === 0 ? 0 : "32px",
+                paddingRight: "24px",
+                paddingLeft: i === 0 ? 0 : "24px",
                 borderRight: i < 2 ? "1px solid var(--border-subtle)" : "none",
               }}>
                 <span style={{
                   fontFamily: "'DM Serif Display', serif",
-                  fontSize: "28px", fontStyle: "italic",
+                  fontSize: "clamp(20px, 4vw, 28px)", fontStyle: "italic",
                   color: "var(--text-primary)", display: "block",
                   lineHeight: 1, marginBottom: "4px",
                   transition: "color 0.35s",
                 }}>{val}</span>
                 <span style={{
                   fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "11px", fontWeight: 600,
+                  fontSize: "10px", fontWeight: 600,
                   letterSpacing: "0.1em", textTransform: "uppercase",
                   color: "var(--text-muted)",
                 }}>{label}</span>
@@ -238,7 +278,7 @@ export default function Body() {
           </div>
         </div>
 
-        <div style={{ position: "relative", overflow: "hidden", minHeight: "400px", zIndex: 0, isolation: "isolate" }}>
+        <div className="bd-hero-map">
           <MapComponent height="100%" />
           <div style={{
             position: "absolute", inset: 0, pointerEvents: "none",
@@ -260,7 +300,7 @@ export default function Body() {
       </div>
 
       {/* ── HOW IT WORKS ── */}
-      <section style={{ padding: "120px 32px", background: "var(--bg-page)", transition: "background 0.35s" }}>
+      <section className="bd-section-pad" style={{ padding: "120px 32px", background: "var(--bg-page)", transition: "background 0.35s" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{
             display: "flex", alignItems: "flex-end",
@@ -277,7 +317,7 @@ export default function Body() {
               }}>How it works</span>
               <h2 style={{
                 fontFamily: "'DM Serif Display', serif",
-                fontSize: "clamp(2rem, 3.5vw, 2.8rem)",
+                fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
                 fontWeight: 400, color: "var(--text-primary)",
                 margin: 0, letterSpacing: "-0.02em",
                 transition: "color 0.35s",
@@ -287,7 +327,7 @@ export default function Body() {
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "32px" }}>
+          <div className="bd-steps-grid">
             {HOW_STEPS.map(({ num, title, desc }) => (
               <div key={num} style={{ padding: "0 0 32px", borderBottom: "2px solid var(--border-subtle)" }}>
                 <span className="bd-step-num">{num}</span>
@@ -309,13 +349,14 @@ export default function Body() {
       </section>
 
       {/* ── EXPLORE ── */}
-      <section style={{ padding: "0 32px 120px", background: "var(--bg-page)", transition: "background 0.35s" }}>
+      <section className="bd-section-pad-bottom" style={{ padding: "0 32px 120px", background: "var(--bg-page)", transition: "background 0.35s" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{
             display: "flex", alignItems: "flex-end",
             justifyContent: "space-between",
             marginBottom: "48px", paddingBottom: "32px",
             borderBottom: "1px solid var(--border-subtle)",
+            flexWrap: "wrap", gap: "12px",
           }}>
             <div>
               <span style={{
@@ -326,7 +367,7 @@ export default function Body() {
               }}>Explore</span>
               <h2 style={{
                 fontFamily: "'DM Serif Display', serif",
-                fontSize: "clamp(2rem, 3.5vw, 2.8rem)",
+                fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
                 fontWeight: 400, color: "var(--text-primary)",
                 margin: 0, letterSpacing: "-0.02em", transition: "color 0.35s",
               }}>
@@ -347,8 +388,7 @@ export default function Body() {
             </Link>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-            {/* All Categories card */}
+          <div className="bd-feat-grid">
             <Link href="/page1" className="bd-feat-card" style={{ background: "var(--accent)", borderColor: "transparent" }}>
               <div style={{
                 width: "42px", height: "42px",
@@ -361,77 +401,36 @@ export default function Body() {
                   <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
                 </svg>
               </div>
-              <h3 style={{
-                fontFamily: "'DM Serif Display', serif",
-                fontSize: "22px", fontWeight: 400,
-                color: "var(--text-on-accent)", margin: "0 0 10px", lineHeight: 1.3,
-              }}>All Categories</h3>
-              <p style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "13px", fontWeight: 300,
-                color: "rgba(255,255,255,0.65)", lineHeight: 1.75, margin: "0 0 auto",
-              }}>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", fontWeight: 400, color: "var(--text-on-accent)", margin: "0 0 10px", lineHeight: 1.3 }}>All Categories</h3>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.65)", lineHeight: 1.75, margin: "0 0 auto" }}>
                 Football to photography — find what moves you.
               </p>
               <div style={{ marginTop: "24px" }}>
-                <span style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "11px", fontWeight: 700,
-                  letterSpacing: "0.08em", textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.55)",
-                }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)" }}>
                   {categoryCount > 0 ? `${categoryCount} categories →` : "Explore →"}
                 </span>
               </div>
             </Link>
 
-            {/* Sports card */}
             <Link href="/page1?cat=sports" className="bd-feat-card">
-              <div style={{
-                width: "42px", height: "42px",
-                border: "1px solid rgba(22,163,74,0.25)",
-                borderRadius: "10px", background: "rgba(22,163,74,0.08)",
-                display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "32px",
-              }}>
+              <div style={{ width: "42px", height: "42px", border: "1px solid rgba(22,163,74,0.25)", borderRadius: "10px", background: "rgba(22,163,74,0.08)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "32px" }}>
                 <svg width="18" height="18" fill="none" stroke="#16a34a" strokeWidth="1.5" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="10"/>
                   <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                   <path d="M2 12h20"/>
                 </svg>
               </div>
-              <h3 style={{
-                fontFamily: "'DM Serif Display', serif",
-                fontSize: "22px", fontWeight: 400,
-                color: "var(--text-primary)", margin: "0 0 10px", lineHeight: 1.3,
-                transition: "color 0.35s",
-              }}>Sports Clubs</h3>
-              <p style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "13px", fontWeight: 300,
-                color: "var(--text-secondary)", lineHeight: 1.75, margin: "0 0 auto",
-                transition: "color 0.35s",
-              }}>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", fontWeight: 400, color: "var(--text-primary)", margin: "0 0 10px", lineHeight: 1.3, transition: "color 0.35s" }}>Sports Clubs</h3>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 300, color: "var(--text-secondary)", lineHeight: 1.75, margin: "0 0 auto", transition: "color 0.35s" }}>
                 Football, basketball, volleyball — teams open for new members.
               </p>
               <div style={{ marginTop: "24px" }}>
-                <span style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "11px", fontWeight: 700,
-                  letterSpacing: "0.08em", textTransform: "uppercase", color: "#16a34a",
-                }}>
-                  Explore →
-                </span>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#16a34a" }}>Explore →</span>
               </div>
             </Link>
 
-            {/* Events card — no href needed, coming soon */}
             <div className="bd-feat-card">
-              <div style={{
-                width: "42px", height: "42px",
-                border: "1px solid rgba(217,119,6,0.25)",
-                borderRadius: "10px", background: "rgba(217,119,6,0.08)",
-                display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "32px",
-              }}>
+              <div style={{ width: "42px", height: "42px", border: "1px solid rgba(217,119,6,0.25)", borderRadius: "10px", background: "rgba(217,119,6,0.08)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "32px" }}>
                 <svg width="18" height="18" fill="none" stroke="#d97706" strokeWidth="1.5" viewBox="0 0 24 24">
                   <rect x="3" y="4" width="18" height="18" rx="2"/>
                   <line x1="16" y1="2" x2="16" y2="6"/>
@@ -439,29 +438,12 @@ export default function Body() {
                   <line x1="3" y1="10" x2="21" y2="10"/>
                 </svg>
               </div>
-              <h3 style={{
-                fontFamily: "'DM Serif Display', serif",
-                fontSize: "22px", fontWeight: 400,
-                color: "var(--text-primary)", margin: "0 0 10px", lineHeight: 1.3,
-                transition: "color 0.35s",
-              }}>Upcoming Events</h3>
-              <p style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "13px", fontWeight: 300,
-                color: "var(--text-secondary)", lineHeight: 1.75, margin: "0 0 auto",
-                transition: "color 0.35s",
-              }}>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", fontWeight: 400, color: "var(--text-primary)", margin: "0 0 10px", lineHeight: 1.3, transition: "color 0.35s" }}>Upcoming Events</h3>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 300, color: "var(--text-secondary)", lineHeight: 1.75, margin: "0 0 auto", transition: "color 0.35s" }}>
                 Tryouts, meetups and open sessions happening near you.
               </p>
               <div style={{ marginTop: "24px" }}>
-                <span style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "10px", fontWeight: 700,
-                  letterSpacing: "0.1em", textTransform: "uppercase",
-                  color: "#d97706", background: "rgba(217,119,6,0.1)",
-                  border: "1px solid rgba(217,119,6,0.2)",
-                  padding: "3px 10px", borderRadius: "20px", display: "inline-block",
-                }}>Coming soon</span>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#d97706", background: "rgba(217,119,6,0.1)", border: "1px solid rgba(217,119,6,0.2)", padding: "3px 10px", borderRadius: "20px", display: "inline-block" }}>Coming soon</span>
               </div>
             </div>
           </div>
@@ -469,56 +451,34 @@ export default function Body() {
       </section>
 
       {/* ── FOR CLUB LEADERS ── */}
-      <section style={{
+      <section className="bd-leaders-pad" style={{
         padding: "80px 32px",
         background: "var(--bg-section)",
         borderTop: "1px solid var(--border-subtle)",
         transition: "background 0.35s",
       }}>
-        <div style={{
-          maxWidth: "1200px", margin: "0 auto",
-          display: "grid", gridTemplateColumns: "1fr auto",
-          gap: "48px", alignItems: "center",
-        }}>
-          <div>
-            <span style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em",
-              textTransform: "uppercase", color: "var(--text-muted)",
-              display: "block", marginBottom: "12px",
-            }}>For Club Leaders</span>
-            <h2 style={{
-              fontFamily: "'DM Serif Display', serif",
-              fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)",
-              fontWeight: 400, lineHeight: 1.15,
-              color: "var(--text-primary)", margin: "0 0 12px",
-              letterSpacing: "-0.02em", transition: "color 0.35s",
-            }}>
-              List your club on <em style={{ fontStyle: "italic", color: "var(--accent)" }}>Duguilan.com</em>
-            </h2>
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "14px", fontWeight: 300, lineHeight: 1.8,
-              color: "var(--text-secondary)", margin: 0, maxWidth: "480px",
-              transition: "color 0.35s",
-            }}>
-              Reach hundreds of students looking for clubs like yours. Free to register, easy to manage.
-            </p>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", flexShrink: 0 }}>
-            <Link href="/club-register" className="bd-cta-fill" style={{ textAlign: "center" }}>
-              Register your club
-            </Link>
-            <Link href="/page1" style={{
-              fontFamily: "'DM Sans', sans-serif",
-              textAlign: "center", fontSize: "12px", fontWeight: 500,
-              color: "var(--text-muted)", textDecoration: "none", transition: "color 0.2s",
-            }}
-              onMouseEnter={e => e.target.style.color = "var(--text-primary)"}
-              onMouseLeave={e => e.target.style.color = "var(--text-muted)"}
-            >
-              Or browse clubs first →
-            </Link>
+        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+          <div className="bd-leaders-grid">
+            <div>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "12px" }}>For Club Leaders</span>
+              <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.6rem)", fontWeight: 400, lineHeight: 1.15, color: "var(--text-primary)", margin: "0 0 12px", letterSpacing: "-0.02em", transition: "color 0.35s" }}>
+                List your club on <em style={{ fontStyle: "italic", color: "var(--accent)" }}>Duguilan.com</em>
+              </h2>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 300, lineHeight: 1.8, color: "var(--text-secondary)", margin: 0, maxWidth: "480px", transition: "color 0.35s" }}>
+                Reach hundreds of students looking for clubs like yours. Free to register, easy to manage.
+              </p>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", flexShrink: 0 }}>
+              <Link href="/club-register" className="bd-cta-fill" style={{ textAlign: "center" }}>
+                Register your club
+              </Link>
+              <Link href="/page1" style={{ fontFamily: "'DM Sans', sans-serif", textAlign: "center", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)", textDecoration: "none", transition: "color 0.2s" }}
+                onMouseEnter={e => e.target.style.color = "var(--text-primary)"}
+                onMouseLeave={e => e.target.style.color = "var(--text-muted)"}
+              >
+                Or browse clubs first →
+              </Link>
+            </div>
           </div>
         </div>
       </section>

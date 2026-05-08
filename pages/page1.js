@@ -95,6 +95,55 @@ const CSS = `
     border-color: var(--text-primary);
     color: var(--text-primary);
   }
+
+  .p1-header-inner {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .p1-search-wrap {
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .p1-cta-banner {
+    margin-top: 80px;
+    padding: 48px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+    background: var(--bg-card);
+    transition: background 0.3s;
+  }
+
+  @media (max-width: 640px) {
+    .p1-header-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .p1-search-wrap {
+      max-width: 100%;
+    }
+    .p1-cta-banner {
+      padding: 28px 20px;
+      margin-top: 48px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .p1-cta-link {
+      width: 100%;
+      text-align: center;
+    }
+  }
 `;
 
 export default function CategoriesPage() {
@@ -129,7 +178,7 @@ export default function CategoriesPage() {
       <div style={{
         borderBottom: "1px solid var(--border-subtle)",
         background: "var(--bg-card)",
-        padding: "56px 32px 40px",
+        padding: "clamp(32px, 5vw, 56px) clamp(20px, 4vw, 32px) clamp(28px, 4vw, 40px)",
         transition: "background 0.3s",
       }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -150,7 +199,7 @@ export default function CategoriesPage() {
             Back to home
           </Link>
 
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "32px", flexWrap: "wrap" }}>
+          <div className="p1-header-inner">
             <div>
               <span className="p1-sans" style={{
                 fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase",
@@ -176,7 +225,7 @@ export default function CategoriesPage() {
               </p>
             </div>
 
-            <div style={{ width: "100%", maxWidth: "340px" }}>
+            <div className="p1-search-wrap">
               <div style={{ position: "relative" }}>
                 <svg style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
                   width="15" height="15" fill="none" stroke="var(--text-muted)" strokeWidth="2" viewBox="0 0 24 24">
@@ -209,7 +258,7 @@ export default function CategoriesPage() {
       </div>
 
       <main style={{ flex: 1 }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 32px 96px" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px clamp(20px, 4vw, 32px) 96px" }}>
 
           <div style={{ display: "flex", gap: "8px", marginBottom: "40px", flexWrap: "wrap" }}>
             {FILTERS.map(f => (
@@ -252,7 +301,7 @@ export default function CategoriesPage() {
               </button>
             </div>
           ) : filtered.length > 0 ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))", gap: "16px" }}>
               {filtered.map((club, i) => {
                 const { accent, bg } = getStyle(club.category);
                 return (
@@ -347,16 +396,7 @@ export default function CategoriesPage() {
             </div>
           )}
           {!loading && clubs.length > 0 && (
-            <div style={{
-              marginTop: "80px",
-              padding: "48px",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: "16px",
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              gap: "32px", flexWrap: "wrap",
-              background: "var(--bg-card)",
-              transition: "background 0.3s",
-            }}>
+            <div className="p1-cta-banner">
               <div>
                 <span className="p1-sans" style={{
                   fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em",
@@ -374,7 +414,7 @@ export default function CategoriesPage() {
                   Reach hundreds of students for free.
                 </p>
               </div>
-              <Link href="/club-register" className="p1-sans" style={{
+              <Link href="/club-register" className="p1-sans p1-cta-link" style={{
                 background: "var(--text-primary)", color: "var(--bg-page)",
                 padding: "13px 28px", borderRadius: "8px",
                 fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em",
