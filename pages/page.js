@@ -1,6 +1,8 @@
 import Header from "../waterbottle/Header";
 import Body from "../waterbottle/Body";
 import Footer from "../waterbottle/Footer";
+import Link from "next/link";
+
 
 export default function Page() {
   return (

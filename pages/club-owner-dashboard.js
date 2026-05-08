@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
+import Link from "next/link";
 
 const API = "/api";
 
@@ -124,12 +125,12 @@ function PaymentRow({ pay, formatDate, formatMNT, onConfirm, onReject, i }) {
         <span className="od-sans" style={{ fontSize: "12px", color: "var(--text-muted)" }}>{formatDate(pay.paid_at || pay.created_at)}</span>
         <span className={`od-badge ${statusStyle}`}>{statusLabel}</span>
         {pay.receipt_url && (
-          <a href={pay.receipt_url} target="_blank" rel="noopener noreferrer" className="od-sans"
+          <Link href={pay.receipt_url} target="_blank" rel="noopener noreferrer" className="od-sans"
             style={{ fontSize: "12px", fontWeight: 600, color: "var(--accent)", textDecoration: "none", border: "1px solid var(--border-subtle)", borderRadius: "7px", padding: "5px 12px", transition: "all 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.background = "var(--accent-soft)"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
             View receipt
-          </a>
+          </Link>
         )}
         {pay.status === "pending" && (
           <>
@@ -260,7 +261,7 @@ export default function ClubOwnerDashboard() {
         <svg width="22" height="22" fill="none" stroke="var(--accent)" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
       <p className="od-display" style={{ fontSize: "22px", color: "var(--text-primary)", fontWeight: 800 }}>{error}</p>
-      <a href="/page1" className="od-sans" style={{ color: "var(--accent)", fontWeight: 600, fontSize: "14px" }}>← Клубууд руу буцах</a>
+      <Link href="/page1" className="od-sans" style={{ color: "var(--accent)", fontWeight: 600, fontSize: "14px" }}>← Клубууд руу буцах</Link>
     </div>
   );
 
@@ -270,10 +271,10 @@ export default function ClubOwnerDashboard() {
       <main style={{ flex: 1, padding: "48px 24px 96px" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto" }}>
           <div className="od-fadein" style={{ marginBottom: "40px" }}>
-            <a href="/page1" className="od-back-btn">
+            <Link href="/page1" className="od-back-btn">
               <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
               Browse clubs
-            </a>
+            </Link>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px", flexWrap: "wrap" }}>
               <div style={{ display: "flex", alignItems: "flex-start", gap: "20px", flexWrap: "wrap" }}>
                 <div style={{ width: "64px", height: "64px", borderRadius: "16px", flexShrink: 0, background: "var(--bg-card)", border: "1.5px solid var(--border-card)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", transition: "background 0.35s" }}>
@@ -296,7 +297,7 @@ export default function ClubOwnerDashboard() {
                 </div>
               </div>
               <button
-                onClick={() => router.push(`/club-edit?clubId=${clubId}`)}
+                onClick={() => router.push(`/club-edit?id=${clubId}`)}
                 className="od-sans"
                 style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "10px", cursor: "pointer", background: "var(--bg-card)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", fontSize: "13px", fontWeight: 600, transition: "all 0.2s", flexShrink: 0 }}
                 onMouseEnter={e => { e.currentTarget.style.background = "var(--accent-soft)"; e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.borderColor = "var(--border-card)"; }}
@@ -369,6 +370,43 @@ export default function ClubOwnerDashboard() {
           )}
           {activeTab === "payments" && (
             <div className="od-fadein">
+              {(club?.qpay_info || club?.dans_info) && (
+                <div style={{ marginBottom: "20px", borderRadius: "14px", border: "1px solid var(--border-subtle)", overflow: "hidden" }}>
+                  <div style={{ padding: "10px 16px", background: "var(--bg-input)", borderBottom: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <svg width="13" height="13" fill="none" stroke="var(--text-muted)" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    <span className="od-sans" style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Таны төлбөрийн мэдээлэл</span>
+                    <Link href={`/club-edit?id=${clubId}`} className="od-sans" style={{ marginLeft: "auto", fontSize: "11px", fontWeight: 600, color: "var(--accent)", textDecoration: "none" }}>Засах →</Link>
+                  </div>
+                  <div style={{ padding: "14px 16px", display: "flex", flexWrap: "wrap", gap: "12px" }}>
+                    {club.qpay_info && (
+                      <div style={{ flex: 1, minWidth: "200px", padding: "12px 14px", borderRadius: "10px", background: "rgba(0,102,204,0.06)", border: "1px solid rgba(0,102,204,0.15)" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                          <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "#0066cc", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <span style={{ color: "#fff", fontSize: "11px", fontWeight: 800, fontFamily: "'DM Sans', sans-serif" }}>Q</span>
+                          </div>
+                          <span className="od-sans" style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>QPay</span>
+                        </div>
+                        {club.qpay_info.startsWith("http") ? (
+                          <img src={club.qpay_info} alt="QPay QR" style={{ width: "100%", maxWidth: "160px", display: "block", borderRadius: "8px" }} />
+                        ) : (
+                          <p className="od-sans" style={{ fontSize: "13px", color: "var(--text-secondary)", margin: 0, lineHeight: 1.6, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>{club.qpay_info}</p>
+                        )}
+                      </div>
+                    )}
+                    {club.dans_info && (
+                      <div style={{ flex: 1, minWidth: "200px", padding: "12px 14px", borderRadius: "10px", background: "rgba(232,66,10,0.05)", border: "1px solid rgba(232,66,10,0.15)" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                          <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "#e8420a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <span style={{ color: "#fff", fontSize: "9px", fontWeight: 800, fontFamily: "'DM Sans', sans-serif" }}>DANS</span>
+                          </div>
+                          <span className="od-sans" style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>Данс / Bank Transfer</span>
+                        </div>
+                        <p className="od-sans" style={{ fontSize: "13px", color: "var(--text-secondary)", margin: 0, lineHeight: 1.8, whiteSpace: "pre-wrap" }}>{club.dans_info}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               {filteredPayments.filter(p => p.status === "pending").length > 0 && (
                 <>
                   <p className="od-sans" style={{ fontSize: "10px", fontWeight: 700, color: "#b45309", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 12px", display: "flex", alignItems: "center", gap: "8px" }}>

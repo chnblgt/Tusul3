@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -258,14 +259,14 @@ export default function VerifyEmailPage() {
       <Background/>
       <div style={{ height:3, background:"linear-gradient(90deg,#4c1d95,#7c3aed,#c4b5fd,#7c3aed,#4c1d95)", flexShrink:0, position:"relative", zIndex:2 }}/>
       <nav style={{ padding:"20px 36px", flexShrink:0, position:"relative", zIndex:2 }}>
-        <a href="/page" style={{ display:"inline-flex", alignItems:"center", gap:10, textDecoration:"none" }}>
+        <Link href="/page" style={{ display:"inline-flex", alignItems:"center", gap:10, textDecoration:"none" }}>
           <div style={{ width:34, height:34, borderRadius:10, background:"linear-gradient(135deg,#1a0533,#3b0764)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 14px rgba(26,5,51,0.25)" }}>
             <span style={{ color:"#c4b5fd", fontWeight:800, fontSize:15, fontFamily:"'Instrument Serif',serif" }}>D</span>
           </div>
           <span className="ve-serif" style={{ fontSize:20, color:"#1a0533", letterSpacing:"-0.02em" }}>
             Duguilan<span style={{ color:"#7c3aed" }}>.com</span>
           </span>
-        </a>
+        </Link>
       </nav>
 
       <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"16px 16px 72px", position:"relative", zIndex:1 }}>
@@ -309,7 +310,7 @@ export default function VerifyEmailPage() {
                     Таны клубын имэйл амжилттай баталгаажлаа. Манай admin хянаж, удахгүй зөвшөөрнө.
                   </p>
                   <ClubStatus/>
-                  <a href="/page" className="ve-btn-ghost" style={{ margin:"0 auto" }}>← Нүүр хуудас руу буцах</a>
+                  <Link href="/page" className="ve-btn-ghost" style={{ margin:"0 auto" }}>← Нүүр хуудас руу буцах</Link>
                 </>
               )}
 
@@ -320,8 +321,8 @@ export default function VerifyEmailPage() {
                   <p className="ve-sans" style={{ fontSize:14.5, color:"#666", lineHeight:1.75, marginBottom:6 }}>{message || "Энэ линк аль хэдийн ашиглагдсан."}</p>
                   <p className="ve-sans" style={{ fontSize:13, color:"#bbb", marginBottom:36 }}>Баталгаажуулсан бол шууд нэвтэрч болно.</p>
                   <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"center" }}>
-                    <a href="/signin" className="ve-btn">Нэвтрэх →</a>
-                    <a href="/page" className="ve-btn-ghost">← Нүүр хуудас</a>
+                    <Link href="/signin" className="ve-btn">Нэвтрэх →</Link>
+                    <Link href="/page" className="ve-btn-ghost">← Нүүр хуудас</Link>
                   </div>
                 </>
               )}
@@ -332,8 +333,8 @@ export default function VerifyEmailPage() {
                   <h1 className="ve-serif" style={{ fontSize:26, color:"#1a0533", letterSpacing:"-0.02em", marginBottom:10 }}>Алдаа гарлаа</h1>
                   <p className="ve-sans" style={{ fontSize:14.5, color:"#666", lineHeight:1.75, marginBottom:36, maxWidth:340, marginLeft:"auto", marginRight:"auto" }}>{message || "Баталгаажуулахад алдаа гарлаа. Линк хуучирсан байж магадгүй."}</p>
                   <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"center" }}>
-                    <a href="/signup" className="ve-btn">Дахин бүртгүүлэх</a>
-                    <a href="/page" className="ve-btn-ghost">← Нүүр хуудас</a>
+                    <Link href="/signup" className="ve-btn">Дахин бүртгүүлэх</Link>
+                    <Link href="/page" className="ve-btn-ghost">← Нүүр хуудас</Link>
                   </div>
                 </>
               )}
@@ -343,7 +344,7 @@ export default function VerifyEmailPage() {
           {status !== "loading" && (
             <p className="ve-sans" style={{ textAlign:"center", fontSize:12, color:"#c4b5fd", marginTop:24, fontWeight:500, lineHeight:1.6 }}>
               Асуух зүйл байвал{" "}
-              <a href="mailto:duguilanmail@gmail.com" style={{ color:"#9879d4", fontWeight:700, textDecoration:"none" }}>duguilanmail@gmail.com</a>
+              <Link href="mailto:duguilanmail@gmail.com" style={{ color:"#9879d4", fontWeight:700, textDecoration:"none" }}>duguilanmail@gmail.com</Link>
               {" "}руу хандана уу
             </p>
           )}

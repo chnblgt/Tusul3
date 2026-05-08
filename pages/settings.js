@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
 import { useTheme } from "@/waterbottle/useTheme";
+import Link from "next/link";
+
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 

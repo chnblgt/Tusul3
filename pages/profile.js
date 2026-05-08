@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
+import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -488,9 +489,9 @@ export default function ProfilePage() {
                   <div style={{width:"68px",height:"68px",borderRadius:"20px",background:"var(--bg-input)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px",fontSize:"30px"}}>🏆</div>
                   <h3 className="pp-display" style={{fontSize:"22px",color:"var(--text-primary)",marginBottom:"8px",fontWeight:800,transition:"color 0.3s"}}>No clubs yet</h3>
                   <p className="pp-sans" style={{color:"var(--text-muted)",fontSize:"14px",marginBottom:"24px",transition:"color 0.3s"}}>Browse clubs and join one that interests you</p>
-                  <a href="/page1" className="pp-sans" style={{background:"var(--accent)",color:"var(--text-on-accent)",padding:"13px 28px",borderRadius:"10px",fontWeight:700,fontSize:"14px",textDecoration:"none"}}>
+                  <Link href="/page1" className="pp-sans" style={{background:"var(--accent)",color:"var(--text-on-accent)",padding:"13px 28px",borderRadius:"10px",fontWeight:700,fontSize:"14px",textDecoration:"none"}}>
                     Browse clubs →
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
@@ -565,9 +566,9 @@ export default function ProfilePage() {
                   <div style={{width:"68px",height:"68px",borderRadius:"20px",background:"var(--bg-input)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px",fontSize:"30px"}}>🏠</div>
                   <h3 className="pp-display" style={{fontSize:"22px",color:"var(--text-primary)",marginBottom:"8px",fontWeight:800,transition:"color 0.3s"}}>No owned clubs</h3>
                   <p className="pp-sans" style={{color:"var(--text-muted)",fontSize:"14px",marginBottom:"24px",transition:"color 0.3s"}}>You haven't registered a club yet</p>
-                  <a href="/register-club" className="pp-sans" style={{background:"var(--accent)",color:"var(--text-on-accent)",padding:"13px 28px",borderRadius:"10px",fontWeight:700,fontSize:"14px",textDecoration:"none"}}>
+                  <Link href="/register-club" className="pp-sans" style={{background:"var(--accent)",color:"var(--text-on-accent)",padding:"13px 28px",borderRadius:"10px",fontWeight:700,fontSize:"14px",textDecoration:"none"}}>
                     Register a Club →
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
@@ -588,9 +589,9 @@ export default function ProfilePage() {
                 <div style={{textAlign:"center",padding:"60px 0"}}>
                   <div style={{fontSize:"34px",marginBottom:"12px"}}>📭</div>
                   <p className="pp-sans" style={{color:"var(--text-muted)",fontSize:"14px",transition:"color 0.3s"}}>No club activity yet — join a club!</p>
-                  <a href="/page1" className="pp-sans" style={{display:"inline-block",marginTop:"16px",background:"var(--accent)",color:"var(--text-on-accent)",padding:"10px 24px",borderRadius:"9px",fontWeight:700,fontSize:"13px",textDecoration:"none"}}>
+                  <Link href="/page1" className="pp-sans" style={{display:"inline-block",marginTop:"16px",background:"var(--accent)",color:"var(--text-on-accent)",padding:"10px 24px",borderRadius:"9px",fontWeight:700,fontSize:"13px",textDecoration:"none"}}>
                     Browse clubs →
-                  </a>
+                  </Link>
                 </div>
               ) : enrolledClubs.map(club=>(
                 <div key={club.id} className="pp-activity-row">

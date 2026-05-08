@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
@@ -116,6 +117,7 @@ export default function ClubEditPage() {
     lat: null, lng: null,
     logo: null, logoPreview: null, existingLogo: null,
     bannerPhotos: [], bannerPreviews: [], existingBanners: [],
+    qpay_info: "", dans_info: "",
   });
 
   const logoRef   = useRef();
@@ -162,6 +164,8 @@ export default function ClubEditPage() {
           lng:          c.lng          || null,
           existingLogo: c.logo         || null,
           existingBanners,
+          qpay_info:    c.qpay_info    || "",
+          dans_info:    c.dans_info    || "",
         }));
       } catch { setError("Серверт холбогдож чадсангүй."); }
       finally { setLoading(false); }
@@ -234,6 +238,8 @@ export default function ClubEditPage() {
       if (form.logo)        fd.append("logo",        form.logo);
       fd.append("existingBanners", JSON.stringify(form.existingBanners));
       form.bannerPhotos.forEach(file => fd.append("bannerPhotos", file));
+      fd.append("qpay_info", form.qpay_info || "");
+      fd.append("dans_info", form.dans_info || "");
 
       const res  = await fetchAPI(`${API}/clubs/${clubId}`, { method: "PUT", body: fd, headers: { "x-user-id": String(user.id) } });
       const data = await res.json();
@@ -265,7 +271,7 @@ export default function ClubEditPage() {
         <svg width="22" height="22" fill="none" stroke="var(--accent)" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
       <p className="ce-display" style={{ fontSize: "22px", color: "var(--text-primary)", fontWeight: 800 }}>{error}</p>
-      <a href="/page1" className="ce-sans" style={{ color: "var(--accent)", fontWeight: 600, fontSize: "14px" }}>← Клубууд руу буцах</a>
+      <Link href="/page1" className="ce-sans" style={{ color: "var(--accent)", fontWeight: 600, fontSize: "14px" }}>← Клубууд руу буцах</Link>
     </div>
   );
 
@@ -519,6 +525,56 @@ export default function ClubEditPage() {
               </div>
             </div>
           </div>
+          <div className="ce-section ce-fadein">
+            <h2 className="ce-section-title">
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              Payment Info
+            </h2>
+            <p className="ce-sans" style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "20px", lineHeight: 1.6 }}>
+              Гишүүд төлбөр хийхэд харуулах QPay QR код эсвэл данс мэдээлэл оруулна уу. Хэрэв үлдээвэл харуулахгүй.
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+              <div>
+                <label className="ce-label">
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ background: "#0066cc", color: "#fff", borderRadius: "5px", padding: "1px 6px", fontSize: "10px", fontWeight: 800 }}>Q</span>
+                    QPay мэдээлэл
+                  </span>
+                </label>
+                <textarea
+                  className="ce-input"
+                  rows={4}
+                  value={form.qpay_info}
+                  onChange={e => setField("qpay_info", e.target.value)}
+                  placeholder={"QPay QR image URL эсвэл данс дугаар:\nжишээ: https://... эсвэл\nQPay данс: 1234567890"}
+                  style={{ resize: "vertical", minHeight: "100px" }}
+                />
+                {form.qpay_info && form.qpay_info.startsWith("http") && (
+                  <div style={{ marginTop: "10px", textAlign: "center" }}>
+                    <img src={form.qpay_info} alt="QPay QR preview" style={{ maxWidth: "140px", borderRadius: "10px", border: "1px solid var(--border-subtle)" }} onError={e => e.target.style.display="none"} />
+                    <p className="ce-sans" style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "6px" }}>QR урьдчилан харах</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="ce-label">
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ background: "#e8420a", color: "#fff", borderRadius: "5px", padding: "1px 5px", fontSize: "9px", fontWeight: 800 }}>DANS</span>
+                    Данс / Bank Transfer
+                  </span>
+                </label>
+                <textarea
+                  className="ce-input"
+                  rows={4}
+                  value={form.dans_info}
+                  onChange={e => setField("dans_info", e.target.value)}
+                  placeholder={"Банкны данс мэдээлэл:\nжишээ:\nХаан банк: 5000123456\nДансны эзэн: Батбаяр"}
+                  style={{ resize: "vertical", minHeight: "100px" }}
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="ce-fadein" style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
             <button onClick={() => router.push(`/club-owner-dashboard?clubId=${clubId}`)} className="ce-sans"
               style={{ padding: "12px 28px", borderRadius: "10px", border: "1.5px solid var(--border-subtle)", background: "var(--bg-card)", color: "var(--text-muted)", fontWeight: 600, fontSize: "14px", cursor: "pointer", transition: "all 0.2s" }}

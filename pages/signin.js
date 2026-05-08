@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
@@ -242,21 +243,21 @@ export default function SignInPage() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         transition: "background 0.3s",
       }}>
-        <a href="/page" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
+        <Link href="/page" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
           <div style={{ width: "30px", height: "30px", background: "var(--text-primary)", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <img src="/assets/logo_white.png" alt="" width={17} height={17} />
           </div>
           <span className="au-serif" style={{ fontSize: "22px", fontWeight: 600, fontStyle: "normal", color: "var(--text-primary)", letterSpacing: "0.01em" }}>
             Duguilan<span style={{ fontStyle: "italic", color: "var(--text-accent)" }}>.com</span>
           </span>
-        </a>
-        <a href="/signup" className="au-sans"
+        </Link>
+        <Link href="/signup" className="au-sans"
           style={{ fontSize: "15px", fontWeight: 500, color: "var(--text-muted)", textDecoration: "none", transition: "color 0.2s" }}
           onMouseEnter={e => e.target.style.color = "var(--text-primary)"}
           onMouseLeave={e => e.target.style.color = "var(--text-muted)"}
         >
           No account? <span style={{ color: "var(--text-accent)", fontWeight: 600 }}>Sign up</span>
-        </a>
+        </Link>
       </div>
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 16px" }}>
         <div className="au-card" style={{ width: "100%", maxWidth: "440px" }}>
@@ -355,7 +356,7 @@ export default function SignInPage() {
 
           <p className="au-sans" style={{ textAlign: "center", fontSize: "13px", color: "var(--text-muted)", margin: 0 }}>
             Already have an account?{" "}
-            <a href="/signup" style={{ color: "var(--text-accent)", fontWeight: 600, textDecoration: "none" }}>Sign up</a>
+            <Link href="/signup" style={{ color: "var(--text-accent)", fontWeight: 600, textDecoration: "none" }}>Sign up</Link>
           </p>
 
         </div>

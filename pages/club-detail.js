@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
@@ -165,6 +166,8 @@ export default function ClubDetailPage() {
   const [members,       setMembers]       = useState([]);
   const [selectedTier,  setSelectedTier]  = useState(null);
   const [showTierModal, setShowTierModal] = useState(false);
+  const [paymentInfo,   setPaymentInfo]   = useState(null);
+  const [membershipStatus, setMembershipStatus] = useState(null); // 'free' | 'pending' | 'confirmed'
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
@@ -197,8 +200,36 @@ export default function ClubDetailPage() {
     if (!user || !id) return;
     fetchAPI(`${API}/myClubs/${user.id}`)
       .then(r => r.json())
-      .then(data => { if (data.success) setEnrolled(data.clubs.some(c => String(c.id) === String(id))); })
+      .then(data => {
+        if (data.success) {
+          const found = data.clubs.find(c => String(c.id) === String(id));
+          setEnrolled(!!found);
+        }
+      })
       .catch(() => {});
+
+    Promise.all([
+      fetchAPI(`${API}/membershipStatus/${user.id}/${id}`).then(r => r.json()),
+      fetchAPI(`${API}/clubs/${id}`).then(r => r.json()),
+    ]).then(([statusData, clubData]) => {
+      if (statusData.success) setMembershipStatus(statusData.payment_status);
+      if (clubData.success && (clubData.club.qpay_info || clubData.club.dans_info)) {
+        const tierName = statusData.tier_name || null;
+        let tierPrice  = null;
+        try {
+          const parsedTiers = JSON.parse(clubData.club.tiers || "[]");
+          const match = parsedTiers.find(t => t.name === tierName);
+          if (match) tierPrice = match.price;
+        } catch {}
+        setPaymentInfo({
+          clubName:  clubData.club.name      || "",
+          qpay_info: clubData.club.qpay_info || null,
+          dans_info: clubData.club.dans_info || null,
+          tierName,
+          amount:    tierPrice,
+        });
+      }
+    }).catch(() => {});
   }, [user, id]);
 
   useEffect(() => {
@@ -236,11 +267,26 @@ export default function ClubDetailPage() {
     if (!selectedTier) return;
     setJoining(true);
     try {
-      await fetchAPI(`${API}/joinClub`, {
+      const res = await fetchAPI(`${API}/joinClub`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user.id, clubId: id, tierId: selectedTier.name, tierPrice: selectedTier.price }),
       });
-      setEnrolled(true); setShowTierModal(false);
+      const data = await res.json();
+      if (!data.success) {
+        alert(data.message || "Алдаа гарлаа");
+        return;
+      }
+      setEnrolled(true);
+      setMembershipStatus("pending");
+      setShowTierModal(false);
+      // Club data is already in state — show payment instructions immediately
+      setPaymentInfo({
+        clubName:  club.name       || "",
+        tierName:  selectedTier.name,
+        amount:    selectedTier.price,
+        qpay_info: club.qpay_info  || null,
+        dans_info: club.dans_info  || null,
+      });
     } catch (e) { console.error(e); }
     finally { setJoining(false); }
   }
@@ -272,10 +318,10 @@ export default function ClubDetailPage() {
           style={{ padding: "10px 22px", background: "var(--accent)", color: "var(--text-on-accent)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
           Retry
         </button>
-        <a href="/page1" className="cd-sans"
+        <Link href="/page1" className="cd-sans"
           style={{ padding: "10px 22px", color: "var(--accent)", fontWeight: 600, fontSize: 14, border: "1.5px solid var(--border-subtle)", borderRadius: 10, textDecoration: "none", display: "inline-flex", alignItems: "center", background: "var(--bg-card)" }}>
           ← Browse clubs
-        </a>
+        </Link>
       </div>
     </div>
   );
@@ -310,10 +356,10 @@ export default function ClubDetailPage() {
       <main style={{ flex: 1 }}>
         <div style={{ maxWidth: "960px", margin: "0 auto", padding: "0 32px 96px" }}>
           <div style={{ paddingTop: "20px" }}>
-            <a href="/page1" className="cd-back">
+            <Link href="/page1" className="cd-back">
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
               Browse clubs
-            </a>
+            </Link>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "32px", alignItems: "start" }}>
@@ -446,11 +492,34 @@ export default function ClubDetailPage() {
                     <button onClick={handleJoin} disabled={joining} className={enrolled ? "cd-leave-btn" : "cd-join-btn"}>
                       {joining ? "…" : enrolled ? "Leave club" : user ? "Join club" : "Sign in to join"}
                     </button>
+
+                    {enrolled && membershipStatus === "pending" && (
+                      <div style={{ marginTop: "12px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", borderRadius: "10px", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", marginBottom: "10px" }}>
+                          <svg width="14" height="14" fill="none" stroke="#f59e0b" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                          <span className="cd-sans" style={{ fontSize: "12.5px", color: "#d97706", fontWeight: 600 }}>Төлбөр баталгаажуулагдаагүй байна</span>
+                        </div>
+                        {paymentInfo && (
+                          <button onClick={() => setPaymentInfo({ ...paymentInfo })} className="cd-action-btn" style={{ width: "100%" }}>
+                            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            Төлбөрийн мэдээлэл харах
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {enrolled && membershipStatus === "confirmed" && (
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", borderRadius: "10px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", marginTop: "12px" }}>
+                        <svg width="14" height="14" fill="none" stroke="#22c55e" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span className="cd-sans" style={{ fontSize: "12.5px", color: "#16a34a", fontWeight: 600 }}>Гишүүнчлэл баталгаажсан</span>
+                      </div>
+                    )}
+
                     {!user && (
                       <p className="cd-sans" style={{ fontSize: "12px", color: "var(--text-muted)", textAlign: "center", margin: "10px 0 0" }}>
-                        <a href="/signin" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</a>
+                        <Link href="/signin" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</Link>
                         {" or "}
-                        <a href="/signup" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>create account</a>
+                        <Link href="/signup" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>create account</Link>
                       </p>
                     )}
                   </div>
@@ -460,28 +529,28 @@ export default function ClubDetailPage() {
                 <p className="cd-card-label">Contact</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   {club.email && (
-                    <a href={`mailto:${club.email}`} className="cd-contact-link">
+                    <Link href={`mailto:${club.email}`} className="cd-contact-link">
                       <div className="cd-contact-icon">
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                       </div>
                       {club.email}
-                    </a>
+                    </Link>
                   )}
                   {club.phone && (
-                    <a href={`tel:${club.phone}`} className="cd-contact-link">
+                    <Link href={`tel:${club.phone}`} className="cd-contact-link">
                       <div className="cd-contact-icon">
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.55a16 16 0 0 0 6.29 6.29l1.42-1.42a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                       </div>
                       {club.phone}
-                    </a>
+                    </Link>
                   )}
                   {club.website && (
-                    <a href={club.website} target="_blank" rel="noopener noreferrer" className="cd-contact-link">
+                    <Link href={club.website} target="_blank" rel="noopener noreferrer" className="cd-contact-link">
                       <div className="cd-contact-icon">
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                       </div>
                       {club.website.replace(/^https?:\/\//, "")}
-                    </a>
+                    </Link>
                   )}
                   {(club.address || club.district) && (
                     <div className="cd-contact-link">
@@ -539,12 +608,70 @@ export default function ClubDetailPage() {
 
             <div style={{ background: "var(--accent-soft)", borderRadius: "10px", padding: "12px 14px", marginBottom: "20px", display: "flex", gap: "8px", alignItems: "flex-start" }}>
               <svg width="14" height="14" fill="none" stroke="var(--accent)" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <p className="cd-sans" style={{ fontSize: "12px", color: "var(--accent)", margin: 0, lineHeight: 1.5 }}>Payment is collected by the club owner. You'll get confirmation once verified.</p>
+              <p className="cd-sans" style={{ fontSize: "12px", color: "var(--accent)", margin: 0, lineHeight: 1.5 }}>Payment is collected by the club owner. You&apos;ll get confirmation once verified.</p>
             </div>
 
             <button onClick={handleConfirmJoin} disabled={!selectedTier || joining} className="cd-join-btn" style={{ opacity: (!selectedTier || joining) ? 0.5 : 1 }}>
               {joining ? "Joining…" : selectedTier ? `Join as ${selectedTier.name} — ₮${Number(selectedTier.price).toLocaleString()}` : "Select a tier to continue"}
             </button>
+          </div>
+        </div>
+      )}
+      {paymentInfo && (
+        <div className="cd-modal-overlay" onClick={() => setPaymentInfo(null)}>
+          <div className="cd-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
+              <div>
+                <h2 className="cd-display" style={{ fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 4px", letterSpacing: "-0.02em" }}>Төлбөр төлөх</h2>
+                <p className="cd-sans" style={{ fontSize: "13px", color: "var(--text-muted)", margin: 0 }}>
+                  <strong style={{ color: "var(--text-primary)" }}>{paymentInfo.clubName}</strong> — {paymentInfo.tierName} · ₮{Number(paymentInfo.amount).toLocaleString()}
+                </p>
+              </div>
+              <button onClick={() => setPaymentInfo(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "20px", lineHeight: 1, padding: "4px" }}>✕</button>
+            </div>
+
+            {!paymentInfo.qpay_info && !paymentInfo.dans_info && (
+              <div style={{ textAlign: "center", padding: "32px 0" }}>
+                <div style={{ fontSize: "40px", marginBottom: "12px" }}>📋</div>
+                <p className="cd-sans" style={{ fontSize: "14px", color: "var(--text-secondary)", lineHeight: 1.6 }}>
+                  Клубын эзэн төлбөрийн мэдээлэл оруулаагүй байна.<br/>
+                  Клубын холбоо барих мэдээллээр нэвтрэн төлбөрөө хийнэ үү.
+                </p>
+              </div>
+            )}
+
+            {paymentInfo.qpay_info && (
+              <div style={{ marginBottom: "16px", padding: "20px", borderRadius: "14px", background: "var(--bg-input)", border: "1px solid var(--border-subtle)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+                  <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#0066cc", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ color: "#fff", fontSize: "13px", fontWeight: 800, fontFamily: "'DM Sans', sans-serif" }}>Q</span>
+                  </div>
+                  <span className="cd-sans" style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>QPay</span>
+                </div>
+                {paymentInfo.qpay_info.startsWith("http") ? (
+                  <img src={paymentInfo.qpay_info} alt="QPay QR" style={{ width: "100%", maxWidth: "220px", display: "block", margin: "0 auto", borderRadius: "10px" }} />
+                ) : (
+                  <p className="cd-sans" style={{ fontSize: "14px", color: "var(--text-secondary)", margin: 0, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{paymentInfo.qpay_info}</p>
+                )}
+              </div>
+            )}
+
+            {paymentInfo.dans_info && (
+              <div style={{ marginBottom: "16px", padding: "20px", borderRadius: "14px", background: "var(--bg-input)", border: "1px solid var(--border-subtle)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+                  <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#e8420a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ color: "#fff", fontSize: "11px", fontWeight: 800, fontFamily: "'DM Sans', sans-serif" }}>DANS</span>
+                  </div>
+                  <span className="cd-sans" style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>Данс / Bank Transfer</span>
+                </div>
+                <p className="cd-sans" style={{ fontSize: "14px", color: "var(--text-secondary)", margin: 0, lineHeight: 1.8, whiteSpace: "pre-wrap" }}>{paymentInfo.dans_info}</p>
+              </div>
+            )}
+
+            <div style={{ background: "var(--accent-soft)", borderRadius: "10px", padding: "12px 14px", display: "flex", gap: "8px", alignItems: "flex-start" }}>
+              <svg width="14" height="14" fill="none" stroke="var(--accent)" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <p className="cd-sans" style={{ fontSize: "12px", color: "var(--accent)", margin: 0, lineHeight: 1.5 }}>Төлбөр хийсний дараа клубын эзэн баталгаажуулна. Гишүүнчлэл идэвхжих болно.</p>
+            </div>
           </div>
         </div>
       )}

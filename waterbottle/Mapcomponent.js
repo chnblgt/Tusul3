@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import Link from "next/link";
+
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -110,7 +112,7 @@ export default function MapComponent({
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          attribution='&copy; <Link href="https://www.openstreetmap.org/copyright">OpenStreetMap</Link>'
         />
 
         {pickMode && onPick && <ClickPicker onPick={onPick} />}

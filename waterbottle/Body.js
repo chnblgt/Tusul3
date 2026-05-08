@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 const MapComponent = dynamic(() => import("./Mapcomponent"), { ssr: false });
 
@@ -165,6 +166,7 @@ export default function Body() {
     <main style={{ flex: 1, background: "var(--bg-page)", transition: "background 0.35s" }}>
       <style>{G}</style>
 
+      {/* ── HERO ── */}
       <section style={{
         minHeight: "90vh",
         display: "grid",
@@ -176,7 +178,7 @@ export default function Body() {
           borderRight: "1px solid var(--border-subtle)",
         }}>
           <div className="bd-a1" style={{ marginBottom: "28px" }}>
-            <span className="bd-tag">Mongolia's Simplest Club Platform</span>
+            <span className="bd-tag">Mongolia&apos;s Simplest Club Platform</span>
           </div>
 
           <h1 className="bd-a2" style={{
@@ -203,9 +205,10 @@ export default function Body() {
           </p>
 
           <div className="bd-a4" style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "56px" }}>
-            <a href="/page1" className="bd-cta-fill">Explore clubs</a>
-            {!loggedIn && <a href="/signup" className="bd-cta-ghost">Create account</a>}
+            <Link href="/page1" className="bd-cta-fill">Explore clubs</Link>
+            {!loggedIn && <Link href="/signup" className="bd-cta-ghost">Create account</Link>}
           </div>
+
           <div className="bd-a5" style={{ display: "flex", gap: "0" }}>
             {[
               { val: animClubs > 0 ? `${animClubs}+` : "—", label: "Active clubs" },
@@ -234,6 +237,7 @@ export default function Body() {
             ))}
           </div>
         </div>
+
         <div style={{ position: "relative", overflow: "hidden", minHeight: "400px", zIndex: 0, isolation: "isolate" }}>
           <MapComponent height="100%" />
           <div style={{
@@ -242,6 +246,8 @@ export default function Body() {
           }} />
         </div>
       </section>
+
+      {/* ── MARQUEE ── */}
       <div className="bd-marquee-wrap">
         <div className="bd-marquee">
           {allMarquee.map((item, i) => (
@@ -252,6 +258,8 @@ export default function Body() {
           ))}
         </div>
       </div>
+
+      {/* ── HOW IT WORKS ── */}
       <section style={{ padding: "120px 32px", background: "var(--bg-page)", transition: "background 0.35s" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{
@@ -299,6 +307,8 @@ export default function Body() {
           </div>
         </div>
       </section>
+
+      {/* ── EXPLORE ── */}
       <section style={{ padding: "0 32px 120px", background: "var(--bg-page)", transition: "background 0.35s" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{
@@ -323,7 +333,7 @@ export default function Body() {
                 Start <em style={{ fontStyle: "italic", color: "var(--accent)" }}>somewhere.</em>
               </h2>
             </div>
-            <a href="/page1" style={{
+            <Link href="/page1" style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: "13px", fontWeight: 600,
               letterSpacing: "0.06em", textTransform: "uppercase",
@@ -334,11 +344,12 @@ export default function Body() {
               onMouseLeave={e => e.target.style.color = "var(--text-muted)"}
             >
               View all clubs →
-            </a>
+            </Link>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-            <a href="/page1" className="bd-feat-card" style={{ background: "var(--accent)", borderColor: "transparent" }}>
+            {/* All Categories card */}
+            <Link href="/page1" className="bd-feat-card" style={{ background: "var(--accent)", borderColor: "transparent" }}>
               <div style={{
                 width: "42px", height: "42px",
                 border: "1px solid rgba(255,255,255,0.2)",
@@ -372,8 +383,10 @@ export default function Body() {
                   {categoryCount > 0 ? `${categoryCount} categories →` : "Explore →"}
                 </span>
               </div>
-            </a>
-            <a href="/page1?cat=sports" className="bd-feat-card">
+            </Link>
+
+            {/* Sports card */}
+            <Link href="/page1?cat=sports" className="bd-feat-card">
               <div style={{
                 width: "42px", height: "42px",
                 border: "1px solid rgba(22,163,74,0.25)",
@@ -409,8 +422,10 @@ export default function Body() {
                   Explore →
                 </span>
               </div>
-            </a>
-            <a href="#" className="bd-feat-card">
+            </Link>
+
+            {/* Events card — no href needed, coming soon */}
+            <div className="bd-feat-card">
               <div style={{
                 width: "42px", height: "42px",
                 border: "1px solid rgba(217,119,6,0.25)",
@@ -448,10 +463,12 @@ export default function Body() {
                   padding: "3px 10px", borderRadius: "20px", display: "inline-block",
                 }}>Coming soon</span>
               </div>
-            </a>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* ── FOR CLUB LEADERS ── */}
       <section style={{
         padding: "80px 32px",
         background: "var(--bg-section)",
@@ -489,10 +506,10 @@ export default function Body() {
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px", flexShrink: 0 }}>
-            <a href="/club-register" className="bd-cta-fill" style={{ textAlign: "center" }}>
+            <Link href="/club-register" className="bd-cta-fill" style={{ textAlign: "center" }}>
               Register your club
-            </a>
-            <a href="/page1" style={{
+            </Link>
+            <Link href="/page1" style={{
               fontFamily: "'DM Sans', sans-serif",
               textAlign: "center", fontSize: "12px", fontWeight: 500,
               color: "var(--text-muted)", textDecoration: "none", transition: "color 0.2s",
@@ -501,7 +518,7 @@ export default function Body() {
               onMouseLeave={e => e.target.style.color = "var(--text-muted)"}
             >
               Or browse clubs first →
-            </a>
+            </Link>
           </div>
         </div>
       </section>

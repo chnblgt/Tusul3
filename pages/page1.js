@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
+import { LineUtil } from "leaflet";
+import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const fetchAPI = (url, opts = {}) =>
@@ -132,7 +134,7 @@ export default function CategoriesPage() {
         transition: "background 0.3s",
       }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          <a href="/page" style={{
+          <Link href="/page" style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
             fontFamily: "'Outfit', sans-serif",
             fontSize: "12px", fontWeight: 500,
@@ -147,7 +149,7 @@ export default function CategoriesPage() {
           >
             <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
             Back to home
-          </a>
+          </Link>
 
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "32px", flexWrap: "wrap" }}>
             <div>
@@ -255,7 +257,7 @@ export default function CategoriesPage() {
               {filtered.map((club, i) => {
                 const { accent, bg } = getStyle(club.category);
                 return (
-                  <a
+                  <Link
                     key={club.id}
                     href={`/club-detail?id=${club.id}`}
                     className="p1-club-card p1-card"
@@ -316,7 +318,7 @@ export default function CategoriesPage() {
                         {club.pricing_type === "free" ? "Free" : "Paid"}
                       </span>
                     </div>
-                  </a>
+                  </Link>
                 );
               })}
             </div>
@@ -329,12 +331,12 @@ export default function CategoriesPage() {
                 {clubs.length === 0 ? "Be the first to register a club!" : "Try a different search or filter."}
               </p>
               {clubs.length === 0 ? (
-                <a href="/club-register" className="p1-sans" style={{
+                <Link href="/club-register" className="p1-sans" style={{
                   background: "var(--text-primary)", color: "var(--bg-page)",
                   padding: "11px 24px", borderRadius: "6px",
                   fontSize: "13px", fontWeight: 600, textDecoration: "none",
                   display: "inline-block", letterSpacing: "0.04em",
-                }}>Register a club →</a>
+                }}>Register a club →</Link>
               ) : (
                 <button onClick={() => { setSearch(""); setFilter("All"); }} className="p1-sans" style={{
                   background: "var(--text-primary)", color: "var(--bg-page)",
@@ -373,7 +375,7 @@ export default function CategoriesPage() {
                   Reach hundreds of students for free.
                 </p>
               </div>
-              <a href="/club-register" className="p1-sans" style={{
+              <Link href="/club-register" className="p1-sans" style={{
                 background: "var(--text-primary)", color: "var(--bg-page)",
                 padding: "13px 28px", borderRadius: "8px",
                 fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em",
@@ -384,7 +386,7 @@ export default function CategoriesPage() {
                 onMouseLeave={e => e.currentTarget.style.background = "var(--text-primary)"}
               >
                 Register your club →
-              </a>
+              </Link>
             </div>
           )}
         </div>

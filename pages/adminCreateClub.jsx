@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const API = "/api";
 
@@ -474,7 +475,7 @@ export default function AdminCreateClub() {
             </p>
           </div>
 
-          <a href="/page1" style={{
+          <Link href="/page1" style={{
             fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600,
             color: "rgba(255,255,255,0.5)", textDecoration: "none",
             border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px",
@@ -482,7 +483,7 @@ export default function AdminCreateClub() {
             transition: "all 0.2s", display: "inline-block",
           }}>
             ← Browse clubs
-          </a>
+          </Link>
         </div>
         <div className="ac-tabs">
           <button
@@ -753,12 +754,12 @@ export default function AdminCreateClub() {
                       <span className={`ac-tag${c.pricingType === "free" ? " free" : ""}`}>
                         {c.pricingType === "free" ? "Free" : "Paid"}
                       </span>
-                      <a href={`/club-detail?id=${c.id}`} style={{
+                      <Link href={`/club-detail?id=${c.id}`} style={{
                         fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 600,
                         color: "#a78bfa", textDecoration: "none",
                       }}>
                         View →
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 ))}

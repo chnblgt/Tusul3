@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const FONT = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');`;
 
 const navCols = [
@@ -69,8 +71,9 @@ export default function Footer() {
             gap: "48px",
             marginBottom: "56px",
           }}>
+            {/* Brand */}
             <div>
-              <a href="/page" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "18px" }}>
+              <Link href="/page" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "18px" }}>
                 <div style={{
                   width: "26px", height: "26px",
                   background: "var(--accent)",
@@ -87,21 +90,23 @@ export default function Footer() {
                 }}>
                   Duguilan<span style={{ color: "var(--accent)", fontStyle: "italic" }}>.com</span>
                 </span>
-              </a>
+              </Link>
               <p style={{
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: "13px", fontWeight: 300, lineHeight: 1.8,
                 color: "var(--text-muted)",
                 maxWidth: "220px", margin: "0 0 24px",
               }}>
-                Mongolia's platform for discovering clubs, communities, and shared passions.
+                Mongolia&apos;s platform for discovering clubs, communities, and shared passions.
               </p>
               <div style={{ display: "flex", gap: "8px" }}>
                 {["FB", "IG", "TW"].map(s => (
-                  <a key={s} href="#" className="ft-social">{s}</a>
+                  <Link key={s} href="#" className="ft-social">{s}</Link>
                 ))}
               </div>
             </div>
+
+            {/* Nav columns */}
             {navCols.map(({ heading, links }) => (
               <div key={heading}>
                 <p style={{
@@ -114,11 +119,13 @@ export default function Footer() {
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   {links.map(({ label, href }) => (
-                    <a key={label} href={href} className="ft-link">{label}</a>
+                    <Link key={label} href={href} className="ft-link">{label}</Link>
                   ))}
                 </div>
               </div>
             ))}
+
+            {/* Contact */}
             <div>
               <p style={{
                 fontFamily: "'DM Sans', sans-serif",
@@ -150,6 +157,8 @@ export default function Footer() {
               </div>
             </div>
           </div>
+
+          {/* Bottom bar */}
           <div style={{
             borderTop: "1px solid var(--border-subtle)",
             paddingTop: "28px",

@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
+import Link from "next/link";
 
 const MapPicker = dynamic(() => import("@/waterbottle/Mapcomponent"), { ssr: false });
 
@@ -152,12 +153,12 @@ function SubmittedPage({ clubName }) {
       <style>{fonts}</style>
       <div style={{ height:3, background:"linear-gradient(90deg,#4c1d95,#7c3aed,#c4b5fd,#7c3aed,#4c1d95)" }}/>
       <nav style={{ padding:"20px 36px" }}>
-        <a href="/page" style={{ display:"inline-flex", alignItems:"center", gap:10, textDecoration:"none" }}>
+        <Link href="/page" style={{ display:"inline-flex", alignItems:"center", gap:10, textDecoration:"none" }}>
           <div style={{ width:32, height:32, borderRadius:10, background:"linear-gradient(135deg,#1a0533,#3b0764)", display:"flex", alignItems:"center", justifyContent:"center" }}>
             <span style={{ color:"#c4b5fd", fontWeight:800, fontSize:15, fontFamily:"'Fraunces',serif" }}>D</span>
           </div>
           <span className="reg-display" style={{ fontSize:19, color:"#1a0533" }}>Duguilan<span style={{ color:"#7c3aed" }}>.com</span></span>
-        </a>
+        </Link>
       </nav>
       <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"16px 16px 72px" }}>
         <div style={{ width:"100%", maxWidth:520, animation:"reg-fadeUp .5s cubic-bezier(.22,1,.36,1) both" }}>
@@ -200,8 +201,8 @@ function SubmittedPage({ clubName }) {
                 ))}
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"center" }}>
-                <a href="/page1" className="reg-btn-primary" style={{ width:"100%", maxWidth:300 }}>Browse clubs →</a>
-                <a href="/page" className="reg-btn-ghost" style={{ width:"100%", maxWidth:300 }}>← Нүүр хуудас руу буцах</a>
+                <Link href="/page1" className="reg-btn-primary" style={{ width:"100%", maxWidth:300 }}>Browse clubs →</Link>
+                <Link href="/page" className="reg-btn-ghost" style={{ width:"100%", maxWidth:300 }}>← Нүүр хуудас руу буцах</Link>
               </div>
             </div>
           </div>
@@ -367,10 +368,10 @@ export default function ClubRegisterPage() {
         <div style={{ maxWidth:"720px", margin:"0 auto" }}>
 
           <div style={{ marginBottom:"48px" }}>
-            <a href="/page" className="reg-back">
+            <Link href="/page" className="reg-back">
               <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
               Back
-            </a>
+            </Link>
             <h1 className="reg-display" style={{ fontSize:"clamp(2rem, 5vw, 3.2rem)", fontWeight:800, color:"#1a0533", letterSpacing:"-0.04em", lineHeight:1.15, margin:"0 0 10px" }}>
               Register your <span style={{ color:"#7c3aed", fontStyle:"italic" }}>club</span>
             </h1>

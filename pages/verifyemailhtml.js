@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function verifyEmailHtml(displayName, verifyLink, note = '') {
   return `<!DOCTYPE html>
 <html lang="mn">
@@ -81,10 +83,10 @@ function verifyEmailHtml(displayName, verifyLink, note = '') {
                   <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                       <td align="center" style="padding-bottom:40px;">
-                        <a href="${verifyLink}"
+                        <Link href="${verifyLink}"
                            style="display:inline-block;padding:16px 48px;background:#7c3aed;color:#ffffff;text-decoration:none;border-radius:10px;font-size:15px;font-weight:700;letter-spacing:0.02em;">
                           Имэйл баталгаажуулах
-                        </a>
+                        </Link>
                       </td>
                     </tr>
                   </table>
@@ -99,9 +101,9 @@ function verifyEmailHtml(displayName, verifyLink, note = '') {
                           Товч ажиллахгүй байвал доорх холбоосыг хуулж хөтөч дээрээ нээнэ үү:
                         </p>
                         <p style="margin:0 0 24px;text-align:center;">
-                          <a href="${verifyLink}" style="font-size:11px;color:#7c3aed;word-break:break-all;text-decoration:none;">
+                          <Link href="${verifyLink}" style="font-size:11px;color:#7c3aed;word-break:break-all;text-decoration:none;">
                             ${verifyLink}
-                          </a>
+                          </Link>
                         </p>
 
                         <!-- Expiry notice -->
