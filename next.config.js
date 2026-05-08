@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://premium-scone-shoplift.ngrok-free.dev/:path*',
+        destination: 'https://backend3-production-27e7.up.railway.app/:path*',
       },
     ];
   },
