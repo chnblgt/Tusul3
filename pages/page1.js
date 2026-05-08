@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
-import { LineUtil } from "leaflet";
 import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
