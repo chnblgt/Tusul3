@@ -1,8 +1,7 @@
 import Header from "../waterbottle/Header";
 import Body from "../waterbottle/Body";
 import Footer from "../waterbottle/Footer";
-import Link from "next/link";
-
+import FloatingQR from "../waterbottle/FloatingQR";
 
 export default function Page() {
   return (
@@ -10,6 +9,7 @@ export default function Page() {
       <Header />
       <Body />
       <Footer />
+      <FloatingQR src="/qr.png" alt="Duguilan.com QR Code" />
     </div>
   );
 }
