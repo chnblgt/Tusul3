@@ -4,11 +4,11 @@ import Footer from "@/waterbottle/Footer";
 const FONT = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');`;
 
 const team = [
-  { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API",          color: "#71717a" },
-  { name: "Delgermurun Ganbold",     role: "Graphic Designer",     focus: "UX/UI Designer",         color: "#a1a1aa" },
-  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API & Lead",   color: "#3f3f46" },
-  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Frontend developer",     color: "#52525b" },
-  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "Frontend developer",     color: "#18181b" },
+  { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API",          color: "#6366f1" },
+  { name: "Delgermurun Ganbold",     role: "Graphic Designer",     focus: "UX/UI Designer",         color: "#6366f1" },
+  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API & Lead",   color: "#6366f1" },
+  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Frontend developer",     color: "#6366f1" },
+  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "Frontend developer",     color: "#6366f1" },
 ];
 
 const CSS = `
