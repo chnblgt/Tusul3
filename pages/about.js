@@ -4,11 +4,11 @@ import Footer from "@/waterbottle/Footer";
 const FONT = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');`;
 
 const team = [
-    { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API",       color: "#2563eb" },
- { name: "Delgermurun Ganbold",     role: "Graphic Designer",     focus: "UX/UI Designer", color: "#baf007" },
-  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API & Lead",       color: "#5533bb" },
-  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Frontend developer",          color: "#0d9488" },
-  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "Frontend developer",      color: "#db2777" },
+  { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API",          color: "#71717a" },
+  { name: "Delgermurun Ganbold",     role: "Graphic Designer",     focus: "UX/UI Designer",         color: "#a1a1aa" },
+  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API & Lead",   color: "#3f3f46" },
+  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Frontend developer",     color: "#52525b" },
+  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "Frontend developer",     color: "#18181b" },
 ];
 
 const CSS = `
@@ -64,8 +64,7 @@ export default function AboutPage() {
       <style>{CSS}</style>
       <Header />
 
-      <main style={{ flex: 1 }}>
-        {/* Hero */}
+      <main style={{ flex: 1 }}>  
         <section style={{
           padding: "clamp(72px, 10vw, 120px) clamp(20px, 4vw, 32px) clamp(64px, 8vw, 100px)",
           borderBottom: "1px solid var(--border-subtle)",
