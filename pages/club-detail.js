@@ -653,7 +653,7 @@ export default function ClubDetailPage() {
                   <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#0066cc", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <span style={{ color: "#fff", fontSize: "13px", fontWeight: 800, fontFamily: "'DM Sans', sans-serif" }}>Q</span>
                   </div>
-                  <span className="cd-sans" style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>QPay</span>
+                  <span className="cd-sans" style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>SocialPay</span>
                 </div>
                 {paymentInfo.qpay_info.startsWith("http") ? (
                   <img src={paymentInfo.qpay_info} alt="QPay QR" style={{ width: "100%", maxWidth: "220px", display: "block", margin: "0 auto", borderRadius: "10px" }} />

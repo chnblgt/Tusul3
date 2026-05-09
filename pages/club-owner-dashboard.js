@@ -96,6 +96,40 @@ const fonts = `
     transition: all 0.2s; margin-bottom: 24px;
   }
   .od-back-btn:hover { color: var(--accent); background: var(--accent-soft); border-color: var(--border-card); }
+
+  .od-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; padding: 24px;
+  }
+  .od-modal {
+    background: var(--bg-card); border-radius: 20px;
+    padding: 32px; max-width: 480px; width: 100%;
+    border: 1px solid var(--border-card);
+    animation: od-fadeUp 0.3s cubic-bezier(.22,1,.36,1) both;
+  }
+  .od-btn-primary {
+    width: 100%; padding: 13px;
+    background: var(--accent); color: var(--text-on-accent);
+    border: none; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .od-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .od-btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+  .od-input {
+    width: 100%; padding: 11px 14px;
+    background: var(--bg-input); border: 1px solid var(--border-input);
+    border-radius: 9px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--text-primary); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
+  }
+  .od-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .od-label {
+    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+    color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 8px;
+  }
 `;
 
 function StatCard({ label, value, sub, accent }) {
@@ -110,49 +144,64 @@ function StatCard({ label, value, sub, accent }) {
 
 function PaymentRow({ pay, formatDate, formatMNT, onConfirm, onReject, i }) {
   const [acting, setActing] = useState(false);
+  const [showNote, setShowNote] = useState(false);
   async function act(fn) { setActing(true); await fn(pay.id); setActing(false); }
   const statusStyle = { confirmed: "od-badge-green", pending: "od-badge-yellow", rejected: "od-badge-red" }[pay.status] || "od-badge-purple";
   const statusLabel = { confirmed: "Confirmed", pending: "Pending", rejected: "Rejected" }[pay.status] || pay.status;
   return (
-    <div className="od-row" style={{ animationDelay: `${i * 0.04}s` }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "14px", flex: 1, minWidth: 0 }}>
-        <div className="od-avatar">{(pay.user_name || "?").charAt(0).toUpperCase()}</div>
-        <div style={{ minWidth: 0 }}>
-          <p className="od-sans" style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {pay.user_name || "Unknown user"}
-          </p>
-          <p className="od-sans" style={{ fontSize: "12px", color: "var(--text-muted)", margin: "2px 0 0" }}>
-            {pay.user_email || "—"}{pay.tier_name ? ` · ${pay.tier_name}` : ""}
-          </p>
+    <div style={{ marginBottom: "8px" }}>
+      <div className="od-row" style={{ animationDelay: `${i * 0.04}s`, flexDirection: "column", alignItems: "stretch", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", flex: 1, minWidth: 0 }}>
+            <div className="od-avatar">{(pay.user_name || "?").charAt(0).toUpperCase()}</div>
+            <div style={{ minWidth: 0 }}>
+              <p className="od-sans" style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {pay.user_name || "Unknown user"}
+              </p>
+              <p className="od-sans" style={{ fontSize: "12px", color: "var(--text-muted)", margin: "2px 0 0" }}>
+                {pay.user_email || "—"}{pay.tier_name ? ` · ${pay.tier_name}` : ""}
+              </p>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <span className="od-display" style={{ fontSize: "15px", fontWeight: 800, color: "var(--accent)", letterSpacing: "-0.02em" }}>{formatMNT(pay.amount)}</span>
+            <span className="od-sans" style={{ fontSize: "12px", color: "var(--text-muted)" }}>{formatDate(pay.paid_at || pay.created_at)}</span>
+            <span className={`od-badge ${statusStyle}`}>{statusLabel}</span>
+            {pay.receipt_url && (
+              <Link href={pay.receipt_url} target="_blank" rel="noopener noreferrer" className="od-sans"
+                style={{ fontSize: "12px", fontWeight: 600, color: "var(--accent)", textDecoration: "none", border: "1px solid var(--border-subtle)", borderRadius: "7px", padding: "5px 12px", transition: "all 0.2s" }}>
+                View receipt
+              </Link>
+            )}
+            {pay.status === "pending" && (
+              <>
+                <button onClick={() => act(onConfirm)} disabled={acting} className="od-sans"
+                  style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: "7px", padding: "6px 14px", cursor: "pointer", color: "#16a34a", fontSize: "12px", fontWeight: 700, opacity: acting ? 0.6 : 1, transition: "all 0.2s" }}>
+                  {acting ? "…" : "✓ Confirm"}
+                </button>
+                <button onClick={() => act(onReject)} disabled={acting} className="od-sans"
+                  style={{ background: "transparent", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "7px", padding: "5px 12px", cursor: "pointer", color: "#dc2626", fontSize: "12px", fontWeight: 600, transition: "all 0.2s" }}>
+                  Reject
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0, flexWrap: "wrap", justifyContent: "flex-end" }}>
-        <span className="od-display" style={{ fontSize: "15px", fontWeight: 800, color: "var(--accent)", letterSpacing: "-0.02em" }}>{formatMNT(pay.amount)}</span>
-        <span className="od-sans" style={{ fontSize: "12px", color: "var(--text-muted)" }}>{formatDate(pay.paid_at || pay.created_at)}</span>
-        <span className={`od-badge ${statusStyle}`}>{statusLabel}</span>
-        {pay.receipt_url && (
-          <Link href={pay.receipt_url} target="_blank" rel="noopener noreferrer" className="od-sans"
-            style={{ fontSize: "12px", fontWeight: 600, color: "var(--accent)", textDecoration: "none", border: "1px solid var(--border-subtle)", borderRadius: "7px", padding: "5px 12px", transition: "all 0.2s" }}
-            onMouseEnter={e => e.currentTarget.style.background = "var(--accent-soft)"}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-            View receipt
-          </Link>
-        )}
-        {pay.status === "pending" && (
-          <>
-            <button onClick={() => act(onConfirm)} disabled={acting} className="od-sans"
-              style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: "7px", padding: "6px 14px", cursor: "pointer", color: "#16a34a", fontSize: "12px", fontWeight: 700, opacity: acting ? 0.6 : 1, transition: "all 0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(34,197,94,0.18)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(34,197,94,0.1)"}>
-              {acting ? "…" : "Confirm"}
+        {pay.payment_note && (
+          <div>
+            <button onClick={() => setShowNote(v => !v)} className="od-sans"
+              style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent)", fontSize: "12px", fontWeight: 600, padding: 0, display: "flex", alignItems: "center", gap: "5px" }}>
+              <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              {showNote ? "Hide note" : "View payment note"}
             </button>
-            <button onClick={() => act(onReject)} disabled={acting} className="od-sans"
-              style={{ background: "transparent", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "7px", padding: "5px 12px", cursor: "pointer", color: "#dc2626", fontSize: "12px", fontWeight: 600, transition: "all 0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-              Reject
-            </button>
-          </>
+            {showNote && (
+              <div style={{ marginTop: "8px", padding: "10px 14px", borderRadius: "9px", background: "var(--accent-soft)", border: "1px solid var(--border-subtle)" }}>
+                <p className="od-sans" style={{ fontSize: "13px", color: "var(--text-secondary)", margin: 0, lineHeight: 1.6 }}>
+                  💬 {pay.payment_note}
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -162,14 +211,19 @@ function PaymentRow({ pay, formatDate, formatMNT, onConfirm, onReject, i }) {
 export default function ClubOwnerDashboard() {
   const router = useRouter();
   const { clubId } = router.query;
-  const [user, setUser]           = useState(null);
-  const [club, setClub]           = useState(null);
-  const [members, setMembers]     = useState([]);
-  const [payments, setPayments]   = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [error, setError]         = useState("");
-  const [activeTab, setActiveTab] = useState("members");
-  const [search, setSearch]       = useState("");
+  const [user, setUser]                 = useState(null);
+  const [club, setClub]                 = useState(null);
+  const [members, setMembers]           = useState([]);
+  const [payments, setPayments]         = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState("");
+  const [activeTab, setActiveTab]       = useState("members");
+  const [search, setSearch]             = useState("");
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [addEmail, setAddEmail]         = useState("");
+  const [addTier, setAddTier]           = useState("");
+  const [addingMember, setAddingMember] = useState(false);
+  const [addMemberMsg, setAddMemberMsg] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
@@ -228,6 +282,27 @@ export default function ClubOwnerDashboard() {
       await fetchAPI(`${API}/club/${clubId}/members/${memberId}`, { method: "DELETE", headers: { "x-user-id": String(user.id) } });
       setMembers(prev => prev.filter(m => m.id !== memberId));
     } catch {}
+  }
+
+  async function addMember() {
+    if (!addEmail) return;
+    setAddingMember(true); setAddMemberMsg("");
+    try {
+      const res = await fetchAPI(`${API}/club/${clubId}/addMember`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-id": String(user.id) },
+        body: JSON.stringify({ email: addEmail, tier_name: addTier || null, payment_status: "confirmed" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAddMemberMsg("✓ Гишүүн амжилттай нэмэгдлээ");
+        setAddEmail(""); setAddTier("");
+        loadAll();
+      } else {
+        setAddMemberMsg(data.message || "Алдаа гарлаа");
+      }
+    } catch { setAddMemberMsg("Серверт холбогдож чадсангүй"); }
+    finally { setAddingMember(false); }
   }
 
   function formatDate(iso) {
@@ -302,17 +377,50 @@ export default function ClubOwnerDashboard() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => router.push(`/club-edit?id=${clubId}`)}
-                className="od-sans"
-                style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "10px", cursor: "pointer", background: "var(--bg-card)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", fontSize: "13px", fontWeight: 600, transition: "all 0.2s", flexShrink: 0 }}
-                onMouseEnter={e => { e.currentTarget.style.background = "var(--accent-soft)"; e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.borderColor = "var(--border-card)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "var(--bg-card)"; e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.borderColor = "var(--border-subtle)"; }}>
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Edit Club
-              </button>
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <button
+                  onClick={() => { setShowAddMember(true); setAddMemberMsg(""); }}
+                  className="od-sans"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "10px", cursor: "pointer", background: "var(--accent)", color: "var(--text-on-accent)", border: "none", fontSize: "13px", fontWeight: 600, transition: "all 0.2s" }}>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                  Add Member
+                </button>
+                <button
+                  onClick={() => router.push(`/club-edit?id=${clubId}`)}
+                  className="od-sans"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "10px", cursor: "pointer", background: "var(--bg-card)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", fontSize: "13px", fontWeight: 600, transition: "all 0.2s", flexShrink: 0 }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--accent-soft)"; e.currentTarget.style.color = "var(--accent)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "var(--bg-card)"; e.currentTarget.style.color = "var(--text-secondary)"; }}>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Edit Club
+                </button>
+              </div>
             </div>
           </div>
+
+          {/* Pending payment requests banner */}
+          {pendingPayments.length > 0 && (
+            <div className="od-fadein" style={{ marginBottom: "24px", padding: "16px 20px", borderRadius: "14px", background: "rgba(245,158,11,0.07)", border: "1.5px solid rgba(245,158,11,0.25)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(245,158,11,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <svg width="16" height="16" fill="none" stroke="#b45309" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div>
+                  <p className="od-sans" style={{ fontSize: "14px", fontWeight: 700, color: "#92400e", margin: 0 }}>
+                    {pendingPayments.length} pending payment{pendingPayments.length > 1 ? "s" : ""} awaiting your review
+                  </p>
+                  <p className="od-sans" style={{ fontSize: "12px", color: "#b45309", margin: "2px 0 0" }}>
+                    Members claimed they've paid — confirm or reject below
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setActiveTab("payments")} className="od-sans"
+                style={{ padding: "8px 18px", background: "#b45309", color: "#fff", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
+                Review now →
+              </button>
+            </div>
+          )}
+
           <div className="od-fadein" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: "14px", marginBottom: "36px" }}>
             <StatCard label="Total Members"    value={members.length}          sub={`${members.length === 1 ? "person" : "people"} joined`} />
             <StatCard label="Total Revenue"    value={formatMNT(totalRevenue)} sub={`${confirmedPayments.length} confirmed`} accent="#16a34a" />
@@ -337,6 +445,7 @@ export default function ClubOwnerDashboard() {
               )}
             </button>
           </div>
+
           {activeTab === "members" && (
             <div className="od-fadein">
               {filteredMembers.length === 0 ? (
@@ -344,7 +453,7 @@ export default function ClubOwnerDashboard() {
                   <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--bg-card)", border: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
                     <svg width="20" height="20" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                   </div>
-                  {search ? "No members match your search" : "No members yet"}
+                  {search ? "No members match your search" : "No members yet — add one with the button above!"}
                 </div>
               ) : filteredMembers.map((member, i) => (
                 <div key={member.id} className="od-row" style={{ animationDelay: `${i * 0.04}s` }}>
@@ -361,7 +470,7 @@ export default function ClubOwnerDashboard() {
                     {member.tier_name && <span className="od-badge od-badge-purple">{member.tier_name}</span>}
                     <span className="od-sans" style={{ fontSize: "12px", color: "var(--text-muted)" }}>Joined {formatDate(member.joined_at)}</span>
                     <span className={`od-badge ${member.payment_status === "confirmed" ? "od-badge-green" : member.payment_status === "pending" ? "od-badge-yellow" : "od-badge-purple"}`}>
-                      {member.payment_status === "confirmed" ? "Paid" : member.payment_status === "pending" ? "Pending" : "Free"}
+                      {member.payment_status === "confirmed" ? "Paid ✓" : member.payment_status === "pending" ? "⏳ Pending" : "Free"}
                     </span>
                     <button onClick={() => removeMember(member.id)} className="od-sans"
                       style={{ background: "transparent", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "7px", padding: "5px 12px", cursor: "pointer", color: "#dc2626", fontSize: "12px", fontWeight: 600, transition: "all 0.2s" }}
@@ -374,6 +483,7 @@ export default function ClubOwnerDashboard() {
               ))}
             </div>
           )}
+
           {activeTab === "payments" && (
             <div className="od-fadein">
               {(club?.qpay_info || club?.dans_info) && (
@@ -413,6 +523,7 @@ export default function ClubOwnerDashboard() {
                   </div>
                 </div>
               )}
+
               {filteredPayments.filter(p => p.status === "pending").length > 0 && (
                 <>
                   <p className="od-sans" style={{ fontSize: "10px", fontWeight: 700, color: "#b45309", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 12px", display: "flex", alignItems: "center", gap: "8px" }}>
@@ -441,6 +552,53 @@ export default function ClubOwnerDashboard() {
           )}
         </div>
       </main>
+
+      {/* Add Member Modal */}
+      {showAddMember && (
+        <div className="od-modal-overlay" onClick={() => setShowAddMember(false)}>
+          <div className="od-modal" onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <div>
+                <h2 className="od-display" style={{ fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Add Member</h2>
+                <p className="od-sans" style={{ fontSize: "13px", color: "var(--text-muted)", margin: "4px 0 0" }}>Manually add a member who has paid</p>
+              </div>
+              <button onClick={() => setShowAddMember(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "20px", lineHeight: 1, padding: "4px" }}>✕</button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "20px" }}>
+              <div>
+                <label className="od-label">Member Email *</label>
+                <input
+                  className="od-input"
+                  placeholder="user@email.com"
+                  value={addEmail}
+                  onChange={e => setAddEmail(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && addMember()}
+                />
+                <p className="od-sans" style={{ fontSize: "11px", color: "var(--text-muted)", margin: "6px 0 0" }}>The user must already have an account on Duguilan.com</p>
+              </div>
+              <div>
+                <label className="od-label">Tier (optional)</label>
+                <input
+                  className="od-input"
+                  placeholder="e.g. Beginners class, SAT…"
+                  value={addTier}
+                  onChange={e => setAddTier(e.target.value)}
+                />
+              </div>
+            </div>
+            <div style={{ padding: "12px 14px", borderRadius: "10px", background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.2)", marginBottom: "20px", display: "flex", gap: "8px" }}>
+              <svg width="14" height="14" fill="none" stroke="#16a34a" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 1 }}><polyline points="20 6 9 17 4 12"/></svg>
+              <p className="od-sans" style={{ fontSize: "12px", color: "#16a34a", margin: 0, lineHeight: 1.5 }}>They will be added as a <strong>confirmed</strong> member immediately.</p>
+            </div>
+            {addMemberMsg && (
+              <p className="od-sans" style={{ fontSize: "13px", fontWeight: 600, color: addMemberMsg.startsWith("✓") ? "#16a34a" : "#dc2626", marginBottom: "14px" }}>{addMemberMsg}</p>
+            )}
+            <button onClick={addMember} disabled={addingMember || !addEmail} className="od-btn-primary">
+              {addingMember ? "Adding…" : "Add Member"}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -4,11 +4,11 @@ import Footer from "@/waterbottle/Footer";
 const FONT = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');`;
 
 const team = [
-    { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API & playboy, alcoholic, hoe",       color: "#2563eb" },
- { name: "Delgermurun Ganbold",     role: "Angiin huuhed",     focus: "Banned from EON & 170cm", color: "#baf007" },
-  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API & pedo",       color: "#5533bb" },
-  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Chill guy, zugeer hamt baisan",          color: "#0d9488" },
-  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "Benttei huuhed",      color: "#db2777" },
+    { name: "Khangarid Jargalsaihan",  role: "Full-Stack Developer", focus: "Backend & API",       color: "#2563eb" },
+ { name: "Delgermurun Ganbold",     role: "Graphic Designer",     focus: "UX/UI Designer", color: "#baf007" },
+  { name: "Chinbiligt Dovchinbazar", role: "Full-Stack Developer", focus: "Backend & API & Lead",       color: "#5533bb" },
+  { name: "Temuulen Temuujin",       role: "Developer",            focus: "Frontend developer",          color: "#0d9488" },
+  { name: "Gan-Erdene Undrakhtamir", role: "Developer",            focus: "Frontend developer",      color: "#db2777" },
 ];
 
 const CSS = `
@@ -100,8 +100,6 @@ export default function AboutPage() {
             </p>
           </div>
         </section>
-
-        {/* Story */}
         <section style={{ padding: "clamp(60px, 8vw, 100px) clamp(20px, 4vw, 32px)", transition: "background 0.35s" }} className="ab-a2">
           <div style={{ maxWidth: "900px", margin: "0 auto" }}>
             <div className="ab-story-grid">
@@ -164,8 +162,6 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
-
-        {/* Team */}
         <section style={{ padding: "clamp(60px, 8vw, 100px) clamp(20px, 4vw, 32px)", background: "var(--bg-section)", transition: "background 0.35s" }} className="ab-a3">
           <div style={{ maxWidth: "900px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "clamp(40px, 5vw, 60px)" }}>
@@ -190,7 +186,7 @@ export default function AboutPage() {
               {team.map(({ name, role, focus, color }) => (
                 <div key={name} className="ab-member">
                   <div style={{
-                    width: "44px", height: "44px", borderRadius: "10px",
+                    width: "44px", height: "44px", borderRadius: "4px",
                     background: `${color}14`, border: `1px solid ${color}28`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     marginBottom: "16px",
