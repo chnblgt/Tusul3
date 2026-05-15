@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
 import { useTheme } from "@/waterbottle/useTheme";
+import { useTranslation } from "@/waterbottle/useTranslation";
 import Link from "next/link";
 
 
@@ -73,6 +74,7 @@ const THEME_META = {
 export default function SettingsPage() {
   const router = useRouter();
   const { setTheme } = useTheme();
+  const { lang, toggleLang } = useTranslation();
   const [user, setUser] = useState(null);
   const [activeTheme, setActiveTheme] = useState("light");
   const [activeSection, setActiveSection] = useState("appearance");
@@ -163,6 +165,7 @@ export default function SettingsPage() {
 
   const sections = [
     { id: "appearance", label: "Appearance", icon: <SunIcon /> },
+    { id: "language",   label: "Language",   icon: <LangIcon /> },
     { id: "profile",    label: "Profile",    icon: <UserIcon /> },
     { id: "account",    label: "Account",    icon: <ShieldIcon /> },
   ];
@@ -336,6 +339,47 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
+                  </div>
+                </div>
+              )}
+              {activeSection === "language" && (
+                <div className="st-section">
+                  <div className="st-section-header">
+                    <h2 className="st-display" style={{ color: "var(--text-primary)" }}>Language</h2>
+                    <p className="st-sans" style={{ color: "var(--text-muted)" }}>Choose your preferred language for Duguilan.com.</p>
+                  </div>
+                  <div className="st-section-body">
+                    <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                      {[
+                        { code: "en", label: "English", flag: "🇬🇧", desc: "Interface in English" },
+                        { code: "mn", label: "Монгол", flag: "🇲🇳", desc: "Интерфейс монгол хэлээр" },
+                      ].map(({ code, label, flag, desc }) => (
+                        <button
+                          key={code}
+                          onClick={() => { if (lang !== code) toggleLang(); }}
+                          style={{
+                            display: "flex", alignItems: "center", gap: "16px",
+                            padding: "16px 20px", borderRadius: "14px", cursor: "pointer",
+                            border: `2px solid ${lang === code ? "var(--accent)" : "var(--border-subtle)"}`,
+                            background: lang === code ? "var(--accent-soft)" : "var(--bg-input)",
+                            transition: "all 0.2s", textAlign: "left",
+                            outline: lang === code ? "3px solid var(--accent-soft)" : "none",
+                            outlineOffset: "2px",
+                          }}
+                        >
+                          <span style={{ fontSize: "28px" }}>{flag}</span>
+                          <div style={{ flex: 1 }}>
+                            <p className="st-sans" style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: lang === code ? "var(--accent)" : "var(--text-primary)" }}>{label}</p>
+                            <p className="st-sans" style={{ margin: "2px 0 0", fontSize: "12px", color: "var(--text-muted)", fontWeight: 400 }}>{desc}</p>
+                          </div>
+                          {lang === code && (
+                            <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <svg width="10" height="10" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -610,6 +654,16 @@ function css() {
       .st-section-header { padding: 20px 16px 14px !important; }
     }
   `;
+}
+
+function LangIcon() {
+  return (
+    <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+  );
 }
 
 function SunIcon() {

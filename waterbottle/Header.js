@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useTheme } from "./useTheme";
+import { useTranslation } from "./useTranslation";
 import { useRouter } from "next/router";
 
 const FONT = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');`;
@@ -8,6 +9,7 @@ const FONT = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Dis
 export default function Header({ user = null }) {
   const router = useRouter();
   const { mode } = useTheme();
+  const { lang, toggleLang } = useTranslation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
@@ -266,6 +268,25 @@ export default function Header({ user = null }) {
 
           {/* Desktop Auth */}
           <div className="hdr-auth-desktop" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {/* Language toggle */}
+            <button
+              onClick={toggleLang}
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "12px", fontWeight: 700,
+                color: "var(--text-secondary)",
+                background: "var(--bg-input)",
+                border: "1px solid var(--border-subtle)",
+                borderRadius: "8px", padding: "6px 12px",
+                cursor: "pointer", letterSpacing: "0.06em",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.borderColor = "var(--accent)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.borderColor = "var(--border-subtle)"; }}
+              title={lang === "en" ? "Монгол хэл рүү" : "Switch to English"}
+            >
+              {lang === "en" ? "MN" : "EN"}
+            </button>
             {!loggedIn ? (
               <>
                 <Link href="/signin" className="hdr-ghost">Sign in</Link>
@@ -328,6 +349,19 @@ export default function Header({ user = null }) {
               {label}
             </Link>
           ))}
+          {/* Language toggle in mobile */}
+          <button
+            onClick={toggleLang}
+            style={{
+              display: "block", width: "100%", textAlign: "left",
+              padding: "16px 0", background: "none", border: "none",
+              borderBottom: "1px solid var(--border-subtle)",
+              fontFamily: "'DM Sans', sans-serif", fontSize: "18px",
+              fontWeight: 600, color: "var(--accent)", cursor: "pointer",
+            }}
+          >
+            {lang === "en" ? "🇲🇳 Монгол" : "🇬🇧 English"}
+          </button>
         </div>
 
         <div style={{ marginTop: "24px" }}>

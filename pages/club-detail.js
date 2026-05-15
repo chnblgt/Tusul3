@@ -7,7 +7,7 @@ import Footer from "@/waterbottle/Footer";
 
 const MapPicker = dynamic(() => import("@/waterbottle/Mapcomponent"), { ssr: false });
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://backend3-production-27e7.up.railway.app/clubs";
 
 const fetchAPI = async (url, options = {}) => {
   try {
