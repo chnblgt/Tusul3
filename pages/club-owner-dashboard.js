@@ -4,7 +4,7 @@ import Header from "@/waterbottle/Header";
 import Footer from "@/waterbottle/Footer";
 import Link from "next/link";
 
-const API = "/api";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const fetchAPI = (url, options = {}) =>
   fetch(url, {

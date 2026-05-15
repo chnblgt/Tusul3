@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const MapPicker = dynamic(() => import("@/waterbottle/Mapcomponent"), { ssr: false });
 
-const API = "/api";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const fetchAPI = (url, options = {}) =>
   fetch(url, {
