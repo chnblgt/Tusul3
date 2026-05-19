@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useTranslation } from "./useTranslation";
 const MapComponent = dynamic(() => import("./Mapcomponent"), { ssr: false });
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -107,7 +108,6 @@ const G = `
     background: var(--accent); opacity: 0.5; flex-shrink: 0;
   }
 
-  /* ── Responsive ── */
   .bd-hero {
     min-height: 90vh;
     display: grid;
@@ -156,6 +156,85 @@ const G = `
   }
 `;
 
+const TRANSLATIONS = {
+  en: {
+    tag: "Mongolia's Simplest Club Platform",
+    heroH1: "Find your",
+    heroAccent: "people.",
+    heroDesc: "Discover clubs, sports, arts, and tech communities across Ulaanbaatar. Built for teens who want to grow.",
+    exploreBtn: "Explore clubs",
+    createBtn: "Create account",
+    statClubs: "Active clubs",
+    statCats: "Categories",
+    statSimple: "Always",
+    statSimpleLabel: "Simple",
+    howLabel: "How it works",
+    howH2a: "Three steps to",
+    howH2b: "belonging.",
+    steps: [
+      { num: "01", title: "Create your account", desc: "Sign up in seconds. Free, always. Just your name and email." },
+      { num: "02", title: "Discover clubs", desc: "Browse sports, arts, tech and more. Filter by location or interest." },
+      { num: "03", title: "Join and connect", desc: "Join for free, attend events, and meet your people." },
+    ],
+    exploreLabel: "Explore",
+    exploreH2a: "Start",
+    exploreH2b: "somewhere.",
+    viewAll: "View all clubs →",
+    allCats: "All Categories",
+    allCatsDesc: "Football to photography — find what moves you.",
+    sportsTitle: "Sports Clubs",
+    sportsDesc: "Football, basketball, volleyball — teams open for new members.",
+    sportsBtn: "Explore →",
+    eventsTitle: "Upcoming Events",
+    eventsDesc: "Tryouts, meetups and open sessions happening near you.",
+    comingSoon: "Coming soon",
+    leadersLabel: "For Club Leaders",
+    leadersH2a: "List your club on",
+    leadersH2b: "Duguilan.com",
+    leadersDesc: "Reach hundreds of students looking for clubs like yours. Free to register, easy to manage.",
+    registerBtn: "Register your club",
+    browseFirst: "Or browse clubs first →",
+  },
+  mn: {
+    tag: "Монголын хамгийн энгийн клубын платформ",
+    heroH1: "Өөрийнхөө",
+    heroAccent: "хүмүүсийг ол.",
+    heroDesc: "Улаанбаатар даяар спорт, урлаг, технологийн клубуудыг нээ. Өсөхийг хүсдэг залуучуудад зориулсан.",
+    exploreBtn: "Клубуудыг үзэх",
+    createBtn: "Бүртгүүлэх",
+    statClubs: "Идэвхтэй клуб",
+    statCats: "Ангилал",
+    statSimple: "Үргэлж",
+    statSimpleLabel: "Энгийн",
+    howLabel: "Хэрхэн ажилладаг",
+    howH2a: "Гурван алхамаар",
+    howH2b: "нэгдэнэ.",
+    steps: [
+      { num: "01", title: "Бүртгэл үүсгэх", desc: "Хэдхэн секундэд бүртгүүл. Үнэгүй, үргэлж. Зөвхөн нэр болон имэйл хаяг." },
+      { num: "02", title: "Клубуудыг нээх", desc: "Спорт, урлаг, технологи болон бусдыг харах. Байршил эсвэл сонирхлоор шүүх." },
+      { num: "03", title: "Нэгдэж холбогдох", desc: "Үнэгүй нэгдэж, арга хэмжээнд оролцож, өөрийн хүмүүстэй уулз." },
+    ],
+    exploreLabel: "Судлах",
+    exploreH2a: "Эхэл",
+    exploreH2b: "хаанаас ч болов.",
+    viewAll: "Бүх клубыг харах →",
+    allCats: "Бүх ангилал",
+    allCatsDesc: "Хөлбөмбөгоос фотографи хүртэл — өөрт тохирохыг ол.",
+    sportsTitle: "Спортын клубууд",
+    sportsDesc: "Хөлбөмбөг, бөсгөлдөр, волейбол — шинэ гишүүд хүлээн авч байна.",
+    sportsBtn: "Судлах →",
+    eventsTitle: "Удахгүй болох арга хэмжээ",
+    eventsDesc: "Шалгаруулалт, уулзалт болон нээлттэй хичээлүүд.",
+    comingSoon: "Удахгүй",
+    leadersLabel: "Клубын удирдагчдад",
+    leadersH2a: "Клубаа",
+    leadersH2b: "Duguilan.com-д бүртгүүл",
+    leadersDesc: "Таны клуб хайж буй олон зуун оюутанд хүр. Бүртгүүлэх үнэгүй, удирдахад хялбар.",
+    registerBtn: "Клубаа бүртгүүлэх",
+    browseFirst: "Эсвэл эхлээд клубуудыг үзэх →",
+  },
+};
+
 function useCountUp(target, dur = 1200) {
   const [val, setVal] = useState(0);
   const started = useRef(false);
@@ -180,17 +259,13 @@ const MARQUEE_ITEMS = [
   "Wrestling", "Boxing", "Judo", "Athletics",
 ];
 
-const HOW_STEPS = [
-  { num: "01", title: "Create your account", desc: "Sign up in seconds. Free, always. Just your name and email." },
-  { num: "02", title: "Discover clubs", desc: "Browse sports, arts, tech and more. Filter by location or interest." },
-  { num: "03", title: "Join and connect", desc: "Join for free, attend events, and meet your people." },
-];
-
 export default function Body() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [clubCount, setClubCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const { lang } = useTranslation();
+  const T = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const animClubs = useCountUp(loaded ? clubCount : 0);
   const animCats  = useCountUp(loaded ? categoryCount : 0);
@@ -218,7 +293,7 @@ export default function Body() {
       <section className="bd-hero">
         <div className="bd-hero-left">
           <div className="bd-a1" style={{ marginBottom: "28px" }}>
-            <span className="bd-tag">Mongolia&apos;s Simplest Club Platform</span>
+            <span className="bd-tag">{T.tag}</span>
           </div>
 
           <h1 className="bd-a2" style={{
@@ -230,8 +305,8 @@ export default function Body() {
             letterSpacing: "-0.025em",
             transition: "color 0.35s",
           }}>
-            Find your<br />
-            <span style={{ color: "var(--accent)", fontStyle: "italic" }}>people.</span>
+            {T.heroH1}<br />
+            <span style={{ color: "var(--accent)", fontStyle: "italic" }}>{T.heroAccent}</span>
           </h1>
 
           <p className="bd-a3" style={{
@@ -241,19 +316,19 @@ export default function Body() {
             maxWidth: "380px", margin: "0 0 40px",
             transition: "color 0.35s",
           }}>
-            Discover clubs, sports, arts, and tech communities across Ulaanbaatar. Built for teens who want to grow.
+            {T.heroDesc}
           </p>
 
           <div className="bd-a4" style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "48px" }}>
-            <Link href="/page1" className="bd-cta-fill">Explore clubs</Link>
-            {!loggedIn && <Link href="/signup" className="bd-cta-ghost">Create account</Link>}
+            <Link href="/page1" className="bd-cta-fill">{T.exploreBtn}</Link>
+            {!loggedIn && <Link href="/signup" className="bd-cta-ghost">{T.createBtn}</Link>}
           </div>
 
           <div className="bd-a5" style={{ display: "flex", gap: "0" }}>
             {[
-              { val: animClubs > 0 ? `${animClubs}+` : "—", label: "Active clubs" },
-              { val: animCats > 0 ? `${animCats}+` : "—", label: "Categories" },
-              { val: "Always", label: "Simple" },
+              { val: animClubs > 0 ? `${animClubs}+` : "—", label: T.statClubs },
+              { val: animCats > 0 ? `${animCats}+` : "—", label: T.statCats },
+              { val: T.statSimple, label: T.statSimpleLabel },
             ].map(({ val, label }, i) => (
               <div key={label} style={{
                 paddingRight: "24px",
@@ -314,7 +389,7 @@ export default function Body() {
                 fontSize: "10px", fontWeight: 700,
                 letterSpacing: "0.16em", textTransform: "uppercase",
                 color: "var(--text-muted)", display: "block", marginBottom: "12px",
-              }}>How it works</span>
+              }}>{T.howLabel}</span>
               <h2 style={{
                 fontFamily: "'DM Serif Display', serif",
                 fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
@@ -322,13 +397,13 @@ export default function Body() {
                 margin: 0, letterSpacing: "-0.02em",
                 transition: "color 0.35s",
               }}>
-                Three steps to <em style={{ fontStyle: "italic", color: "var(--accent)" }}>belonging.</em>
+                {T.howH2a} <em style={{ fontStyle: "italic", color: "var(--accent)" }}>{T.howH2b}</em>
               </h2>
             </div>
           </div>
 
           <div className="bd-steps-grid">
-            {HOW_STEPS.map(({ num, title, desc }) => (
+            {T.steps.map(({ num, title, desc }) => (
               <div key={num} style={{ padding: "0 0 32px", borderBottom: "2px solid var(--border-subtle)" }}>
                 <span className="bd-step-num">{num}</span>
                 <h3 style={{
@@ -364,14 +439,14 @@ export default function Body() {
                 fontSize: "10px", fontWeight: 700,
                 letterSpacing: "0.16em", textTransform: "uppercase",
                 color: "var(--text-muted)", display: "block", marginBottom: "12px",
-              }}>Explore</span>
+              }}>{T.exploreLabel}</span>
               <h2 style={{
                 fontFamily: "'DM Serif Display', serif",
                 fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
                 fontWeight: 400, color: "var(--text-primary)",
                 margin: 0, letterSpacing: "-0.02em", transition: "color 0.35s",
               }}>
-                Start <em style={{ fontStyle: "italic", color: "var(--accent)" }}>somewhere.</em>
+                {T.exploreH2a} <em style={{ fontStyle: "italic", color: "var(--accent)" }}>{T.exploreH2b}</em>
               </h2>
             </div>
             <Link href="/page1" style={{
@@ -384,7 +459,7 @@ export default function Body() {
               onMouseEnter={e => e.target.style.color = "var(--text-primary)"}
               onMouseLeave={e => e.target.style.color = "var(--text-muted)"}
             >
-              View all clubs →
+              {T.viewAll}
             </Link>
           </div>
 
@@ -401,9 +476,9 @@ export default function Body() {
                   <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
                 </svg>
               </div>
-              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", fontWeight: 400, color: "var(--text-on-accent)", margin: "0 0 10px", lineHeight: 1.3 }}>All Categories</h3>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", fontWeight: 400, color: "var(--text-on-accent)", margin: "0 0 10px", lineHeight: 1.3 }}>{T.allCats}</h3>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.65)", lineHeight: 1.75, margin: "0 0 auto" }}>
-                Football to photography — find what moves you.
+                {T.allCatsDesc}
               </p>
               <div style={{ marginTop: "24px" }}>
                 <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)" }}>
@@ -420,12 +495,12 @@ export default function Body() {
                   <path d="M2 12h20"/>
                 </svg>
               </div>
-              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", fontWeight: 400, color: "var(--text-primary)", margin: "0 0 10px", lineHeight: 1.3, transition: "color 0.35s" }}>Sports Clubs</h3>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", fontWeight: 400, color: "var(--text-primary)", margin: "0 0 10px", lineHeight: 1.3, transition: "color 0.35s" }}>{T.sportsTitle}</h3>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 300, color: "var(--text-secondary)", lineHeight: 1.75, margin: "0 0 auto", transition: "color 0.35s" }}>
-                Football, basketball, volleyball — teams open for new members.
+                {T.sportsDesc}
               </p>
               <div style={{ marginTop: "24px" }}>
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#16a34a" }}>Explore →</span>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#16a34a" }}>{T.sportsBtn}</span>
               </div>
             </Link>
 
@@ -438,12 +513,12 @@ export default function Body() {
                   <line x1="3" y1="10" x2="21" y2="10"/>
                 </svg>
               </div>
-              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", fontWeight: 400, color: "var(--text-primary)", margin: "0 0 10px", lineHeight: 1.3, transition: "color 0.35s" }}>Upcoming Events</h3>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", fontWeight: 400, color: "var(--text-primary)", margin: "0 0 10px", lineHeight: 1.3, transition: "color 0.35s" }}>{T.eventsTitle}</h3>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 300, color: "var(--text-secondary)", lineHeight: 1.75, margin: "0 0 auto", transition: "color 0.35s" }}>
-                Tryouts, meetups and open sessions happening near you.
+                {T.eventsDesc}
               </p>
               <div style={{ marginTop: "24px" }}>
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#d97706", background: "rgba(217,119,6,0.1)", border: "1px solid rgba(217,119,6,0.2)", padding: "3px 10px", borderRadius: "20px", display: "inline-block" }}>Coming soon</span>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#d97706", background: "rgba(217,119,6,0.1)", border: "1px solid rgba(217,119,6,0.2)", padding: "3px 10px", borderRadius: "20px", display: "inline-block" }}>{T.comingSoon}</span>
               </div>
             </div>
           </div>
@@ -460,23 +535,23 @@ export default function Body() {
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div className="bd-leaders-grid">
             <div>
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "12px" }}>For Club Leaders</span>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "12px" }}>{T.leadersLabel}</span>
               <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.6rem)", fontWeight: 400, lineHeight: 1.15, color: "var(--text-primary)", margin: "0 0 12px", letterSpacing: "-0.02em", transition: "color 0.35s" }}>
-                List your club on <em style={{ fontStyle: "italic", color: "var(--accent)" }}>Duguilan.com</em>
+                {T.leadersH2a} <em style={{ fontStyle: "italic", color: "var(--accent)" }}>{T.leadersH2b}</em>
               </h2>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 300, lineHeight: 1.8, color: "var(--text-secondary)", margin: 0, maxWidth: "480px", transition: "color 0.35s" }}>
-                Reach hundreds of students looking for clubs like yours. Free to register, easy to manage.
+                {T.leadersDesc}
               </p>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", flexShrink: 0 }}>
               <Link href="/club-register" className="bd-cta-fill" style={{ textAlign: "center" }}>
-                Register your club
+                {T.registerBtn}
               </Link>
               <Link href="/page1" style={{ fontFamily: "'DM Sans', sans-serif", textAlign: "center", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)", textDecoration: "none", transition: "color 0.2s" }}
                 onMouseEnter={e => e.target.style.color = "var(--text-primary)"}
                 onMouseLeave={e => e.target.style.color = "var(--text-muted)"}
               >
-                Or browse clubs first →
+                {T.browseFirst}
               </Link>
             </div>
           </div>

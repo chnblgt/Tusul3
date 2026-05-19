@@ -9,7 +9,6 @@ const fetchAPI = (url, opts = {}) =>
 
 const CATEGORIES = ["Football","Basketball","Volleyball","Tennis","Swimming","Chess","Music","Art","Dance","Drama","Coding","Science","Wrestling","Boxing","Judo","Athletics","Other"];
 
-// ── Shared design tokens (same as signin) ──────────────────────────────────
 const COLORS = {
   "--bg-page":        "#fafaf8",
   "--bg-card":        "#ffffff",
