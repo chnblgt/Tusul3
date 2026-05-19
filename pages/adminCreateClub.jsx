@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://backend3-production-27e7.up.railway.app";
 
 const fetchAPI = (url, options = {}) =>
   fetch(url, {
@@ -10,7 +10,7 @@ const fetchAPI = (url, options = {}) =>
     headers: { "ngrok-skip-browser-warning": "true", ...options.headers },
   });
 
-const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || "";
+const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || "admin123";
 
 const CATEGORIES = [
   "Football", "Basketball", "Volleyball", "Tennis", "Swimming",

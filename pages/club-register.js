@@ -345,8 +345,8 @@ export default function ClubRegisterPage() {
       }
       const response = await fetchAPI(`${API}/registerClub`, { method: "POST", body: fd });
       const result   = await response.json();
-      if (!response.ok) { setError(result.message || "Клуб бүртгэхэд алдаа гарлаа"); return; }
-      setSubmitted(true);
+      if (!response.ok) { setError(result.message || "..."); return; }
+      setSubmitted(true); 
     } catch {
       setError("Сервертэй холбогдож чадсангүй. Backend ажиллаж байгаа эсэхийг шалгана уу.");
     } finally { setLoading(false); }
