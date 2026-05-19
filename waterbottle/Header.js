@@ -269,7 +269,7 @@ export default function Header({ user = null }) {
           {/* Desktop Auth */}
           <div className="hdr-auth-desktop" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {/* Language toggle */}
-            <button
+            {/* <button
               onClick={toggleLang}
               style={{
                 fontFamily: "'DM Sans', sans-serif",
@@ -284,9 +284,9 @@ export default function Header({ user = null }) {
               onMouseEnter={e => { e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.borderColor = "var(--accent)"; }}
               onMouseLeave={e => { e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.borderColor = "var(--border-subtle)"; }}
               title={lang === "en" ? "Монгол хэл рүү" : "Switch to English"}
-            >
+            > 
               {lang === "en" ? "MN" : "EN"}
-            </button>
+            </button> */}
             {!loggedIn ? (
               <>
                 <Link href="/signin" className="hdr-ghost">Sign in</Link>
